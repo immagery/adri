@@ -5,9 +5,10 @@
 #include "grid3D.h"
 #include "Node.h"
 
-#include <Computation\GreenCoords.h>
-#include <Computation\HarmonicCoords.h>
-#include <Computation\MeanValueCoords.h>
+//TODELETE
+//#include <Computation\GreenCoords.h>
+//#include <Computation\HarmonicCoords.h>
+//#include <Computation\MeanValueCoords.h>
 
 #define DYN_CAGE_ID -1
 
