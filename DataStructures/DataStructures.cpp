@@ -18,7 +18,7 @@ void  buildCube(MyMesh& mesh, vcg::Point3d center, double radius) {
 
     MyMesh::VertexPointer ivp[12];
     MyMesh::VertexIterator vi=mesh.vert.begin();
-    unsigned int idx = 0;
+    //unsigned int idx = 0;
 
     ivp[0]=&*vi;(*vi).P()=MyMesh::CoordType ( -radius+center.X(), -radius+center.Y(),  radius+center.Z()); ++vi;
     ivp[1]=&*vi;(*vi).P()=MyMesh::CoordType (  radius+center.X(), -radius+center.Y(),  radius+center.Z()); ++vi;

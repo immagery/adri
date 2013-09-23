@@ -12,7 +12,7 @@ using namespace vcg;
 
 int findWeight(vector<weight>& weights, int label)
 {
-	for(int i = 0; i< weights.size(); i++)
+	for(unsigned int i = 0; i< weights.size(); i++)
 	{
 		if(weights[i].label == label)
 			return i;
@@ -132,7 +132,7 @@ void cellData::SaveToFile(ofstream& myfile)
 
 	labels.resize(influences.size());
 	weights.resize(influences.size());
-	for(int i = 0; i< influences.size(); i++)
+	for(unsigned int i = 0; i< influences.size(); i++)
 	{
 		labels[i] = influences[i].label;
 		weights[i] = influences[i].weightValue;
@@ -190,7 +190,7 @@ void cellData::LoadFromFile(ifstream& myfile)
 	if(size > 0)
 	{
 		influences.resize(size);
-		for(int i = 0; i< influences.size(); i++)
+		for(unsigned int i = 0; i< influences.size(); i++)
 		{
 			influences[i].label = al[i];
 			influences[i].weightValue = aw[i];
@@ -569,14 +569,14 @@ void grid3d::cleanZeroInfluences()
 					
 				// Eliminamos los pesos igual a 0
 				cellD->auxInfluences.clear();
-				for(int infl = 0; infl < cellD->influences.size(); infl++)
+				for(unsigned int infl = 0; infl < cellD->influences.size(); infl++)
 				{
 					if(cellD->influences[infl].weightValue != 0)
 						cellD->auxInfluences.push_back(cellD->influences[infl]);
 				}
 
 				cellD->influences.clear();
-				for(int infl = 0; infl < cellD->auxInfluences.size(); infl++)
+				for(unsigned int infl = 0; infl < cellD->auxInfluences.size(); infl++)
 				{
 					cellD->influences.push_back(cellD->auxInfluences[infl]);
 				}
@@ -602,7 +602,7 @@ void grid3d::normalizeWeightsByDomain()
 				cellData* cellD = cells[i][j][k]->data;
 
 				float childGain = 0;
-				for(int infl = 0; infl< cellD->auxInfluences.size(); infl++)
+				for(unsigned int infl = 0; infl< cellD->auxInfluences.size(); infl++)
 				{
 
 					if(cellD->auxInfluences[infl].weightValue < 0 ||
@@ -630,7 +630,7 @@ void grid3d::normalizeWeightsByDomain()
 						}
 					}
 
-					for(int infl = 0; infl< cellD->auxInfluences.size(); infl++)
+					for(unsigned int infl = 0; infl< cellD->auxInfluences.size(); infl++)
 					{
 						int l = cellD->auxInfluences[infl].label;
 						float w = cellD->auxInfluences[infl].weightValue;
@@ -669,7 +669,7 @@ void grid3d::normalizeWeightsByDomain()
 						}
 					}
 
-					for(int infl = 0; infl< cellD->auxInfluences.size(); infl++)
+					for(unsigned int infl = 0; infl< cellD->auxInfluences.size(); infl++)
 					{
 						int l = cellD->auxInfluences[infl].label;
 						float w = (cellD->auxInfluences[infl].weightValue/childGain)*cellD->domain;
@@ -1083,10 +1083,10 @@ int grid3d::typeCells(MyFace& face)
     Point3d aux = v1^v2;
     Point3d normal = aux^v1;
 
-    float v1Norm = v1.Norm();
-    float v2Norm = v2.Norm();
-    float v3Norm = v3.Norm();
-    float normalNorm = normal.Norm();
+    float v1Norm = (float)v1.Norm();
+    float v2Norm = (float)v2.Norm();
+    float v3Norm = (float)v3.Norm();
+    float normalNorm = (float)normal.Norm();
 
     Point3d v1Dir = v1/v1Norm;
     Point3d v2Dir = v2/v2Norm;

@@ -1,7 +1,7 @@
 #ifndef DATASTRUCTURES_H
 #define DATASTRUCTURES_H
 
-#define DIR_MODELS_FOR_TEST "I:/Chus/phd_dev/Data/models_for_test/"
+#define DIR_MODELS_FOR_TEST "C:/Users/chus/Documents/dev/Data/models/"
 
 #include <vcg/complex/complex.h>
 #include<vcg/complex/append.h>

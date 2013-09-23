@@ -26,7 +26,7 @@ public:
 	{
 		size = 0;
 		withDiagonal = true;
-		for(int i = 0; i< elements.size(); i++)
+		for(unsigned int i = 0; i< elements.size(); i++)
 			elements[i].clear();
 		elements.clear();
 	}
@@ -318,7 +318,7 @@ public:
 
 	~binding()
     {
-		for(int i = 0; i< bindedSkeletons.size(); i++)
+		for(unsigned int i = 0; i< bindedSkeletons.size(); i++)
 			delete bindedSkeletons[i];
 
         // Node definition data

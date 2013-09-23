@@ -18,7 +18,7 @@ void Modelo::cleanSpotVertexes()
 void Modelo::addSpotVertex(int i)
 {
 	//((GeometryRender*)shading)->spotVertex = i;
-	for(int b = 0; b < globalIndirection.size(); b++)
+	for(unsigned int b = 0; b < globalIndirection.size(); b++)
 		if(globalIndirection[b]== i)
 		{
 			((GeometryRender*)shading)->spotVertexes.push_back(globalIndirection[b]);
@@ -30,9 +30,9 @@ void Modelo::setSpotVertexes(vector<int>& indices)
 {
 	((GeometryRender*)shading)->spotVertexes.clear();
 	//((GeometryRender*)shading)->spotVertex = i;
-	for(int b = 0; b < globalIndirection.size(); b++)
+	for(unsigned int b = 0; b < globalIndirection.size(); b++)
 	{
-		for(int ind = 0; ind < indices.size(); ind++)
+		for(unsigned int ind = 0; ind < indices.size(); ind++)
 		{
 			if(globalIndirection[b]== indices[ind])
 			{
@@ -45,7 +45,7 @@ void Modelo::setSpotVertexes(vector<int>& indices)
 void Modelo::setSpotVertex(int i)
 {
 	//((GeometryRender*)shading)->spotVertex = i;
-	for(int b = 0; b < globalIndirection.size(); b++)
+	for(unsigned int b = 0; b < globalIndirection.size(); b++)
 		if(globalIndirection[b]== i)
 		{
 			((GeometryRender*)shading)->spotVertex = globalIndirection[b];
@@ -119,7 +119,7 @@ Modelo::~Modelo()
 	globalIndirection.clear();
 	embedding.clear();
 
-	for(int i = 0; i< bindings.size(); i++)
+	for(unsigned int i = 0; i< bindings.size(); i++)
 		delete bindings[i];
 }
 

@@ -66,7 +66,7 @@ void WriteEmbedding(std::string fileName, vector< vector<double> >& V, bool asci
 void ReadEmbedding(std::string fileName, vector< vector<double> >& V, bool ascii)
 {
 	//  Limpiamos los datos de entrada.
-	for(int i = 0; i <V.size(); i++) V[i].clear();
+	for(unsigned int i = 0; i <V.size(); i++) V[i].clear();
 	V.clear();
 
     FILE* fout = NULL;
@@ -114,7 +114,7 @@ double BiharmonicDistanceP2P_sorted(vector<double>& weights, vector<int>& weight
 	symMatrix& A = bd->BihDistances;
     
 	double qAp = 0;
-	for(int i = 0; i< weightsSort.size(); i++)
+	for(unsigned int i = 0; i< weightsSort.size(); i++)
 	{
 		if(weights[weightsSort[i]] < threshold)
 			break;

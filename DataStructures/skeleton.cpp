@@ -608,7 +608,7 @@ int proposeNodes(vector<skeleton*>& skts, vector< DefNode >& nodePoints)
  float GetMinSegmentLenght(float minLength, float cellSize)
  {
 	if(minLength > cellSize*3)
-		return minLength-0.01;
+		return minLength-(float)0.01;
 
 	else
 		return cellSize;
@@ -617,7 +617,7 @@ int proposeNodes(vector<skeleton*>& skts, vector< DefNode >& nodePoints)
  float getMinSkeletonSize(skeleton* skt)
  {
 	float minlength = -1;
-	for(int i = 0; i< skt->joints.size(); i++)
+	for(unsigned int i = 0; i< skt->joints.size(); i++)
 	{
 		if(skt->joints[i]->father)
 		{

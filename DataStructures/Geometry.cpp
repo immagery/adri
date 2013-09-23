@@ -50,7 +50,7 @@ void Geometry::freezeTransformations()
 {
     Matrix44d tm(tMatrix);
 
-	for(int vi = 0; vi < nodes.size(); vi++ )
+	for(unsigned int vi = 0; vi < nodes.size(); vi++ )
 		nodes[vi]->position = tm*nodes[vi]->position;
 
     loadIdentity();
@@ -172,7 +172,7 @@ bool Geometry::getBoundingBox(Point3d& minAuxPt,Point3d& maxAuxPt)
 	for(int i = 0; i< 3; i++)
 		minValue[i] = maxValue[i] = nodes[0]->position[i];
 
-	for(int i = 1; i< nodes.size(); i++)
+	for(unsigned int i = 1; i< nodes.size(); i++)
 	{
 		for(int j = 0; j< 3; j++)
 		{
@@ -189,7 +189,7 @@ bool Geometry::getBoundingBox(Point3d& minAuxPt,Point3d& maxAuxPt)
 void Geometry::computeFaceNormals()
 {
 	faceNormals.resize(triangles.size());
-	for(int i = 0; i < triangles.size(); i++)
+	for(unsigned int i = 0; i < triangles.size(); i++)
 	{
 		Point3d v1 = triangles[i]->verts[1]->position - triangles[i]->verts[0]->position;
 		Point3d v2 = triangles[i]->verts[2]->position - triangles[i]->verts[0]->position;
@@ -206,19 +206,19 @@ void Geometry::computeVertNormals()
 	vector<int> vertTriCounter;
 	vertTriCounter.resize(nodes.size(),0);
 
-	for(int i = 0; i < nodes.size();i++)
+	for(unsigned int i = 0; i < nodes.size();i++)
 		vertNormals[i] = Point3d(0,0,0);
 
-	for(int i = 0; i < triangles.size(); i++)
+	for(unsigned int i = 0; i < triangles.size(); i++)
 	{
-		for(int j = 0; j < triangles[i]->verts.size(); j++)
+		for(unsigned int j = 0; j < triangles[i]->verts.size(); j++)
 		{
 			vertTriCounter[triangles[i]->verts[j]->id]++;
 			vertNormals[triangles[i]->verts[j]->id] += faceNormals[i];
 		}
 	}
 
-	for(int i = 0; i < nodes.size();i++)
+	for(unsigned int i = 0; i < nodes.size();i++)
 		vertNormals[i] = (vertNormals[i]/vertTriCounter[i]).normalized();
 
 	//faceNormals.clear();
