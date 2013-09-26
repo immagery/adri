@@ -285,17 +285,24 @@ class TriangleData
 class binding
 {
 public:
-    binding()
-    {
+
+	void setDefaultValues()
+	{
         // Parameters
         smoothPropagationRatio = 1;
         worldScale = 1;
         minConfidenceLevel = -1;
         minTriangleArea = -1;
 		ntriangles = 0;
+		smoothingPasses = 3;
 
 		bindId = -1;
 
+		weightsCutThreshold = -10;
+	}
+
+    binding()
+    {
         // binded skeletons
         bindedSkeletons.clear();
 
@@ -311,9 +318,6 @@ public:
 		weightsRepresentative.clear();
 
 		cutThreshold.clear();
-
-		weightsCutThreshold = -10;
-
     }
 
 	~binding()
@@ -337,14 +341,8 @@ public:
 
 	binding(int points)
 	{
-        // Parameters
-        smoothPropagationRatio = 1;
-        worldScale = 1;
-        minConfidenceLevel = -1;
-        minTriangleArea = -1;
-		ntriangles = 0;
-
-		bindId = -1;
+        // Init default values
+        setDefaultValues();
 
         // binded skeletons
         bindedSkeletons.clear();
@@ -368,6 +366,8 @@ public:
     float smoothPropagationRatio;
     float worldScale;
     float minConfidenceLevel;
+
+	int smoothingPasses;
 
     float minTriangleArea;
 

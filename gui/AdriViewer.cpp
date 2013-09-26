@@ -20,8 +20,8 @@
 //#include <computation/HarmonicCoords.h>
 
 #include <utils/util.h>
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+//#include <mainwindow.h>
+//#include "ui_mainwindow.h"
 
 #include <DataStructures/Scene.h>
 #include <DataStructures/Cage.h>
