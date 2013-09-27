@@ -336,7 +336,7 @@ void saveBinding(binding* bd, string fileName)
 		{
 			int idInfl = bd->pointData[pt].influences[infl].label;
 			float inflValue = bd->pointData[pt].influences[infl].weightValue;
-			string inflName = "";
+			string inflName = "dummy";
 
 			joint* jt;
 			for(int skt = 0; skt< bd->bindedSkeletons.size(); skt++)
@@ -345,10 +345,14 @@ void saveBinding(binding* bd, string fileName)
 				if(jt) break;
 			}
 
-			if(jt)
-				inflName = jt->sName;
+			if(jt) inflName = jt->sName;
+			else
+			{
+				printf("Algo pasa con este indice: %d\n",idInfl);
+				fflush(0);
+			}
 
-			fprintf(fout, " %s %f", inflName, inflValue);
+			fprintf(fout, " %s %f", inflName.c_str(), inflValue);
 		}
 
 		fprintf(fout, "\n"); fflush(fout);
