@@ -323,6 +323,40 @@ void cleanZeroInfluences(binding* bd)
     }
 }
 
+void saveBinding(binding* bd, string fileName)
+{
+	std::printf("\nGuardando %s\n",fileName.c_str());
+	FILE* fout = fopen(fileName.c_str(), "w");
+
+	for(int pt = 0; pt< bd->pointData.size(); pt++)
+	{
+		fprintf(fout, "%d", pt);
+
+		for(int infl = 0; infl< bd->pointData[pt].influences.size(); infl++)
+		{
+			int idInfl = bd->pointData[pt].influences[infl].label;
+			float inflValue = bd->pointData[pt].influences[infl].weightValue;
+			string inflName = "";
+
+			joint* jt;
+			for(int skt = 0; skt< bd->bindedSkeletons.size(); skt++)
+			{
+				jt = bd->bindedSkeletons[skt]->jointRef[idInfl];
+				if(jt) break;
+			}
+
+			if(jt)
+				inflName = jt->sName;
+
+			fprintf(fout, " %s %f", inflName, inflValue);
+		}
+
+		fprintf(fout, "\n"); fflush(fout);
+	}
+
+	fclose(fout);
+}
+
 void normalizeWeightsByDomain(binding *bd)
 {
     for(int i = 0; i< bd->pointData.size(); i++)

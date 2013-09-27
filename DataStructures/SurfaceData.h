@@ -410,4 +410,6 @@ public:
 void normalizeWeightsByDomain(binding *bd);
 void cleanZeroInfluences(binding* bd);
 
+void saveBinding(binding* bd, string fileName);
+
 #endif // SURFACEDATA_H
