@@ -72,6 +72,8 @@ PointData::PointData()
     vertexContainer = false;
     itPass =-1;
 
+	secondInfluences.clear();
+
     confidenceLevel = 0;
 
     ownerLabel = -1;
@@ -106,6 +108,8 @@ PointData::PointData(const PointData& pd)
 	embedding.resize(pd.embedding.size());
 	for(int i = 0; i< pd.embedding.size(); i++)
 		embedding[i] = pd.embedding[i]; 
+
+	secondInfluences.clear();
 
 	vertexContainer = pd.vertexContainer;
     itPass =-1;
@@ -147,6 +151,8 @@ PointData::PointData(int weightsSize)
     ownerLabel = -1;
     confidenceLevel = 0;
 
+	secondInfluences.clear();
+
     component = -1;
     assigned = false;
     validated = false;
@@ -161,6 +167,7 @@ void PointData::clear()
 {
     auxInfluences.clear();
     influences.clear();
+	secondInfluences.clear();
 
     component = -1;
     assigned = false;

@@ -226,6 +226,9 @@ class PointData
     // Influences assigned to this cell
     vector<weight> influences;
 
+	// Influences assigned to this cell
+    vector<float> secondInfluences;
+
     float getDomain(int fatherId)
     {
         for(unsigned int i = 0; i< influences.size(); i++)
