@@ -4,6 +4,7 @@
 
 #ifdef WIN64
 #include <glew.h>
+#include <GL/glew.h>
 #endif
 
 #define VERBOSE false
@@ -20,7 +21,7 @@
 //#include <computation/HarmonicCoords.h>
 
 #include <utils/util.h>
-//#include <mainwindow.h>
+//#include "mainwindow.h"
 //#include "ui_mainwindow.h"
 
 #include <DataStructures/Scene.h>
@@ -77,7 +78,7 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
     showDeformedModel = false;
 
     // Transform
-    movX = movY = movZ = rotX = rotY = rotZ = 0;
+//    this->setAnimationPeriod(0);
 
     // Drawing flags.
 //    drawCage = true;
@@ -138,6 +139,8 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
 	interiorPoint = Point3d(0,0,0);
 
     //ctxMode = CTX_SELECTION;
+
+    frame = 0;
 }
 
  AdriViewer::~AdriViewer()
@@ -168,6 +171,7 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
     glDepthFunc(GL_LEQUAL);
 
     restoreStateFromFile();
+    setAnimationPeriod(4);
     startAnimation();
 
     //testScene();
@@ -397,6 +401,7 @@ void AdriViewer::readSkeleton(string fileName)
         //ReadEmbedding((newPath+sEmbeddingFile).toStdString(), m->embedding);
 
         modelDefFile.close();
+        escena->skinner->computeRestPositions(escena->skeletons);
     }
  }
 
