@@ -250,7 +250,15 @@ void JointRender::drawFunc(joint* jt)
     glPopMatrix();
 }
 
-void JointRender::computeWorldPos(joint* jt)
+void JointRender::computeRestPos(joint* jt) {
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	computeRestPosRec(jt);
+	glPopMatrix();
+}
+
+void JointRender::computeRestPosRec(joint* jt)
 {
     glPushMatrix();
 
@@ -268,9 +276,57 @@ void JointRender::computeWorldPos(joint* jt)
     glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
     jt->worldPosition = Point3d(modelview[12],modelview[13],modelview[14]);
 
+	Eigen::MatrixXf m(4,4);
+	m << modelview[0], modelview[1], modelview[2], modelview[3],
+		modelview[4], modelview[5], modelview[6], modelview[7],
+		modelview[8], modelview[9], modelview[10], modelview[11],
+		modelview[12], modelview[13], modelview[14], modelview[15];
+	jt->iT = m.inverse().transpose();
+
     for(unsigned int i = 0; i< jt->childs.size(); i++)
     {
-        jt->childs[i]->computeWorldPos();
+        computeRestPosRec(jt->childs[i]);
+    }
+
+    glPopMatrix();
+}
+
+void JointRender::computeWorldPos(joint* jt) {
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	glLoadIdentity();
+	computeWorldPosRec(jt);
+	glPopMatrix();
+}
+
+void JointRender::computeWorldPosRec(joint* jt)
+{
+    glPushMatrix();
+
+    glTranslated(jt->pos.X(),jt->pos.Y(),jt->pos.Z());
+
+    glRotatef((GLfloat)jt->orientJoint.Z(),0,0,1);
+    glRotatef((GLfloat)jt->orientJoint.Y(),0,1,0);
+    glRotatef((GLfloat)jt->orientJoint.X(),1,0,0);
+
+    glRotatef((GLfloat)jt->rot.Z(),0,0,1);
+    glRotatef((GLfloat)jt->rot.Y(),0,1,0);
+    glRotatef((GLfloat)jt->rot.X(),1,0,0);
+
+    GLdouble modelview[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
+    jt->worldPosition = Point3d(modelview[12],modelview[13],modelview[14]);
+
+	Eigen::MatrixXf m(4,4);
+	m << modelview[0], modelview[1], modelview[2], modelview[3],
+		modelview[4], modelview[5], modelview[6], modelview[7],
+		modelview[8], modelview[9], modelview[10], modelview[11],
+		modelview[12], modelview[13], modelview[14], modelview[15];
+	jt->W = m.transpose();
+
+    for(unsigned int i = 0; i< jt->childs.size(); i++)
+    {
+        computeWorldPosRec(jt->childs[i]);
     }
 
     glPopMatrix();

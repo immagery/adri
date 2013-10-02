@@ -5,6 +5,7 @@
 #include "Cage.h"
 #include "skeleton.h"
 #include "Modelo.h"
+#include "Skinning.h"
 
 // reservamos unos cuantos números para elementos especiales
 #define FIRST_NODE_ID 100
@@ -86,6 +87,7 @@ class scene
     public:
     scene()
     {
+		skinner = new Skinning();
         scene::sceneIds = FIRST_NODE_ID;
 		modelLoaded = false;
 		skeletonLoaded = false;
@@ -151,6 +153,22 @@ class scene
             ((skeleton*)(skeletons[i]))->select(false, -1);
     }
 
+	int findIdByName(string name) {
+		for (int i = 0; i < skeletons[0]->joints.size(); ++i) {
+			if (skeletons[0]->joints[i]->sName == name) return skeletons[0]->joints[i]->nodeId;
+		}
+		return -1;
+	}
+
+	string findNameById(int id) {
+				for (int i = 0; i < skeletons[0]->joints.size(); ++i) {
+			if (skeletons[0]->joints[i]->nodeId == id) return skeletons[0]->joints[i]->sName;
+		}
+		return "";
+	}
+
+	void loadBindingForModel(Modelo* m, string path);
+
 	//Models
     vector< object*   > models;
     vector< deformer* > deformers;
@@ -167,6 +185,9 @@ class scene
 	// Skeleton
 	map<int, joint*> deformerRef; // A reference to all the joints from id.
 	vector< skeleton* > skeletons;
+
+	// Skinning
+	Skinning* skinner;
 
 	procState state;
 

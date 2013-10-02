@@ -236,6 +236,11 @@ void joint::computeWorldPos()
 	*/
 }
 
+void joint::computeRestPos() {
+	//if(dirtyFlag) update();
+	((JointRender*)shading)->computeRestPos(this);
+}
+
 void joint::setJointOrientation(double ojX,double  ojY,double  ojZ)
 {
     orientJoint = Point3d(ojX, ojY, ojZ);

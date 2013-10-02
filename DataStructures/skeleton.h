@@ -3,11 +3,13 @@
 
 #include "Object.h"
 #include "DefNode.h"
+#include "Eigen/Dense"
 
 #include <vcg\math\quaternion.h>
 #include <map>
 
 class DefNode;
+
 
 // SKELETON
 class joint : public object
@@ -25,6 +27,9 @@ class joint : public object
 
 		vector< double > embedding;
 		vector< vector< double > > childVector;
+
+		Eigen::Matrix4f iT;
+		Eigen::Matrix4f W;
 
         float expansion;
 		float smoothness;
@@ -49,6 +54,7 @@ class joint : public object
                             int id);
 
         void computeWorldPos();
+		void computeRestPos();
 
         // GETTERS & SETTERS
         void setJointOrientation(double ojX,
