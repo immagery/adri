@@ -48,10 +48,8 @@ void Geometry::drawFunc()
 
 void Geometry::freezeTransformations()
 {
-    Matrix44d tm(tMatrix);
-
 	for(unsigned int vi = 0; vi < nodes.size(); vi++ )
-		nodes[vi]->position = tm*nodes[vi]->position;
+		nodes[vi]->position = tMatrix*nodes[vi]->position;
 
     loadIdentity();
 }
@@ -188,7 +186,8 @@ bool Geometry::getBoundingBox(Point3d& minAuxPt,Point3d& maxAuxPt)
 
 void Geometry::computeFaceNormals()
 {
-	faceNormals.resize(triangles.size());
+	int trianglesSize = triangles.size();
+	faceNormals.resize(trianglesSize);
 	for(unsigned int i = 0; i < triangles.size(); i++)
 	{
 		Point3d v1 = triangles[i]->verts[1]->position - triangles[i]->verts[0]->position;

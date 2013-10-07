@@ -19,6 +19,7 @@ public:
 		boneId = -1;
 		nodeId = -1;
 		rootBoneId = -1;
+		childBoneId = -1;
 
 		ratio = -1;
 		expansion = 1;
@@ -32,6 +33,7 @@ public:
 		boneId = id;
 		nodeId = -1;
 		rootBoneId = -1;
+		childBoneId = -1;
 
 		ratio = -1;
 		expansion = 1;
@@ -44,6 +46,8 @@ public:
 	{
 		boneId = id;
 		nodeId = -1;
+		rootBoneId = -1;
+		childBoneId = -1;
 
 		ratio = -1;
 		expansion = 1;
@@ -57,6 +61,7 @@ public:
 		boneId = def_orig.boneId;
 		nodeId = def_orig.nodeId;
 		rootBoneId = def_orig.rootBoneId;
+		childBoneId = def_orig.childBoneId;
 
 		ratio = def_orig.ratio;
 		expansion = def_orig.expansion;
@@ -68,6 +73,8 @@ public:
 	int boneId; // Who is my parent?
 	int nodeId;
 	int rootBoneId;
+
+	int childBoneId;
 
 	float ratio; // position over the bone (for blending through the bone)
 	float expansion; // influence expansion (for segmentation)

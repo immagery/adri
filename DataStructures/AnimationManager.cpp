@@ -1,9 +1,9 @@
 #include "AnimationManager.h"
 #include <fstream>
-#include <qfile.h>
-#include <qtextstream.h>
-#include <qstringlist.h>
-#include <qregexp.h>
+#include <QtCore/qfile.h>
+#include <QtCore/qtextstream.h>
+#include <QtCore/qstringlist.h>
+#include <QtCore/qregexp.h>
 
 
 AnimationManager::AnimationManager() {

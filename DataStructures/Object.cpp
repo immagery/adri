@@ -5,7 +5,8 @@ using namespace vcg;
 object::object() : node()
 {
     pos = Point3d(0,0,0);
-    rot = Point3d(0,0,0);
+    //rot = Point3d(0,0,0);
+	qrot = Quaternion<double>(1,0,0,0);
 
     shading = new shadingNode();
 
@@ -17,7 +18,8 @@ object::object() : node()
 object::object(unsigned int id) : node(id)
 {
     pos = Point3d(0,0,0);
-    rot = Point3d(0,0,0);
+    //rot = Point3d(0,0,0);
+	qrot = Quaternion<double>(1,0,0,0);
 
     shading = new shadingNode(id+1);
 
@@ -29,7 +31,8 @@ object::object(unsigned int id) : node(id)
 object::object(vcg::Point3d _pos) : node()
 {
     pos = Point3d(_pos);
-    rot = Point3d(0,0,0);
+    //rot = Point3d(0,0,0);
+	qrot = Quaternion<double>(1,0,0,0);
 
     shading = new shadingNode();
 
@@ -38,10 +41,26 @@ object::object(vcg::Point3d _pos) : node()
     dirtyFlag = false;
 }
 
+/*
 object::object(vcg::Point3d _pos, vcg::Point3d _rot) : node()
 {
     pos = Point3d(_pos);
-    rot = Point3d(_rot);
+    //rot = Point3d(_rot);
+	qrot = Quaternion<double>(_qrot);
+
+    shading = new shadingNode();
+
+    loadIdentity();
+
+    dirtyFlag = false;
+}
+*/
+
+object::object(vcg::Point3d _pos, vcg::Quaternion<double> _qrot) : node()
+{
+    pos = Point3d(_pos);
+    //rot = Point3d(_rot);
+	qrot = Quaternion<double>(_qrot);
 
     shading = new shadingNode();
 
@@ -53,7 +72,8 @@ object::object(vcg::Point3d _pos, vcg::Point3d _rot) : node()
 void object::resetTransformation()
 {
     pos = Point3d(0,0,0);
-    rot = Point3d(0,0,0);
+    //rot = Point3d(0,0,0);
+	qrot = Quaternion<double>(1,0,0,0);
     dirtyFlag = true;
 }
 
@@ -67,7 +87,10 @@ void object::addTranslation(double tx, double ty, double tz)
 void object::addRotation(double rx, double ry, double rz)
 {
     // Aplicar la rotación, creo que hay que hacerlo con una multiplicacion.
-    rot += Point3d(rx, ry, rz);
+	Quaternion<double> qAux;
+	qAux.FromEulerAngles(rx, ry, rz);
+	qrot += qAux;
+	//rot += Point3d(rx, ry, rz);
     dirtyFlag = true;
 }
 
@@ -79,13 +102,16 @@ bool object::propagateDirtyness()
 
 void object::loadIdentity()
 {
-    for(int i = 0; i< 16; i++)
+    for(int i = 0; i< 4; i++)
     {
-        if(i % 5 == 0)
-            tMatrix[i] = 1;
-        else
-            tMatrix[i] = 0;
-    }
+		for(int j = 0; j< 4; j++)
+		{
+			if(i == j)
+				tMatrix[i][j] = 1;
+			else
+				tMatrix[i][j] = 0;
+		}
+	}
 }
 
 void object::select(bool bToogle, unsigned int id)

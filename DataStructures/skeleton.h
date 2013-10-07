@@ -3,7 +3,7 @@
 
 #include "Object.h"
 #include "DefNode.h"
-#include "Eigen/Dense"
+#include <Eigen/Dense>
 
 #include <vcg\math\quaternion.h>
 #include <map>
@@ -21,7 +21,7 @@ class joint : public object
         vector< DefNode* > nodes;
         Point3d orientJoint;
 
-		Quaternion<double> orient;
+		//Quaternion<double> qrot;
 
 		int deformerId;
 

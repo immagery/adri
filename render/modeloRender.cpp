@@ -2,12 +2,12 @@
 #include "ModeloRender.h"
 #include "ShadingNode.h"
 
-#include <vcg/complex/allocate.h>
-#include <vcg/complex/algorithms/update/normal.h>
-#include <vcg/complex/algorithms/update/bounding.h>
+//#include <vcg/complex/allocate.h>
+//#include <vcg/complex/algorithms/update/normal.h>
+//#include <vcg/complex/algorithms/update/bounding.h>
 
-#include <wrap/io_trimesh/import.h>
-#include <wrap/io_trimesh/export.h>
+//#include <wrap/io_trimesh/import.h>
+//#include <wrap/io_trimesh/export.h>
 #include "wrap/gl/trimesh.h"
 
 #include <DataStructures/Modelo.h> 

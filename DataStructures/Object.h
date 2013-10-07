@@ -16,16 +16,21 @@ class object : public node
 
 public:
     Point3d pos;
-    Point3d rot;
+    //Point3d rot;
+	Quaternion<double> qrot;
 
-    double tMatrix[16];
+	Matrix44d tMatrix;
+
+    //double tMatrix[16];
 
     shadingNode* shading;
 
     object();
     object(unsigned int id);
     object(vcg::Point3d _pos);
-    object(vcg::Point3d _pos, vcg::Point3d _rot);
+
+	object(vcg::Point3d _pos, vcg::Quaternion<double> _qrot);
+    //object(vcg::Point3d _pos, vcg::Point3d _rot);
 
     // transformation functions
     void resetTransformation();

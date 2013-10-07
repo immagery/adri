@@ -518,6 +518,7 @@ int subdivideBone(joint* parent, joint* child,
 		nodePoints.push_back(DefNode(newOrigen+(dir*newSubdivLength*i),boneId));
 		nodePoints.back().nodeId = scene::getNewId();
 		nodePoints.back().ratio = (float)i/(float)numDivisions;
+		nodePoints.back().childBoneId = child->nodeId;
 
 		// Expansion propagation
 		float expValue = parent->expansion;

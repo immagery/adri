@@ -15,6 +15,7 @@
 
 #include "AdriViewer.h"
 
+#include <DataStructures/Scene.h>
 //TODELETE
 //#include <computation/GreenCoords.h>
 //#include <computation/HarmonicCoords.h>
@@ -39,7 +40,7 @@
 
 //#include <Eigen/Dense>
 
-#include <vcg/simplex/face/jumping_pos.h>
+//#include <vcg/simplex/face/jumping_pos.h>
 
 #include <iostream>
 #include <fstream>
@@ -1050,4 +1051,86 @@ void AdriViewer::endSelection(const QPoint&)
      QGLViewer::mouseReleaseEvent(e);
  }
 
+ void AdriViewer::ChangeStillCage(int id)
+{
+    //stillCageSelected = parent->ui->cagesComboBox->itemData(id).toInt();
+}
 
+void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
+{
+    // TODO
+    /*
+    MyMesh::VertexIterator vi;
+    for(vi = cage.vert.begin(); vi!=cage.vert.end(); ++vi )
+    {
+        DrawObject* o = new DrawObject();
+        o->frame.setPosition(Vec(vi->P()[0], vi->P()[1], vi->P()[2])); // Posicion
+        o->id = vi->IMark(); // id
+        objects_.append(o);
+    }
+    */
+}
+
+
+ void AdriViewer::loadSelectVertexCombo(MyMesh& cage)
+ {
+     //QString vertName("Vertice %1");
+     //parent->ui->selectElementComboLabel->setText("Vertices de la caja");
+
+     //MyMesh::VertexIterator vi;
+     //int idx = 0;
+     //for(vi = cage.vert.begin(); vi!=cage.vert.end(); ++vi )
+     //    parent->ui->selectElementCombo->addItem(vertName.arg(idx), QVariant(idx++));
+
+     //connect(parent->ui->selectElementCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeVertexSelection(int)));
+ }
+
+ void AdriViewer::changeVertexSelection(int id)
+ {
+	
+	//influenceDrawingIdx = parent->ui->selectElementCombo->itemData(id).toInt();
+    //updateGL();
+ }
+
+
+ void AdriViewer::changeVisualizationMode(int mode)
+{
+    escena->iVisMode = mode;
+    // TOFIX
+}
+
+ void AdriViewer::UpdateVertexSource(int id)
+{
+    escena->desiredVertex = id;
+    //paintModelWithData();   // TODO paint model
+    //paintPlaneWithData();
+
+    //updateGridRender();
+
+    //TODO
+    /*
+   double vmin = 9999999, vmax = -9999999;
+   for(int i = 0; i < m.modeloOriginal.vn; i++)
+   {
+       vmin = min(BHD_distancias[i][id], vmin);
+       vmax = max(BHD_distancias[i][id], vmax);
+   }
+
+   printf("Distancias-> max:%f min:%f\n", vmax, vmin); fflush(0);
+
+   vertexColors.resize(m.modeloOriginal.vn);
+   for(int i = 0; i < m.modeloOriginal.vn; i++)
+   {
+       vertexColors[i] = GetColour(BHD_distancias[i][id], vmin, vmax);
+   }
+
+   colorsLoaded = true;
+
+   updateGL();
+   */
+}
+
+ void AdriViewer::doTests(string fileName, string name, string path) 
+ {
+ 
+ }
