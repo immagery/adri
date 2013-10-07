@@ -37,6 +37,8 @@ enum viewingModes { DynCage_Mode = 0, Cages_Mode, BHD_Mode, SimpleModel_Mode};
 
 enum shadingModes { SH_MODE_FLAT = 0, SH_MODE_SMOOTH};
 
+class AdriMainWindow;
+
 class AdriViewer : public QGLViewer
 {
     Q_OBJECT
@@ -160,7 +162,7 @@ public:
 
     bool updateInfo();
 
-    MainWindow *parent;
+    AdriMainWindow *parent;
 protected:
     virtual void drawWithNames();
 //    virtual void postSelection(const QPoint& point);
@@ -181,6 +183,15 @@ protected:
 
 
 public slots:
+
+	void changeVisualizationMode(int mode);
+	void UpdateVertexSource(int id);
+	void ChangeStillCage(int id);
+	void loadSelectableVertex(Cage* cage);
+	void loadSelectVertexCombo(MyMesh& cage);
+	void changeVertexSelection(int id);
+
+	void doTests(string fileName, string name, string path);
 
     // GENERAL
     //void ChangeSliceXZ(int slice);

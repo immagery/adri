@@ -223,9 +223,13 @@ void JointRender::drawFunc(joint* jt)
     glRotatef((GLfloat)jt->orientJoint.Y(),0,1,0);
     glRotatef((GLfloat)jt->orientJoint.X(),1,0,0);
 
-    glRotatef((GLfloat)jt->rot.Z(),0,0,1);
-    glRotatef((GLfloat)jt->rot.Y(),0,1,0);
-    glRotatef((GLfloat)jt->rot.X(),1,0,0);
+
+	double alpha, beta, gamma;
+	jt->qrot.ToEulerAngles(alpha, beta, gamma);
+
+    glRotatef((GLfloat)gamma,0,0,1);
+    glRotatef((GLfloat)beta,0,1,0);
+    glRotatef((GLfloat)alpha,1,0,0);
 
     // Pintamos un tri-círculo
     if(selected)
@@ -268,9 +272,16 @@ void JointRender::computeRestPosRec(joint* jt)
     glRotatef((GLfloat)jt->orientJoint.Y(),0,1,0);
     glRotatef((GLfloat)jt->orientJoint.X(),1,0,0);
 
-    glRotatef((GLfloat)jt->rot.Z(),0,0,1);
-    glRotatef((GLfloat)jt->rot.Y(),0,1,0);
-    glRotatef((GLfloat)jt->rot.X(),1,0,0);
+	double alpha, beta, gamma;
+	jt->qrot.ToEulerAngles(alpha, beta, gamma);
+
+    glRotatef((GLfloat)gamma,0,0,1);
+    glRotatef((GLfloat)beta,0,1,0);
+    glRotatef((GLfloat)alpha,1,0,0);
+
+    //glRotatef((GLfloat)jt->rot.Z(),0,0,1);
+    //glRotatef((GLfloat)jt->rot.Y(),0,1,0);
+    //glRotatef((GLfloat)jt->rot.X(),1,0,0);
 
     GLdouble modelview[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
@@ -309,9 +320,16 @@ void JointRender::computeWorldPosRec(joint* jt)
     glRotatef((GLfloat)jt->orientJoint.Y(),0,1,0);
     glRotatef((GLfloat)jt->orientJoint.X(),1,0,0);
 
-    glRotatef((GLfloat)jt->rot.Z(),0,0,1);
-    glRotatef((GLfloat)jt->rot.Y(),0,1,0);
-    glRotatef((GLfloat)jt->rot.X(),1,0,0);
+	double alpha, beta, gamma;
+	jt->qrot.ToEulerAngles(alpha, beta, gamma);
+
+    glRotatef((GLfloat)gamma,0,0,1);
+    glRotatef((GLfloat)beta,0,1,0);
+    glRotatef((GLfloat)alpha,1,0,0);
+	
+	//glRotatef((GLfloat)jt->rot.Z(),0,0,1);
+    //glRotatef((GLfloat)jt->rot.Y(),0,1,0);
+    //glRotatef((GLfloat)jt->rot.X(),1,0,0);
 
     GLdouble modelview[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
