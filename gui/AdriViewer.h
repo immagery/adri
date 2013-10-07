@@ -16,6 +16,7 @@
 #include "DataStructures/Object.h"
 #include "DataStructures/skeleton.h"
 #include "DataStructures/Modelo.h"
+#include "DataStructures/AnimationManager.h"
 
 #include "SelectionManager.h"
 
@@ -119,8 +120,9 @@ public:
     MyMesh littleCube;
 
     // Transform
-    int rotX, rotY, rotZ;
-    int movX, movY, movZ;
+    // Animation
+    AnimationManager aniManager;
+    int frame;
 
     //vector< object*> modelos; // Todos los objetos que tendremos en la escena
     scene* escena; // Escena con jerarquía
@@ -260,6 +262,7 @@ public slots:
 signals:
     void updateSceneView();
     void jointDataShow(float, int);
+    void changedFrame(int);
 
 private :
   void startManipulation();

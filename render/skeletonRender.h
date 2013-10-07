@@ -26,6 +26,9 @@ class JointRender : public shadingNode
 
         void drawFunc(joint* jt);
 		void computeWorldPos(joint* jt);
+		void computeWorldPosRec(joint* jt);
+		void computeRestPos(joint* jt);
+		void computeRestPosRec(joint* jt);
 };
 
 

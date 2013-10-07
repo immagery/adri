@@ -3,7 +3,7 @@
 #endif
 
 #ifdef WIN64
-#include <glew.h>
+#include <GL/glew.h>
 #endif
 
 #define VERBOSE false
@@ -20,7 +20,7 @@
 //#include <computation/HarmonicCoords.h>
 
 #include <utils/util.h>
-//#include <mainwindow.h>
+//#include "mainwindow.h"
 //#include "ui_mainwindow.h"
 
 #include <DataStructures/Scene.h>
@@ -77,7 +77,7 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
     showDeformedModel = false;
 
     // Transform
-    movX = movY = movZ = rotX = rotY = rotZ = 0;
+//    this->setAnimationPeriod(0);
 
     // Drawing flags.
 //    drawCage = true;
@@ -138,6 +138,8 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
 	interiorPoint = Point3d(0,0,0);
 
     //ctxMode = CTX_SELECTION;
+
+    frame = 0;
 }
 
  AdriViewer::~AdriViewer()
@@ -168,6 +170,7 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
     glDepthFunc(GL_LEQUAL);
 
     restoreStateFromFile();
+    setAnimationPeriod(4);
     startAnimation();
 
     //testScene();
@@ -395,8 +398,12 @@ void AdriViewer::readSkeleton(string fileName)
 
         // Leer embedding
         //ReadEmbedding((newPath+sEmbeddingFile).toStdString(), m->embedding);
-
+		
         modelDefFile.close();
+		QString path = (sGlobalPath.append(sPath).append("binding.txt"));
+		string spath = path.toStdString();
+		escena->loadBindingForModel(m,(newPath.append("binding.txt").toStdString()));
+        escena->skinner->computeRestPositions(escena->skeletons);
     }
  }
 
@@ -722,6 +729,9 @@ void AdriViewer::readSkeleton(string fileName)
         glShadeModel(GL_SMOOTH);
      else if(ShadingModeFlag == SH_MODE_FLAT)
         glShadeModel(GL_FLAT);
+
+	 // Skinning y solvers
+	 escena->skinner->computeDeformations(escena->skeletons);
 
      /*
      for(unsigned int i = 0; i< escena->shaders.size(); i++)

@@ -49,3 +49,34 @@ void scene::setGlobalSmoothness(float globalSmooth)
 	*/
 }
 
+void scene::loadBindingForModel(Modelo* m, string path) {
+	// Copiar el modelo para tener una "copia deformable"
+	Modelo* m2 = new Modelo(getNewId());
+	models.push_back(m2);
+
+	// Copiar vertices
+	m2->nodes.resize(m->nodes.size());
+	for (int i = 0; i < m2->nodes.size(); ++i) {
+		m2->nodes[i] = new GraphNode(i);
+		m2->nodes[i]->position = m->nodes[i]->position;
+		m2->nodes[i]->connections.resize(m->nodes[i]->connections.size());
+		for (int j = 0; j < m2->nodes[i]->connections.size(); ++j) {
+			m2->nodes[i]->connections[j] = m->nodes[i]->connections[j];
+		}
+	}
+
+	// Copiar caras
+	m2->triangles.resize(m->triangles.size());
+	for (int i = 0; i < m2->triangles.size(); ++i) {
+		m2->triangles[i] = new GraphNodePolygon(i);
+		m2->triangles[i]->verts.resize(m->triangles[i]->verts.size());
+		for (int j = 0; j < m2->triangles[i]->verts.size(); ++j) {
+			m2->triangles[i]->verts[j] = m->triangles[i]->verts[j];
+		}
+	}
+
+	m2->shading->visible = true;
+	m2->computeNormals();
+	skinner->loadBindingForModel(m,m2,path, skeletons);
+}
+
