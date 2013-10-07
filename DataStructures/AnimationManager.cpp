@@ -8,6 +8,7 @@
 
 AnimationManager::AnimationManager() {
     animationEnabled = false;
+	simulationEnabled = false;
 }
 
 bool AnimationManager::objectHasAnimation (int id) {
