@@ -11,6 +11,7 @@ class AnimationManager
 public:
 
     bool animationEnabled;
+	bool simulationEnabled;
     map<int, Animation> animations;		// maps from joint ID to animation
 
     AnimationManager();

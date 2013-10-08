@@ -1,13 +1,11 @@
 #include "AnimationManager.h"
 #include <fstream>
-#include <QtCore/qfile.h>
-#include <QtCore/qtextstream.h>
-#include <QtCore/qstringlist.h>
-#include <QtCore/qregexp.h>
+#include <sstream>
 
 
 AnimationManager::AnimationManager() {
     animationEnabled = false;
+	simulationEnabled = false;
 }
 
 bool AnimationManager::objectHasAnimation (int id) {
@@ -54,37 +52,27 @@ void AnimationManager::saveAnimation(string path, scene* escena) {
 }
 
 void AnimationManager::loadAnimations(string path, scene* escena){
-	QFile file(path.c_str());
-	if (!file.exists()) return;
-	file.open(QFile::ReadOnly);
-    QTextStream in(&file);
-    QString line;
+	ifstream file(path.c_str(), ios::in);
+	if (!file.is_open()) return;
+	string line;
 
 	bool first = true;
 	int currentID, keyframe;
 	Animation a;
 
-    while (!in.atEnd()) {
-        line = in.readLine();
-		if (line.toStdString() == "###") {
+	while (file.good()) {
+        getline(file,line);
+		if (line == "###") {
 			if (!first) animations[currentID] = a;
 			else first = false;
-			line = in.readLine();
-			currentID = escena->findIdByName(line.toStdString());
+			getline(file,line);
+			currentID = escena->findIdByName(line);
 			continue;
 		}
         
-		QStringList list = line.split(QRegExp(" "));
-		keyframe = list.at(0).toInt();
-		int tx = list.at(1).toInt();
-		int ty = list.at(2).toInt();
-		int tz = list.at(3).toInt();
-		int rx = list.at(4).toInt();
-		int ry = list.at(5).toInt();
-		int rz = list.at(6).toInt();
-		int sx = list.at(7).toInt();
-		int sy = list.at(8).toInt();
-		int sz = list.at(9).toInt();
+		stringstream ss(line);
+		int tx, ty, tz, rx, ry, rz, sx, sy, sz;
+		ss >> tx >> ty >> tz >> rx >> ry >> rz >> sx >> sy >> sz;
 		a.addTransform(keyframe,tx,ty,tz,rx,ry,rz,sx,sy,sz);
 		
     }

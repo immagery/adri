@@ -22,6 +22,8 @@
 
 #include "DrawObject.h"
 
+//#include "Particles.h"
+
 #define INFO_STRING "Info > %1"
 
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
@@ -125,6 +127,7 @@ public:
     // Animation
     AnimationManager aniManager;
     int frame;
+	//Particles* particles;
 
     //vector< object*> modelos; // Todos los objetos que tendremos en la escena
     scene* escena; // Escena con jerarquía

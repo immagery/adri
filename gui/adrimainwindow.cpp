@@ -94,7 +94,6 @@ AdriMainWindow::AdriMainWindow(QWidget *parent) :
 
     connect(ui->exportWeights_btn, SIGNAL(released()), ui->glCustomWidget, SLOT(exportWeightsToMaya()));
 
-    connect(ui->expansionSlider, SIGNAL(sliderReleased()), this, SLOT(changeExpansionSlider()));
     connect(ui->expansionSlider, SIGNAL(valueChanged(int)), this, SLOT(updateExpansionSlidervalue(int)));
 
 	connect(ui->thresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(updateThresholdSlidervalue(int)));
@@ -104,9 +103,9 @@ AdriMainWindow::AdriMainWindow(QWidget *parent) :
     connect(ui->smoothPropagationSlider, SIGNAL(sliderReleased()), this, SLOT(changeSmoothSlider()));
     connect(ui->smoothPropagationSlider, SIGNAL(valueChanged(int)), this, SLOT(updateSmoothSlidervalue(int)));
 
-	connect(ui->smoothingPasses, SIGNAL(valueChanged(int)), this, SLOT(changeSmoothingPasses(int)));
+	//connect(ui->smoothingPasses, SIGNAL(valueChanged(int)), this, SLOT(changeSmoothingPasses(int)));
 
-	connect(ui->auxValueInt, SIGNAL(valueChanged(int)), this, SLOT(changeAuxValueInt(int)));
+	//connect(ui->auxValueInt, SIGNAL(valueChanged(int)), this, SLOT(changeAuxValueInt(int)));
 
     connect(ui->glCustomWidget, SIGNAL(jointDataShow(float, int)), this , SLOT(jointDataUpdate(float,int)));
 
@@ -125,6 +124,23 @@ AdriMainWindow::AdriMainWindow(QWidget *parent) :
 	
 	connect(ui->dataSource, SIGNAL(valueChanged(int)), this, SLOT(distancesSourceValueChange(int)));
 	connect(ui->positionPlaneSlider, SIGNAL(sliderMoved(int)), this, SLOT(changeSelPointForPlane(int)));
+
+	// Transform
+    connect(ui->rotationAmountX, SIGNAL(valueChanged(int)), this, SLOT(changeTransformRotateAmountX(int)));
+    connect(ui->rotationAmountY, SIGNAL(valueChanged(int)), this, SLOT(changeTransformRotateAmountY(int)));
+    connect(ui->rotationAmountZ, SIGNAL(valueChanged(int)), this, SLOT(changeTransformRotateAmountZ(int)));
+    connect(ui->resetRotation, SIGNAL(clicked()), this, SLOT(resetRotationValues()));
+
+    // Animation
+    connect(ui->addKeyframe, SIGNAL(clicked()), this, SLOT(addAnimationKeyframe()));
+    connect(ui->toggleAnim, SIGNAL(clicked()), this, SLOT(toggleAnimation()));
+    connect(ui->animSlider, SIGNAL(valueChanged(int)), this, SLOT(changeFrame(int)));
+    connect(ui->glCustomWidget, SIGNAL(changedFrame(int)), this, SLOT(changeAnimSlider(int)));
+	connect(ui->saveAnim, SIGNAL(clicked()), this, SLOT(saveAnimation()));
+	connect(ui->loadAnim, SIGNAL(clicked()), this, SLOT(loadAnimation()));
+
+	// Simulation
+	connect(ui->toggleSim, SIGNAL(clicked()), this, SLOT(toggleSimulation()));
 }
 
 
@@ -590,5 +606,159 @@ void AdriMainWindow::keyPressEvent(QKeyEvent* event)
     default:
         break;
     }
+}
+
+void AdriMainWindow::changeTransformRotateAmountX(int) {
+
+    object *selectedObject = NULL;
+    if (ui->glCustomWidget->selMgr.selection.size() > 0)
+        selectedObject = ui->glCustomWidget->selMgr.selection.back();
+
+    if (selectedObject != NULL)
+        selectedObject->pos.X() = ui->rotationAmountX->value()/10.0;
+
+	//ui->glCustomWidget->particles->xvalue = ui->rotationAmountX->value()/10.0;
+
+    QString msg = QString::number(ui->rotationAmountX->value());
+    ui->rotationEditX->setText(msg);
+
+}
+
+void AdriMainWindow::changeTransformRotateAmountY(int) {
+    object *selectedObject = NULL;
+    if (ui->glCustomWidget->selMgr.selection.size() > 0)
+        selectedObject = ui->glCustomWidget->selMgr.selection.back();
+
+    //if (selectedObject != NULL)
+        //selectedObject->rot.Y() = ui->rotationAmountY->value();
+
+    QString msg = QString::number(ui->rotationAmountY->value());
+    ui->rotationEditY->setText(msg);
+
+
+}
+
+void AdriMainWindow::changeTransformRotateAmountZ(int) {
+    object *selectedObject = NULL;
+    if (ui->glCustomWidget->selMgr.selection.size() > 0)
+        selectedObject = ui->glCustomWidget->selMgr.selection.back();
+
+    //if (selectedObject != NULL)
+        //selectedObject->rot.Z() = ui->rotationAmountZ->value();
+
+    QString msg = QString::number(ui->rotationAmountZ->value());
+    ui->rotationEditZ->setText(msg);
+
+}
+
+void AdriMainWindow::resetRotationValues() {
+    object *selectedObject = NULL;
+
+    if (ui->glCustomWidget->selMgr.selection.size() > 0)
+        selectedObject = ui->glCustomWidget->selMgr.selection.back();
+
+
+    //if (selectedObject != NULL) selectedObject->rot.SetZero();
+    ui->rotationAmountX->setValue(0);
+    ui->rotationAmountY->setValue(0);
+    ui->rotationAmountZ->setValue(0);
+
+}
+
+void AdriMainWindow::addAnimationKeyframe() {
+
+
+    object *selectedObject = NULL;
+    if (ui->glCustomWidget->selMgr.selection.size() > 0)
+        selectedObject = ui->glCustomWidget->selMgr.selection.back();
+
+    if (selectedObject == NULL) return;
+
+    int id = selectedObject->nodeId;
+    int frame = ui->animSlider->value();
+    AdriViewer * viewer = ui->glCustomWidget;
+    if (!viewer->aniManager.objectHasAnimation(id)) viewer->aniManager.addAnimation(id);
+    viewer->aniManager.addKeyFrame(id, frame, 0, 0, 0,
+                                ui->rotationAmountX->value(),
+                                ui->rotationAmountY->value(),
+                                ui->rotationAmountZ->value(),
+                                0, 0, 0);
+
+	ui->kfBar->addKeyframe(frame, 150);
+}
+
+void AdriMainWindow::toggleAnimation() {
+    ui->glCustomWidget->aniManager.animationEnabled = !ui->glCustomWidget->aniManager.animationEnabled;
+	if (ui->glCustomWidget->aniManager.animationEnabled) ui->toggleSim->setEnabled(false);
+	else ui->toggleSim->setEnabled(true);
+}
+
+void AdriMainWindow::toggleSimulation() {
+    ui->glCustomWidget->aniManager.simulationEnabled = !ui->glCustomWidget->aniManager.simulationEnabled;
+	if (ui->glCustomWidget->aniManager.simulationEnabled) ui->toggleAnim->setEnabled(false);
+	else ui->toggleAnim->setEnabled(true);
+}
+
+void AdriMainWindow::changeFrame(int frame) {
+    // Change the frame label to its correct value
+    QString msg = QString::number(frame);
+    ui->frameLabel->setText(msg);
+
+    // Tell animManager to load that frame info
+    ui->glCustomWidget->frame = frame;
+
+    // Update UI values accordingly
+    for (unsigned int i = 0; i < ui->glCustomWidget->escena->skeletons.size(); ++i) {
+        skeleton* skt = ((skeleton*) ui->glCustomWidget->escena->skeletons[i]);
+        for (unsigned int j = 0; j < skt->joints.size(); ++j) {
+            if (ui->glCustomWidget->aniManager.objectHasAnimation(skt->joints[j]->nodeId)) {
+                object * joint = (object *)skt->joints[j];
+                //joint->rot = ui->glCustomWidget->aniManager.getRotation(skt->joints[j]->nodeId, frame);
+
+                ui->rotationAmountX->blockSignals(true);
+                //ui->rotationAmountX->setValue(joint->rot.X());
+                //ui->rotationEditX->setText(QString("%1").arg(joint->rot.X(), 3, 'g', 3));
+                ui->rotationAmountX->blockSignals(false);
+
+                ui->rotationAmountY->blockSignals(true);
+                //ui->rotationAmountY->setValue(joint->rot.Y());
+                //ui->rotationEditY->setText(QString("%1").arg(joint->rot.Y(), 3, 'g', 3));
+                ui->rotationAmountY->blockSignals(false);
+
+                ui->rotationAmountZ->blockSignals(true);
+                //ui->rotationAmountZ->setValue(joint->rot.Z());
+                //ui->rotationEditZ->setText(QString("%1").arg(joint->rot.Z(), 3, 'g', 3));
+                ui->rotationAmountZ->blockSignals(false);
+
+            }
+        }
+    }
+}
+
+void AdriMainWindow::changeAnimSlider(int val) {
+    ui->animSlider->setValue(val);
+}
+
+void AdriMainWindow::saveAnimation() {
+	string path = ui->glCustomWidget->sPathGlobal.toStdString();
+	ui->glCustomWidget->aniManager.saveAnimation("../models/animation.txt", ui->glCustomWidget->escena);
+}
+
+void AdriMainWindow::loadAnimation() {
+	QFileDialog inFileDialog(0, "Selecciona un fichero", ui->glCustomWidget->sPathGlobal, "*.off *.txt");
+	inFileDialog.setFileMode(QFileDialog::ExistingFile);
+	    QStringList fileNames;
+     if (inFileDialog.exec())
+         fileNames = inFileDialog.selectedFiles();
+
+    if(fileNames.size() == 0)
+        return;
+
+    QFileInfo sPathAux(fileNames[0]);
+    QString aux = sPathAux.canonicalPath();
+
+	ui->glCustomWidget->aniManager.loadAnimations(fileNames[0].toStdString(), ui->glCustomWidget->escena);
+	ui->kfBar->addListOfKeyframes(ui->glCustomWidget->aniManager.getFrames(), 150);
+	ui->kfBar->repaint();
 }
 

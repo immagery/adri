@@ -6,6 +6,7 @@
 #include "skeleton.h"
 #include "Modelo.h"
 #include "Skinning.h"
+//#include "solvers/SolverManager.h"
 
 // reservamos unos cuantos números para elementos especiales
 #define FIRST_NODE_ID 100
@@ -88,6 +89,7 @@ class scene
     scene()
     {
 		skinner = new Skinning();
+		//solverManager = new SolverManager();
         scene::sceneIds = FIRST_NODE_ID;
 		modelLoaded = false;
 		skeletonLoaded = false;
@@ -188,6 +190,9 @@ class scene
 
 	// Skinning
 	Skinning* skinner;
+
+	// Solvers
+	//SolverManager* solverManager;
 
 	procState state;
 

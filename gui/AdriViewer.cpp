@@ -47,6 +47,10 @@
 
 #include <QtCore/QTextStream>
 
+//#include "solvers/SolverSinusoidal.h"
+//#include "solvers/SolverStatic.h"
+//#include "solvers/SolverVerlet.h"
+
 
 using namespace qglviewer;
 using namespace vcg;
@@ -58,7 +62,7 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
 
     // Scene variables.
     m_ptCenter.SetZero();
-    m_sceneRadius = 20000;
+    m_sceneRadius = 30;
 
     m_sceneMin[0] = -m_sceneRadius;
     m_sceneMin[1] = -m_sceneRadius;
@@ -141,6 +145,14 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
     //ctxMode = CTX_SELECTION;
 
     frame = 0;
+	aniManager.simulationEnabled = false;
+	aniManager.animationEnabled = false;
+	//particles = new Particles();
+	//particles->bake(1500, 1/24.0);
+
+	setSceneCenter(Vec(0,0,0));
+    setSceneRadius(40);
+	ReBuildScene();
 }
 
  AdriViewer::~AdriViewer()
@@ -171,7 +183,7 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
     glDepthFunc(GL_LEQUAL);
 
     restoreStateFromFile();
-    setAnimationPeriod(4);
+    setAnimationPeriod(40);
     startAnimation();
 
     //testScene();
@@ -188,6 +200,24 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
          deformMesh();
 
      */
+
+	 if (!aniManager.animationEnabled) return;
+
+     for (unsigned int i = 0; i < escena->skeletons.size(); ++i) {
+         skeleton* skt = ((skeleton*) escena->skeletons[i]);
+         for (unsigned int j = 0; j < skt->joints.size(); ++j) {
+             int id = skt->joints[j]->nodeId;
+
+             if (aniManager.objectHasAnimation(id)) {
+                Point3d position = aniManager.getPosition(id, frame);
+                Point3d rotation = aniManager.getRotation(id, frame);
+                //TOFIX ((joint*)skt->joints[j])->rot = rotation;
+             }
+         }
+     }
+     ++frame;
+     if (frame == 150) aniManager.animationEnabled = false;
+     emit changedFrame(frame);
  }
 
 
@@ -401,10 +431,51 @@ void AdriViewer::readSkeleton(string fileName)
         //ReadEmbedding((newPath+sEmbeddingFile).toStdString(), m->embedding);
 		
         modelDefFile.close();
+		
+		// Skinning
 		QString path = (sGlobalPath.append(sPath).append("binding.txt"));
 		string spath = path.toStdString();
 		escena->loadBindingForModel(m,(newPath.append("binding.txt").toStdString()));
         escena->skinner->computeRestPositions(escena->skeletons);
+
+		
+		/*SolverSinusoidal* sinY = new SolverSinusoidal(0.1,1.5,0);	sinY->dimension = 1;
+		SolverSinusoidal* sinZ = new SolverSinusoidal(0.2,1,0);	sinZ->dimension = 2;
+		SolverSinusoidal* mouthSolver = new SolverSinusoidal(0.3,1,0); mouthSolver->dimension = 2;
+		SolverStatic* solverS = new SolverStatic();
+		SolverVerlet* verlet = new SolverVerlet();
+		int n = escena->skeletons[0]->joints.size();*/
+		escena->skeletons[0]->joints[0]->computeWorldPos();
+
+		// Verlet
+		//for (int i = 0; i < n; ++i) verlet->addJoint(escena->skeletons[0]->joints[i], i);
+
+		/*for (int i = 0; i < n; ++i) {
+
+			// Set the static pos
+			if (i >= n-7) escena->skeletons[0]->joints[i]->rot.Z() -= 10;
+			else if (i < n-5) escena->skeletons[0]->joints[i]->rot.Z() -= 3;
+
+			// Sinusoidals
+			if (i > 0 && i < n-5 && i%2 == 0) {
+				sinY->addJoint(escena->skeletons[0]->joints[i], i);
+				sinZ->addJoint(escena->skeletons[0]->joints[i], i);
+			}
+			if (i >= n-6 && i % 2 == 0) mouthSolver->addJoint(escena->skeletons[0]->joints[i], i);
+
+			// Static
+			solverS->addJoint(escena->skeletons[0]->joints[i], i);
+			
+		}*/
+		
+		//solverS->setStatic();
+		//verlet->setPositions();
+		//escena->solverManager->addSolver(sinY);
+		//escena->solverManager->addSolver(sinZ);
+		//escena->solverManager->addSolver(solverS);
+		//escena->solverManager->addSolver(mouthSolver);
+		//escena->solverManager->addSolver(verlet);
+		//aniManager.animationEnabled = true;
     }
  }
 
@@ -731,8 +802,15 @@ void AdriViewer::readSkeleton(string fileName)
      else if(ShadingModeFlag == SH_MODE_FLAT)
         glShadeModel(GL_FLAT);
 
-	 // Skinning y solvers
-	 escena->skinner->computeDeformations(escena->skeletons);
+	 // SKINNING I SOLVERS
+	 if (escena->skeletons.size() > 0) {
+		/*vector<Point3d> rots = escena->solverManager->computeSolvers(frame,escena->skeletons);
+		for (int i = 0; i < escena->skeletons[0]->joints.size(); ++i) {
+			 // TOFIX escena->skeletons[0]->joints[i]->rot += rots[i];
+		}*/
+		escena->skinner->computeDeformations(escena->skeletons);
+	 }
+
 
      /*
      for(unsigned int i = 0; i< escena->shaders.size(); i++)
@@ -768,6 +846,17 @@ void AdriViewer::readSkeleton(string fileName)
 
          ((Modelo*)escena->models[i])->drawFunc();
      }
+
+	 /*if (aniManager.simulationEnabled) {
+		 double fps = 1.0/this->animationPeriod()*1000;
+		 double currentTime = (double)frame/fps;
+		 int numReps = fps;
+		 for (int k = 0; k < numReps; ++k) particles->solve(currentTime + ((double)k / numReps)*this->animationPeriod()/1000.0);
+		 ++frame;
+	 }
+
+	 if (aniManager.animationEnabled) particles->drawFunc(frame);
+	 else particles->drawFunc();*/
 
      glDisable(GL_LIGHTING);
      drawPointLocator(interiorPoint, 1, true);
