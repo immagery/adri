@@ -1,5 +1,5 @@
 #include "KeyframeBar.h"
-#include <QPainter>
+#include <QtGui/QPainter>
 
 KeyframeBar::KeyframeBar(QWidget *parent) : QLabel(parent){
 	keyframes = vector<float>(0);
