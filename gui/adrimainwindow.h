@@ -69,6 +69,23 @@ public slots:
 
 	void UpdateScene();
 
+	// Transform: rotation values for joints
+    void changeTransformRotateAmountX(int);
+    void changeTransformRotateAmountY(int);
+    void changeTransformRotateAmountZ(int);
+    void resetRotationValues();
+
+    // Animation: keyframe managing, animation I/O
+    void addAnimationKeyframe();
+    void toggleAnimation();
+    void changeFrame(int);
+    void changeAnimSlider(int);
+	void saveAnimation();
+	void loadAnimation();
+
+	// Simulation
+	void toggleSimulation();
+
 protected:
     virtual void keyPressEvent(QKeyEvent* event);
 
