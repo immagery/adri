@@ -1,7 +1,5 @@
 #include "adrimainwindow.h"
 
-#include "ui_mainwindow.h"
-
 #include <QtWidgets/QToolButton>
 #include <QtWidgets/QToolBar>
 #include <QtCore/QDir>
@@ -68,8 +66,6 @@ AdriMainWindow::AdriMainWindow(QWidget *parent) :
     //connect(ui->gridSlices_button, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
     //connect(ui->SliceSelectorXY, SIGNAL(valueChanged(int)), ui->glCustomWidget, SLOT(ChangeSliceXY(int)));
     //connect(ui->SliceSelectorXZ, SIGNAL(valueChanged(int)), ui->glCustomWidget, SLOT(ChangeSliceXZ(int)));
-
-    connect(ui->voxelization_btn, SIGNAL(released()), ui->glCustomWidget, SLOT(computeProcess()));
 
 	//connect(ui->nextStep_button, SIGNAL(released()), ui->glCustomWidget, SLOT(nextProcessStep()));
 	//connect(ui->allNextStep_button, SIGNAL(released()), ui->glCustomWidget, SLOT(allNextProcessSteps()));

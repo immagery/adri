@@ -4,6 +4,9 @@
 #include <QtWidgets/QMainWindow>
 #include <QtCore/QModelIndex>
 
+#include <ui_mainwindow.h>
+
+
 class TreeModel;
 class TreeItem;
 class treeNode;
