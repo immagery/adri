@@ -1,14 +1,3 @@
-//#ifdef WIN32
-//#include <GL/glew.h>
-//#include <GL/gl.h>
-//#include <GL/glu.h>
-//#endif
-
-//#ifdef MACOSX
-//#include <gl.h>
-//#include <glu.h>
-//#endif
-
 #include "Geometry.h"
 #include "..\render\geometryRender.h"
 
