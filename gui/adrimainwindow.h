@@ -56,7 +56,6 @@ public slots:
 
     void updateSmoothSlidervalue(int);
 
-    void changeExpansionSlider();
 	void changeInteriorPointPosition();
     void updateExpansionSlidervalue(int);
     void jointDataUpdate(float fvalue, int id);

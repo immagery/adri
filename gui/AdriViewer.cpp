@@ -211,7 +211,7 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
              if (aniManager.objectHasAnimation(id)) {
                 Point3d position = aniManager.getPosition(id, frame);
                 Point3d rotation = aniManager.getRotation(id, frame);
-                ((joint*)skt->joints[j])->rot = rotation;
+                //TOFIX ((joint*)skt->joints[j])->rot = rotation;
              }
          }
      }
@@ -450,7 +450,7 @@ void AdriViewer::readSkeleton(string fileName)
 		// Verlet
 		//for (int i = 0; i < n; ++i) verlet->addJoint(escena->skeletons[0]->joints[i], i);
 
-		for (int i = 0; i < n; ++i) {
+		/*for (int i = 0; i < n; ++i) {
 
 			// Set the static pos
 			if (i >= n-7) escena->skeletons[0]->joints[i]->rot.Z() -= 10;
@@ -466,7 +466,7 @@ void AdriViewer::readSkeleton(string fileName)
 			// Static
 			solverS->addJoint(escena->skeletons[0]->joints[i], i);
 			
-		}
+		}*/
 		
 		solverS->setStatic();
 		verlet->setPositions();
@@ -806,7 +806,7 @@ void AdriViewer::readSkeleton(string fileName)
 	 if (escena->skeletons.size() > 0) {
 		vector<Point3d> rots = escena->solverManager->computeSolvers(frame,escena->skeletons);
 		for (int i = 0; i < escena->skeletons[0]->joints.size(); ++i) {
-			 escena->skeletons[0]->joints[i]->rot += rots[i];
+			 // TOFIX escena->skeletons[0]->joints[i]->rot += rots[i];
 		}
 		escena->skinner->computeDeformations(escena->skeletons);
 	 }
@@ -857,8 +857,6 @@ void AdriViewer::readSkeleton(string fileName)
 
 	 if (aniManager.animationEnabled) particles->drawFunc(frame);
 	 else particles->drawFunc();
-
-	 //particles->drawFunc(frame);
 
      glDisable(GL_LIGHTING);
      drawPointLocator(interiorPoint, 1, true);
