@@ -617,7 +617,7 @@ void AdriMainWindow::changeTransformRotateAmountX(int) {
     if (selectedObject != NULL)
         selectedObject->pos.X() = ui->rotationAmountX->value()/10.0;
 
-	ui->glCustomWidget->particles->xvalue = ui->rotationAmountX->value()/10.0;
+	//ui->glCustomWidget->particles->xvalue = ui->rotationAmountX->value()/10.0;
 
     QString msg = QString::number(ui->rotationAmountX->value());
     ui->rotationEditX->setText(msg);
