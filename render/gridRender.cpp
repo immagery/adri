@@ -155,8 +155,9 @@ void gridRenderer::drawFunc(object* obj)
 			//colorsToRender.resize(grid.borderCellsCounts*3);
 
 			glDisable(GL_LIGHTING);
+
 			glPointSize(7);
-			glBegin(GL_POINTS);
+			
             // Lo ideal es crear un grid booleano para pintar o no, tener resuelto el test.
             for(int i = 0; i< grid->dimensions.X(); i++)
             {
@@ -165,7 +166,7 @@ void gridRenderer::drawFunc(object* obj)
                     for(int k = 0; k< grid->dimensions.Z(); k++)
                     {
                         cell3d* cell = grid->cells[i][j][k];
-                        Point3d o(grid->bounding.min + Point3d(i,j,k)*grid->cellSize - Point3d(0.5,0.5,0.5)*grid->cellSize);
+                        Point3d o(grid->bounding.min + Point3d(i,j,k)*grid->cellSize + Point3d(0.5,0.5,0.5)*grid->cellSize);
 
                         if(m_bShow_boundary && cell->getType() == BOUNDARY)
                         {
@@ -174,14 +175,34 @@ void gridRenderer::drawFunc(object* obj)
 							col[1] = cell->data->color[1];
 							col[2] = cell->data->color[2];
 
+							glBegin(GL_POINTS);
 							glColor3f((GLfloat)col[0], (GLfloat)col[1], (GLfloat)col[2]);
 							glVertex3f((GLfloat)o[0], (GLfloat)o[1], (GLfloat)o[2]);
+							glEnd();
+                        }
+
+						if(m_bShow_interior && cell->getType() == INTERIOR)
+                        {
+							Point3f col;
+							col[0] = cell->data->color[0];
+							col[1] = cell->data->color[1];
+							col[2] = cell->data->color[2];
+
+							if(cell->data->ownerWeight == 0)
+								glPointSize(2);
+							else
+								glPointSize(7);
+
+							glBegin(GL_POINTS);
+							glColor3f((GLfloat)col[0], (GLfloat)col[1], (GLfloat)col[2]);
+							glVertex3f((GLfloat)o[0], (GLfloat)o[1], (GLfloat)o[2]);
+							glEnd();
                         }
                     }
                 }
 			}
 
-			glEnd();
+			
 			glEnable(GL_LIGHTING);
 
 			//glDisable(GL_LIGHTING);
@@ -306,6 +327,49 @@ bool gridRenderer::update(object* obj)
     }
 
     return true;
+}
+
+void gridRenderer::updateGridColorsAndValues()
+{
+	// Actualizamos los colores para no tener que buscar y calcular
+	for(int i = 0; i< grid->dimensions.X(); i++)
+    {
+        for(int j = 0; j< grid->dimensions.Y(); j++)
+        {
+            for(int k = 0; k< grid->dimensions.Z(); k++)
+            {
+                if(grid->cells[i][j][k]->getType() != EXTERIOR )
+                {
+					cell3d* cell = grid->cells[i][j][k];
+
+					int ce = -1;
+					for(int infl = 0; infl < cell->data->influences.size(); infl++)
+					{
+						if(cell->data->influences[infl].label == m_iWeightsId)
+						{
+							ce = infl;
+							cell->data->ownerWeight = cell->data->influences[infl].weightValue;
+							float r,g,b;
+							float value = cell->data->ownerWeight*1000;
+							GetColourGlobal(value,0.0,1.0, r, g, b);
+							cell->data->color = Point3f(r,g,b);
+							break;
+						}
+					}
+					if(ce == -1)
+					{
+						cell->data->ownerWeight = 0;
+						float r,g,b;
+						GetColourGlobal(cell->data->ownerWeight,0.0,1.0, r, g, b);
+						cell->data->color = Point3f(r,g,b);
+					}
+				}
+			}
+		}
+	}
+	// Actulizamos el valor de influencia para pintarlo de alguna manera particular
+
+
 }
 
 

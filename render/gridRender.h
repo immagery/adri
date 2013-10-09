@@ -83,6 +83,8 @@ public:
         return true;
     }
 
+	void updateGridColorsAndValues();
+
     // asignación del grid a renderizar
     //void setGrid(grid3d* _grid) {grid = _grid;}
 
@@ -121,6 +123,9 @@ public:
     bool m_bShow_interior; // Enable showing interior voxels
     bool m_bShow_exterior; // Enable showing exterior voxels
     bool m_bShow_boundary; // Enable showing boundary voxels
+
+	bool m_bShow_weights;
+	int  m_iWeightsId;
 
 	bool m_bShowAllGrid; // Enable showing all cubes of the grid restricted by segmentationIndicesToShow...
 

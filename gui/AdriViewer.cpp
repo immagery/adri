@@ -21,7 +21,7 @@
 //#include <computation/HarmonicCoords.h>
 
 #include <utils/util.h>
-//#include "mainwindow.h"
+#include "adrimainwindow.h"
 //#include "ui_mainwindow.h"
 
 #include <DataStructures/Scene.h>
@@ -1097,9 +1097,42 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
     // TOFIX
 }
 
+void AdriViewer::updateGridRender()
+{
+    for(unsigned int i = 0; i< escena->visualizers.size(); i++)
+    {
+        if(escena->visualizers[i]->iam == GRIDRENDERER_NODE)
+        {
+
+            gridRenderer* gr = ((gridRenderer*)escena->visualizers[i]);
+            gr->m_bShowAllGrid = parent->ui->allGrid_button->isChecked();
+            //gr->m_bBorders = parent->ui->GridDraw_interior->isChecked();
+			gr->m_bShow_interior = parent->ui->GridDraw_interior->isChecked();
+            gr->m_bShow_exterior = parent->ui->GridDraw_exterior->isChecked();
+            gr->m_bShow_boundary = parent->ui->GridDraw_boundary->isChecked();
+
+			gr->m_iWeightsId = parent->ui->dataSource->value();
+
+            gr->grid->res = parent->ui->gridResolutionIn->text().toInt();
+            gr->grid->worldScale = parent->ui->sceneScale->text().toInt();
+
+            gr->desiredVertex = parent->ui->DistancesVertSource->text().toInt();
+
+            gr->setSliceXY(parent->ui->SliceSelectorXY->value());
+            gr->setSliceXZ(parent->ui->SliceSelectorXZ->value());
+
+			gr->updateGridColorsAndValues();
+
+            gr->propagateDirtyness();
+			
+       }
+    }
+}
+
  void AdriViewer::UpdateVertexSource(int id)
 {
     escena->desiredVertex = id;
+	updateGridRender();
     //paintModelWithData();   // TODO paint model
     //paintPlaneWithData();
 

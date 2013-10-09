@@ -153,3 +153,13 @@ int indexOf(vector<int>& labels, int label)
 
     return res;
 }
+
+double Deg2Rad(double deg)
+{
+	return (deg/360)*M_PI*2;
+}
+
+double Rad2Deg(double rad)
+{
+	return (rad*360)/(M_PI*2);
+}

@@ -53,6 +53,13 @@ AdriMainWindow::AdriMainWindow(QWidget *parent) :
    // connect(ui->processAll, SIGNAL(triggered()), ui->glCustomWidget, SLOT(processAllCoords()));
     //connect(ui->deformedMeshCheck, SIGNAL(released()), ui->glCustomWidget, SLOT(showDeformedModelSlot()));
 
+	connect(ui->GridDraw_interior, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
+    connect(ui->GridDraw_exterior, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
+    connect(ui->allGrid_button, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
+    connect(ui->gridSlices_button, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
+    connect(ui->SliceSelectorXY, SIGNAL(valueChanged(int)), ui->glCustomWidget, SLOT(ChangeSliceXY(int)));
+    connect(ui->SliceSelectorXZ, SIGNAL(valueChanged(int)), ui->glCustomWidget, SLOT(ChangeSliceXZ(int)));
+
     connect(ui->cagesComboBox, SIGNAL(currentIndexChanged(int)), ui->glCustomWidget, SLOT(ChangeStillCage(int)));
     connect(ui->enableStillCage, SIGNAL(toggled(bool)), this, SLOT(enableStillCage(bool)));
 
@@ -614,10 +621,15 @@ void AdriMainWindow::changeTransformRotateAmountX(int) {
     if (ui->glCustomWidget->selMgr.selection.size() > 0)
         selectedObject = ui->glCustomWidget->selMgr.selection.back();
 
-    if (selectedObject != NULL)
-        selectedObject->pos.X() = ui->rotationAmountX->value()/10.0;
+    //if (selectedObject != NULL)
+    //    selectedObject->pos.X() = ui->rotationAmountX->value()/10.0;
 
 	//ui->glCustomWidget->particles->xvalue = ui->rotationAmountX->value()/10.0;
+
+	Quaternion<double> qaux;
+	qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()),Deg2Rad(ui->rotationAmountY->value()),Deg2Rad(ui->rotationAmountZ->value()));
+	if (selectedObject != NULL)
+		selectedObject->qrot = qaux;
 
     QString msg = QString::number(ui->rotationAmountX->value());
     ui->rotationEditX->setText(msg);
@@ -629,8 +641,12 @@ void AdriMainWindow::changeTransformRotateAmountY(int) {
     if (ui->glCustomWidget->selMgr.selection.size() > 0)
         selectedObject = ui->glCustomWidget->selMgr.selection.back();
 
-    //if (selectedObject != NULL)
-        //selectedObject->rot.Y() = ui->rotationAmountY->value();
+    if (selectedObject != NULL)
+	{
+		Quaternion<double> qaux;
+		qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()),Deg2Rad(ui->rotationAmountY->value()),Deg2Rad(ui->rotationAmountZ->value()));
+        selectedObject->qrot = qaux;
+	}
 
     QString msg = QString::number(ui->rotationAmountY->value());
     ui->rotationEditY->setText(msg);
@@ -645,6 +661,16 @@ void AdriMainWindow::changeTransformRotateAmountZ(int) {
 
     //if (selectedObject != NULL)
         //selectedObject->rot.Z() = ui->rotationAmountZ->value();
+
+	Quaternion<double> qaux;
+	float ang01, ang02, ang03;
+	ang01 = Deg2Rad(ui->rotationAmountX->value());
+	ang02 = Deg2Rad(ui->rotationAmountY->value());
+	ang03 = Deg2Rad(ui->rotationAmountZ->value());
+	qaux.FromEulerAngles(ang01,ang02,ang03);
+	
+	if (selectedObject != NULL)
+		selectedObject->qrot = qaux;
 
     QString msg = QString::number(ui->rotationAmountZ->value());
     ui->rotationEditZ->setText(msg);

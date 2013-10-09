@@ -554,7 +554,7 @@ int grid3d::fillInside()
     return cellsCount;
 }
 
-#define TERMINATE_CRITERION 0.00001
+#define TERMINATE_CRITERION 0.001
 
 
 void grid3d::cleanZeroInfluences()
@@ -840,7 +840,6 @@ void grid3d::expandWeightsOptimized(Modelo* m)
     float iterationVariation = 9999;
     int iterations = 0;
 
-	/*
     for(int i = 0; i< dimensions.X(); i++)
     {
         for(int j = 0; j< dimensions.Y(); j++)
@@ -851,33 +850,18 @@ void grid3d::expandWeightsOptimized(Modelo* m)
                 {
                     cells[i][j][k]->data->pos = Point3i(i,j,k);
                     cells[i][j][k]->changed = false;
+					cells[i][j][k]->data->validated = false;
+					cells[i][j][k]->data->tempOwnerWeight = 0.0;
+					cells[i][j][k]->data->ownerWeight = 0.0;
                 }
             }
         }
     }
-	*/
-
+	
     vector<bool> expandedWeight;
     vector<float> interationVariationArray;
     expandedWeight.resize(weightSize, false);
     interationVariationArray.resize(weightSize, 0);
-
-	// Limpiamos todo el grid
-	for(int i = 0; i< dimensions.X(); i++)
-	{
-		for(int j = 0; j< dimensions.Y(); j++)
-		{
-			for(int k = 0; k< dimensions.Z(); k++)
-			{
-				if(cells[i][j][k]->getType() != EXTERIOR )
-				{
-					cells[i][j][k]->data->validated = false;
-					cells[i][j][k]->data->tempOwnerWeight = 0;
-					cells[i][j][k]->data->ownerWeight = 0;
-				}
-			}
-		}
-	}
 
 	printf("\nIncializado\n");fflush(0);
 
@@ -904,6 +888,8 @@ void grid3d::expandWeightsOptimized(Modelo* m)
 		cells[i][j][k]->data->ownerLabel = weightIdx;
 		cells[i][j][k]->data->segmentId = weightIdx;
 		cells[i][j][k]->data->validated = true;
+		cells[i][j][k]->data->ownerWeight = 1.0;
+		cells[i][j][k]->data->tempOwnerWeight = 1.0;
 
 		// Anadimos los vecinos con peso 0
         for(unsigned int p = 0; p < positions.size(); p++)
@@ -930,23 +916,25 @@ void grid3d::expandWeightsOptimized(Modelo* m)
 		
 		printf("\nExpansion\n"); fflush(0);
 		iterationVariation = TERMINATE_CRITERION*2;
+		int iterationsDone = 0;
 		while(iterationVariation >= TERMINATE_CRITERION)
 		{
+			float localVar = 0;
 			for(unsigned int cellCount = 0; cellCount< stepProcessCells.size(); cellCount++)
 			{
 				cell3d* currentCell = stepProcessCells[cellCount];
-				int i = currentCell->data->pos.X();
-				int j = currentCell->data->pos.Y();
-				int k = currentCell->data->pos.Z();
+				int nexti = currentCell->data->pos.X();
+				int nextj = currentCell->data->pos.Y();
+				int nextk = currentCell->data->pos.Z();
 
 				float tempValue = 0;
 				float inPos = 0;
 
 				for(unsigned int p = 0; p < positions.size(); p++)
 				{
-					int newI = i+positions[p].X();
-					int newJ = j+positions[p].Y();
-					int newK = k+positions[p].Z();
+					int newI = nexti+positions[p].X();
+					int newJ = nextj+positions[p].Y();
+					int newK = nextk+positions[p].Z();
 
 					// Comprobamos que no se salga del grid.
 					if(newI <0 || newI >= dimensions.X()) continue;
@@ -974,57 +962,74 @@ void grid3d::expandWeightsOptimized(Modelo* m)
                     // Si ha habido cambio...vemos cuanto.
                     if(tempValue > 0)
                     {
-						cells[i][j][k]->data->tempOwnerWeight = tempValue;
-						iterationVariation = max(iterationVariation, fabs(cells[i][j][k]->data->tempOwnerWeight - cells[i][j][k]->data->ownerWeight));
+						cells[nexti][nextj][nextk]->data->tempOwnerWeight = tempValue;
+						localVar = max(localVar, fabs(cells[nexti][nextj][nextk]->data->tempOwnerWeight - cells[nexti][nextj][nextk]->data->ownerWeight));
                     }
                 }
-
-				printf("\nValor de iteracion:%f y acaba en %f\n", iterationVariation,TERMINATE_CRITERION );fflush(0);
 			}
 
-			printf("\nGuardado\n" );fflush(0);
 			for(unsigned int cellCount = 0; cellCount< stepProcessCells.size(); cellCount++)
 			{
 				cell3d* currentCell = stepProcessCells[cellCount];
-				int i = currentCell->data->pos.X();
-				int j = currentCell->data->pos.Y();
-				int k = currentCell->data->pos.Z();
+				int nexti = currentCell->data->pos.X();
+				int nextj = currentCell->data->pos.Y();
+				int nextk = currentCell->data->pos.Z();
 
-				cells[i][j][j]->data->ownerWeight = cells[i][j][j]->data->tempOwnerWeight;
+				float owner001 = cells[nexti][nextj][nextk]->data->ownerWeight;
+				float owner002 = cells[nexti][nextj][nextk]->data->tempOwnerWeight;
+
+				cells[nexti][nextj][nextk]->data->ownerWeight = cells[nexti][nextj][nextk]->data->tempOwnerWeight;
 			}
 
 			for(unsigned int cellCount = 0; cellCount< cellsToAdd.size(); cellCount++)
 			{
 				cell3d* currentCell = cellsToAdd[cellCount];
-				int i = currentCell->data->pos.X();
-				int j = currentCell->data->pos.Y();
-				int k = currentCell->data->pos.Z();
+				int nexti = currentCell->data->pos.X();
+				int nextj = currentCell->data->pos.Y();
+				int nextk = currentCell->data->pos.Z();
 
 				// No deberia ser necesario... pero lo hacemos.
-				cells[i][j][j]->data->ownerWeight = cells[i][j][j]->data->tempOwnerWeight;
+				//cells[nexti][nextj][nextk]->data->ownerWeight = cells[nexti][nextj][nextk]->data->tempOwnerWeight;
 
 				// Se podria hacer de golpe con un resize 
 				stepProcessCells.push_back(cellsToAdd[cellCount]);
 			}
 			cellsToAdd.clear();
 
-
+			iterationVariation = min(iterationVariation, localVar);
+			//printf("\n%d: Valor de iteracion:%f y acaba en %f\n",iterationsDone, localVar,TERMINATE_CRITERION );fflush(0);
+			iterationsDone++;
 		}
 
+		printf("\nIteraciones: %d\n", iterationsDone );fflush(0);
 		printf("\nLimpieza\n" );fflush(0);
+
+		double weightThreshold = 1/pow(10,4);
+
+		int discarted = 0;
 		for(unsigned int cellCount = 0; cellCount< stepProcessCells.size(); cellCount++)
 		{
 			cell3d* currentCell = stepProcessCells[cellCount];
-			int i = currentCell->data->pos.X();
-			int j = currentCell->data->pos.Y();
-			int k = currentCell->data->pos.Z();
+			int nexti = currentCell->data->pos.X();
+			int nextj = currentCell->data->pos.Y();
+			int nextk = currentCell->data->pos.Z();
 
-			cells[i][j][j]->data->influences.push_back(weight(weightIdx,cells[i][j][j]->data->ownerWeight));
+			if(cells[nexti][nextj][nextk]->data->ownerWeight > weightThreshold)
+				cells[nexti][nextj][nextk]->data->influences.push_back(weight(weightIdx,cells[nexti][nextj][nextk]->data->ownerWeight));
+			else
+				discarted++;
 
-			cells[i][j][k]->data->validated = false;
-			cells[i][j][k]->data->tempOwnerWeight = 0;
-			cells[i][j][k]->data->ownerWeight = 0;
+			cells[nexti][nextj][nextk]->data->validated = false;
+			cells[nexti][nextj][nextk]->data->tempOwnerWeight = 0;
+			cells[nexti][nextj][nextk]->data->ownerWeight = 0;
 		}
+		
+		cells[i][j][k]->data->ownerLabel = -1;
+		cells[i][j][k]->data->segmentId = -1;
+		cells[i][j][k]->data->validated = false;
+		cells[i][j][k]->data->ownerWeight = 0.0;
+		cells[i][j][k]->data->tempOwnerWeight = 0.0;
+		cells[i][j][k]->data->influences.push_back(weight(weightIdx,1.0));
 
         iterations++;
     }
@@ -1254,9 +1259,9 @@ int grid3d::typeCells(MyMesh& mesh)
 Point3i grid3d::cellId(Point3d pt)
 {
     Point3d aux = pt - bounding.min;
-    int x = (int)round(aux.X()/cellSize);
-    int y = (int)round(aux.Y()/cellSize);
-    int z = (int)round(aux.Z()/cellSize);
+    int x = (int)floor(aux.X()/cellSize);
+    int y = (int)floor(aux.Y()/cellSize);
+    int z = (int)floor(aux.Z()/cellSize);
     return Point3i(x,y,z);
 }
 
@@ -1271,7 +1276,7 @@ int grid3d::typeCells(Modelo* m, int triIdx)
 {
     // A. Anadimos los vertices.
     Point3i cell[3];
-    Box3i boundingCells;
+    //Box3i boundingCells;
 
     int boundaryCells = 0;
 
@@ -1287,18 +1292,22 @@ int grid3d::typeCells(Modelo* m, int triIdx)
 	for(int i = 0; i<points.size(); i++)
     {
 		cell[i] = cellId(points[i]); // Obtenemos la celda en la que cae el vértice
-        boundingCells.Add(cell[i]);
+        //boundingCells.Add(cell[i]);
 
-        if(cells[cell[i].X()][cell[i].Y()][cell[i].Z()]->getType() != BOUNDARY)
+		int x = cell[i].X();
+		int y = cell[i].Y();
+		int z = cell[i].Z();
+
+        if(cells[x][y][z]->getType() != BOUNDARY)
         {
-            cells[cell[i].X()][cell[i].Y()][cell[i].Z()]->setType(BOUNDARY);
+            cells[x][y][z]->setType(BOUNDARY);
             boundaryCells++;
         }
 
-		if(cells[cell[i].X()][cell[i].Y()][cell[i].Z()]->data == NULL)
-			cells[cell[i].X()][cell[i].Y()][cell[i].Z()]->data = new cellData();
+		if(cells[x][y][z]->data == NULL)
+			cells[x][y][z]->data = new cellData();
 
-        cells[cell[i].X()][cell[i].Y()][cell[i].Z()]->data->vertexContainer = true;
+        cells[x][y][z]->data->vertexContainer = true;
         //cells[cell[i].X()][cell[i].Y()][cell[i].Z()]->weights[face.V(i)->IMark()] = 1.0;
     }
 
@@ -1488,7 +1497,7 @@ int grid3d::typeCells(MyFace& face)
 {
     // A. Anadimos los vertices.
     Point3i cell[3];
-    Box3i boundingCells;
+    //Box3i boundingCells;
 
     int boundaryCells = 0;
 
@@ -1496,7 +1505,7 @@ int grid3d::typeCells(MyFace& face)
     for(int i = 0; i<3; i++)
     {
         cell[i] = cellId(face.P(i)); // Obtenemos la celda en la que cae el vértice
-        boundingCells.Add(cell[i]);
+        //boundingCells.Add(cell[i]);
 
         if(cells[cell[i].X()][cell[i].Y()][cell[i].Z()]->getType() != BOUNDARY)
         {

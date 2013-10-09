@@ -227,9 +227,9 @@ void JointRender::drawFunc(joint* jt)
 	double alpha, beta, gamma;
 	jt->qrot.ToEulerAngles(alpha, beta, gamma);
 
-    glRotatef((GLfloat)gamma,0,0,1);
-    glRotatef((GLfloat)beta,0,1,0);
-    glRotatef((GLfloat)alpha,1,0,0);
+    glRotatef((GLfloat)Rad2Deg(gamma),0,0,1);
+    glRotatef((GLfloat)Rad2Deg(beta),0,1,0);
+    glRotatef((GLfloat)Rad2Deg(alpha),1,0,0);
 
     // Pintamos un tri-círculo
     if(selected)

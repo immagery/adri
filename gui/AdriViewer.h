@@ -261,6 +261,8 @@ public slots:
 
 //    void updateGridRender();
 
+	void updateGridRender();
+
     // Biharmonic Distances
     //void UpdateVertexSource(int id); // Updates the source for harmonic distances testing
     //void importSegmentation(QString fileName);
