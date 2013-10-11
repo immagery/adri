@@ -105,11 +105,17 @@ PointData::PointData(const PointData& pd)
 	for(int i = 0; i< pd.auxInfluences.size(); i++)
 		auxInfluences[i] = pd.auxInfluences[i]; 
 
+	secondInfluences.resize(pd.secondInfluences.size());
+	for(int i = 0; i< pd.secondInfluences.size(); i++)
+	{
+		secondInfluences[i].resize(pd.secondInfluences[i].size());
+		for(int j = 0; j< pd.secondInfluences[i].size(); j++)
+			secondInfluences[i][j] = pd.secondInfluences[i][j]; 
+	}
+
 	embedding.resize(pd.embedding.size());
 	for(int i = 0; i< pd.embedding.size(); i++)
 		embedding[i] = pd.embedding[i]; 
-
-	secondInfluences.clear();
 
 	vertexContainer = pd.vertexContainer;
     itPass =-1;
@@ -353,6 +359,17 @@ void saveBinding(binding* bd, string fileName)
 			}
 
 			fprintf(fout, " %s %f", inflName.c_str(), inflValue);
+		}
+
+		fprintf(fout, "\n"); fflush(fout);
+
+		for(int infl = 0; infl< bd->pointData[pt].influences.size(); infl++)
+		{
+			fprintf(fout, "%d ", bd->pointData[pt].secondInfluences[infl].size());
+			for(int child = 0; child < bd->pointData[pt].secondInfluences[infl].size(); child++)
+			{
+				fprintf(fout, "%f ", bd->pointData[pt].secondInfluences[infl][child]);
+			}
 		}
 
 		fprintf(fout, "\n"); fflush(fout);

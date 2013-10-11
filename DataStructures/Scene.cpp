@@ -50,33 +50,41 @@ void scene::setGlobalSmoothness(float globalSmooth)
 }
 
 void scene::loadBindingForModel(Modelo* m, string path) {
-	// Copiar el modelo para tener una "copia deformable"
-	Modelo* m2 = new Modelo(getNewId());
-	models.push_back(m2);
 
-	// Copiar vertices
-	m2->nodes.resize(m->nodes.size());
-	for (int i = 0; i < m2->nodes.size(); ++i) {
-		m2->nodes[i] = new GraphNode(i);
-		m2->nodes[i]->position = m->nodes[i]->position;
-		m2->nodes[i]->connections.resize(m->nodes[i]->connections.size());
-		for (int j = 0; j < m2->nodes[i]->connections.size(); ++j) {
-			m2->nodes[i]->connections[j] = m->nodes[i]->connections[j];
+	m->originalModel = new Geometry(getNewId());
+	Geometry *modelCopy = m->originalModel;
+
+	// Copiar el modelo para tener una "copia deformable"
+	//Modelo* m2 = new Modelo(getNewId());
+	//models.push_back(m2);
+
+	modelCopy->nodes.resize(m->nodes.size());
+	for (int i = 0; i < modelCopy->nodes.size(); ++i) 
+	{
+		modelCopy->nodes[i] = new GraphNode(i);
+		modelCopy->nodes[i]->position = m->nodes[i]->position;
+		modelCopy->nodes[i]->connections.resize(m->nodes[i]->connections.size());
+		for (int j = 0; j < modelCopy->nodes[i]->connections.size(); ++j) 
+		{
+			modelCopy->nodes[i]->connections[j] = modelCopy->nodes[m->nodes[i]->connections[j]->id];
 		}
 	}
 
 	// Copiar caras
-	m2->triangles.resize(m->triangles.size());
-	for (int i = 0; i < m2->triangles.size(); ++i) {
-		m2->triangles[i] = new GraphNodePolygon(i);
-		m2->triangles[i]->verts.resize(m->triangles[i]->verts.size());
-		for (int j = 0; j < m2->triangles[i]->verts.size(); ++j) {
-			m2->triangles[i]->verts[j] = m->triangles[i]->verts[j];
+	modelCopy->triangles.resize(m->triangles.size());
+	for (int i = 0; i < modelCopy->triangles.size(); ++i) 
+	{
+		modelCopy->triangles[i] = new GraphNodePolygon(i);
+		modelCopy->triangles[i]->verts.resize(m->triangles[i]->verts.size());
+		for (int j = 0; j < modelCopy->triangles[i]->verts.size(); ++j) 
+		{
+			modelCopy->triangles[i]->verts[j] = modelCopy->nodes[m->triangles[i]->verts[j]->id];
 		}
 	}
 
-	m2->shading->visible = true;
-	m2->computeNormals();
-	skinner->loadBindingForModel(m,m2,path, skeletons);
+	modelCopy->shading->visible = false;
+	modelCopy->computeNormals();
+	
+	skinner->loadBindingForModel(m, path, skeletons);
 }
 

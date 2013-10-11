@@ -1,14 +1,3 @@
-//#ifdef WIN32
-//#include <GL/glew.h>
-//#include <GL/gl.h>
-//#include <GL/glu.h>
-//#endif
-
-//#ifdef MACOSX
-//#include <gl.h>
-//#include <glu.h>
-//#endif
-
 #include "Geometry.h"
 #include "..\render\geometryRender.h"
 
@@ -192,7 +181,7 @@ void Geometry::computeFaceNormals()
 	{
 		Point3d v1 = triangles[i]->verts[1]->position - triangles[i]->verts[0]->position;
 		Point3d v2 = triangles[i]->verts[2]->position - triangles[i]->verts[0]->position;
-		faceNormals[i] = v1.normalized()^v2.normalized();		
+		faceNormals[i] = (v1.normalized()^v2.normalized()).normalized();		
 	}
 }
 

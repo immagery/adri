@@ -135,6 +135,7 @@ class cellData
     // Intermediate owner of the cell, and its weight
     int ownerLabel;
     float ownerWeight;
+	int tempOwnerLabel;
 	float tempOwnerWeight;
 	float confidenceLevel;
 
@@ -241,6 +242,8 @@ public:
     void LoadFromFile(ifstream& myfile);
 };
 
+class Modelo;
+
 // Uniform grid
 class grid3d
 {
@@ -308,14 +311,24 @@ public:
 
     ////  FUNCTIONS ///
 
-    // Marca las celdas con los diferentes tipos seg√∫n la geometr√≠a de entrada.
+    // Marca las celdas con los diferentes tipos segun la geometria de entrada.
     int typeCells(MyMesh& mesh);
+
+	// Marca las celdas con los diferentes tipos segun la geometria de entrada.
+	// Con la nueva estructura de grafo
+	int typeCells(Modelo* mesh);
+	int typeCells(Modelo* m, int i);
 
     // Extiende por interior los pesos asignados en las celdas de los v√©rtices.
     void expandWeights();
 
+	// Extiende por interior los pesos asignados en las celdas de los vertices, optimizado para no morir en peso de memoria.
+	void expandWeightsOptimized(Modelo* m);
+
     // Normaliza los valores para que estén entre 0 y 1, como todas las funciones son continuas, esta también debería serlo.
     void normalizeWeights();
+
+	void normalizeWeightsOptimized();
 
 	// Normaliza los valores en los vectores auxiliares limitados por el dominio.
 	// Solo normaliza las celdas que tienen como propierarios sameLevelIds.

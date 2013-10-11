@@ -10,6 +10,7 @@
 #include <vector>
 #include <time.h>
 #include <stdio.h>
+#include <map>
 
 using namespace std;
 
@@ -29,5 +30,10 @@ double round(double x);
 double sign(double v);
 
 double det(vcg::Point3d u1, vcg::Point3d u2, vcg::Point3d u3);
+
+double Deg2Rad(double deg);
+
+double Rad2Deg(double rad);
+
 
 #endif // UTIL_H

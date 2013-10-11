@@ -13,17 +13,20 @@ class Skinning
 public:
 	Skinning();
 	~Skinning();
-    void loadBindingForModel (Modelo * m, Modelo* m2, string path, const vector< skeleton* >& skeletons);
+    void loadBindingForModel (Modelo *m, string path, const vector< skeleton* >& skeletons);
     void saveBindingToFile (string path);
     void computeRestPositions(const vector< skeleton* >& skeletons);
 	void computeDeformations(const vector< skeleton* >& skeletons);
+	void computeDeformationsWithSW(const vector< skeleton* >& skeletons);
     Point3d deformVertex ();
 
-	vector<Modelo*> originalModels;
-	vector<Modelo*> deformedModels;
+	vector<Geometry*> originalModels;
+	vector<Geometry*> deformedModels;
 
 	vector<binding*> bindings;
     map<pair<int, int>, Point3d> restPositions;
     // some way to store triplets vertex - bone - position
+
+	int quaternionDef;
 };
 

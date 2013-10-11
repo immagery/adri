@@ -63,6 +63,7 @@ public slots:
     void updateExpansionSlidervalue(int);
     void jointDataUpdate(float fvalue, int id);
 	
+	void changeAuxValueInt(int value);
 
 	void changeVisModeForPlane(int);
 	void changeSelPointForPlane(int);

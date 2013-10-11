@@ -20,7 +20,9 @@
 void joint::initDefaults()
 {
 	father = NULL;
-    orientJoint = Point3d(0,0,0);
+    qOrient = Quaternion<double>(1,0,0,0);
+	
+	//orientJoint = Point3d(0,0,0);
     childs.clear();
     nodes.clear();
     
@@ -112,7 +114,8 @@ joint::joint(joint* _father) : object()
 joint::joint(joint* _father, unsigned int nodeId) : object(nodeId)
 {
     father = _father;
-    orientJoint = Point3d(0,0,0);
+    //orientJoint = Point3d(0,0,0);
+	qOrient = Quaternion<double>(1,0,0,0);
     //JointSkeletonId = 0;
     childs.clear();
     nodes.clear();
@@ -138,7 +141,8 @@ joint::~joint()
 
     father = NULL;
 
-    orientJoint = Point3d(0,0,0);
+    //orientJoint = Point3d(0,0,0);
+	qOrient = Quaternion<double>(1,0,0,0);
 }
 
 void joint::setFather(joint* f)
@@ -243,7 +247,9 @@ void joint::computeRestPos() {
 
 void joint::setJointOrientation(double ojX,double  ojY,double  ojZ)
 {
-    orientJoint = Point3d(ojX, ojY, ojZ);
+	qOrient.FromEulerAngles( Deg2Rad(ojX), Deg2Rad( ojY),  Deg2Rad(ojZ));
+	qOrient.Normalize();
+    //orientJoint = Point3d(ojX, ojY, ojZ);
 }
 
 void joint::getRelatives(vector<joint*>& joints)

@@ -19,9 +19,10 @@ class joint : public object
         joint* father;
         vector< joint* > childs;
         vector< DefNode* > nodes;
-        Point3d orientJoint;
+        
+		//Point3d orientJoint;
 
-		//Quaternion<double> qrot;
+		vcg::Quaternion<double> qOrient;
 
 		int deformerId;
 

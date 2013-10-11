@@ -17,7 +17,7 @@ class object : public node
 public:
     Point3d pos;
     //Point3d rot;
-	Quaternion<double> qrot;
+	vcg::Quaternion<double> qrot;
 
 	Matrix44d tMatrix;
 

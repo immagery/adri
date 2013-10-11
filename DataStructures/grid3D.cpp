@@ -2,6 +2,8 @@
 #include "..\DataStructures\DefNode.h"
 #include "..\utils\util.h"
 
+#include <DataStructures/Modelo.h>
+
 #define DEBUG false
 
 #include <iostream>
@@ -552,7 +554,7 @@ int grid3d::fillInside()
     return cellsCount;
 }
 
-#define TERMINATE_CRITERION 0.00001
+#define TERMINATE_CRITERION 0.001
 
 
 void grid3d::cleanZeroInfluences()
@@ -689,7 +691,49 @@ void grid3d::normalizeWeightsByDomain()
             }
         }
     }
+}
 
+
+void grid3d::normalizeWeightsOptimized()
+{
+	float maxValue = -9999, minValue = 9999;
+	for(int i = 0; i< dimensions.X(); i++)
+	{
+		for(int j = 0; j< dimensions.Y(); j++)
+		{
+			for(int k = 0; k< dimensions.Z(); k++)
+			{
+				if(cells[i][j][k]->getType() == INTERIOR)
+				{
+					// normalizamos también lo vertices.
+					//if(cells[i][j][k]->data->vertexContainer)
+					//	continue;
+
+					double sum = 0;
+					for(int w = 0; w < cells[i][j][k]->data->influences.size(); w++)
+					{
+						sum += cells[i][j][k]->data->influences[w].weightValue;
+						maxValue = max(cells[i][j][k]->data->influences[w].weightValue, maxValue);
+						minValue = min(cells[i][j][k]->data->influences[w].weightValue, minValue);
+					}
+
+					if(sum > 0)
+					{
+						for(int w = 0; w < cells[i][j][k]->data->influences.size(); w++)
+						{
+							cells[i][j][k]->data->influences[w].weightValue /= sum;
+						}
+					}
+					else
+					{
+						printf("Hay un problema con este peso... es igual a cero la suma.\n"); fflush(0);
+					}
+				}
+			}
+		}
+	}
+
+	printf("MinValue: %f; MaxValue: %f\n", minValue, maxValue); fflush(0);
 }
 
 void grid3d::normalizeWeights()
@@ -780,14 +824,225 @@ void grid3d::normalizeWeights()
 	*/
 }
 
+void grid3d::expandWeightsOptimized(Modelo* m)
+{
+    // Inicializamos los posibles vecinos en un array para
+    // Simplificar el codigo -> 6-conectado
+    vector<Point3i> positions;
+    positions.resize(6);
+    positions[0] = Point3i(1,0,0);
+    positions[1] = Point3i(-1,0,0);
+    positions[2] = Point3i(0,1,0);
+    positions[3] = Point3i(0,-1,0);
+    positions[4] = Point3i(0,0,1);
+    positions[5] = Point3i(0,0,-1);
+
+    float iterationVariation = 9999;
+    int iterations = 0;
+
+    for(int i = 0; i< dimensions.X(); i++)
+    {
+        for(int j = 0; j< dimensions.Y(); j++)
+        {
+            for(int k = 0; k< dimensions.Z(); k++)
+            {
+                if(cells[i][j][k]->getType() != EXTERIOR )
+                {
+                    cells[i][j][k]->data->pos = Point3i(i,j,k);
+                    cells[i][j][k]->changed = false;
+					cells[i][j][k]->data->validated = false;
+					cells[i][j][k]->data->tempOwnerWeight = 0.0;
+					cells[i][j][k]->data->ownerWeight = 0.0;
+                }
+            }
+        }
+    }
+	
+    vector<bool> expandedWeight;
+    vector<float> interationVariationArray;
+    expandedWeight.resize(weightSize, false);
+    interationVariationArray.resize(weightSize, 0);
+
+	printf("\nIncializado\n");fflush(0);
+
+	vector<cell3d*> stepProcessCells;
+	vector<cell3d*> cellsToAdd;
+
+	// Procesamos los pesos por separado, expandiendo según convenga.
+	for(int weightIdx = 0; weightIdx < m->nodes.size(); weightIdx++)
+	{
+		printf("\nPeso %d\n", weightIdx);fflush(0);
+
+		stepProcessCells.clear();
+		cellsToAdd.clear();
+
+		// Inicializamos
+		//cell3d* currentCell = processCells[cellId(m->nodes[weightIdx]->position)];
+		Point3i originCell = cellId(m->nodes[weightIdx]->position);
+        int i = originCell.X();
+        int j = originCell.Y();
+        int k = originCell.Z();
+
+        assert(cells[i][j][k]->getType() == INTERIOR || cells[i][j][k]->getType() == BOUNDARY);
+
+		cells[i][j][k]->data->ownerLabel = weightIdx;
+		cells[i][j][k]->data->segmentId = weightIdx;
+		cells[i][j][k]->data->validated = true;
+		cells[i][j][k]->data->ownerWeight = 1.0;
+		cells[i][j][k]->data->tempOwnerWeight = 1.0;
+
+		// Anadimos los vecinos con peso 0
+        for(unsigned int p = 0; p < positions.size(); p++)
+        {
+            int newI = i+positions[p].X();
+            int newJ = j+positions[p].Y();
+            int newK = k+positions[p].Z();
+
+            // Comprobamos que no se salga del grid.
+            if(newI <0 || newI >= dimensions.X()) continue;
+            if(newJ <0 || newJ >= dimensions.Y()) continue;
+            if(newK <0 || newK >= dimensions.Z()) continue;
+
+            if(cells[newI][newJ][newK]->getType() == EXTERIOR) continue;
+
+			if(!cells[newI][newJ][newK]->data->validated)
+			{
+				cells[newI][newJ][newK]->data->tempOwnerWeight = 0;
+				cells[newI][newJ][newK]->data->ownerWeight = 0;
+				cells[newI][newJ][newK]->data->validated = true;
+				stepProcessCells.push_back(cells[newI][newJ][newK]);
+			}
+		}
+		
+		printf("\nExpansion\n"); fflush(0);
+		iterationVariation = TERMINATE_CRITERION*2;
+		int iterationsDone = 0;
+		while(iterationVariation >= TERMINATE_CRITERION)
+		{
+			float localVar = 0;
+			for(unsigned int cellCount = 0; cellCount< stepProcessCells.size(); cellCount++)
+			{
+				cell3d* currentCell = stepProcessCells[cellCount];
+				int nexti = currentCell->data->pos.X();
+				int nextj = currentCell->data->pos.Y();
+				int nextk = currentCell->data->pos.Z();
+
+				float tempValue = 0;
+				float inPos = 0;
+
+				for(unsigned int p = 0; p < positions.size(); p++)
+				{
+					int newI = nexti+positions[p].X();
+					int newJ = nextj+positions[p].Y();
+					int newK = nextk+positions[p].Z();
+
+					// Comprobamos que no se salga del grid.
+					if(newI <0 || newI >= dimensions.X()) continue;
+					if(newJ <0 || newJ >= dimensions.Y()) continue;
+					if(newK <0 || newK >= dimensions.Z()) continue;
+
+					if(cells[newI][newJ][newK]->getType() == EXTERIOR) continue;
+
+					if(!cells[newI][newJ][newK]->data->validated)
+					{
+						cells[newI][newJ][newK]->data->tempOwnerWeight = 0;
+						cells[newI][newJ][newK]->data->ownerWeight = 0;
+						cells[newI][newJ][newK]->data->validated = true;
+						cellsToAdd.push_back(cells[newI][newJ][newK]);
+					}
+
+					tempValue += cells[newI][newJ][newK]->data->ownerWeight;
+                    inPos++;
+				}
+
+				if(inPos > 0)
+                {
+                    tempValue = tempValue / inPos;
+
+                    // Si ha habido cambio...vemos cuanto.
+                    if(tempValue > 0)
+                    {
+						cells[nexti][nextj][nextk]->data->tempOwnerWeight = tempValue;
+						localVar = max(localVar, fabs(cells[nexti][nextj][nextk]->data->tempOwnerWeight - cells[nexti][nextj][nextk]->data->ownerWeight));
+                    }
+                }
+			}
+
+			for(unsigned int cellCount = 0; cellCount< stepProcessCells.size(); cellCount++)
+			{
+				cell3d* currentCell = stepProcessCells[cellCount];
+				int nexti = currentCell->data->pos.X();
+				int nextj = currentCell->data->pos.Y();
+				int nextk = currentCell->data->pos.Z();
+
+				float owner001 = cells[nexti][nextj][nextk]->data->ownerWeight;
+				float owner002 = cells[nexti][nextj][nextk]->data->tempOwnerWeight;
+
+				cells[nexti][nextj][nextk]->data->ownerWeight = cells[nexti][nextj][nextk]->data->tempOwnerWeight;
+			}
+
+			for(unsigned int cellCount = 0; cellCount< cellsToAdd.size(); cellCount++)
+			{
+				cell3d* currentCell = cellsToAdd[cellCount];
+				int nexti = currentCell->data->pos.X();
+				int nextj = currentCell->data->pos.Y();
+				int nextk = currentCell->data->pos.Z();
+
+				// No deberia ser necesario... pero lo hacemos.
+				//cells[nexti][nextj][nextk]->data->ownerWeight = cells[nexti][nextj][nextk]->data->tempOwnerWeight;
+
+				// Se podria hacer de golpe con un resize 
+				stepProcessCells.push_back(cellsToAdd[cellCount]);
+			}
+			cellsToAdd.clear();
+
+			iterationVariation = min(iterationVariation, localVar);
+			//printf("\n%d: Valor de iteracion:%f y acaba en %f\n",iterationsDone, localVar,TERMINATE_CRITERION );fflush(0);
+			iterationsDone++;
+		}
+
+		printf("\nIteraciones: %d\n", iterationsDone );fflush(0);
+		printf("\nLimpieza\n" );fflush(0);
+
+		double weightThreshold = 1/pow(10,4);
+
+		int discarted = 0;
+		for(unsigned int cellCount = 0; cellCount< stepProcessCells.size(); cellCount++)
+		{
+			cell3d* currentCell = stepProcessCells[cellCount];
+			int nexti = currentCell->data->pos.X();
+			int nextj = currentCell->data->pos.Y();
+			int nextk = currentCell->data->pos.Z();
+
+			if(cells[nexti][nextj][nextk]->data->ownerWeight > weightThreshold)
+				cells[nexti][nextj][nextk]->data->influences.push_back(weight(weightIdx,cells[nexti][nextj][nextk]->data->ownerWeight));
+			else
+				discarted++;
+
+			cells[nexti][nextj][nextk]->data->validated = false;
+			cells[nexti][nextj][nextk]->data->tempOwnerWeight = 0;
+			cells[nexti][nextj][nextk]->data->ownerWeight = 0;
+		}
+		
+		cells[i][j][k]->data->ownerLabel = -1;
+		cells[i][j][k]->data->segmentId = -1;
+		cells[i][j][k]->data->validated = false;
+		cells[i][j][k]->data->ownerWeight = 0.0;
+		cells[i][j][k]->data->tempOwnerWeight = 0.0;
+		cells[i][j][k]->data->influences.push_back(weight(weightIdx,1.0));
+
+        iterations++;
+    }
+}
+
 void grid3d::expandWeights()
 {
-
-	assert(false); // Disabled for flux verification.
+	assert(false);
+	// esto probablemente no fucnione porque no está adaptado bien.
 
 	/*
     // Inicializamos los posibles vecinos en un array para
-    // Simplificar el cÃ³digo -> 6-conectado
+    // Simplificar el codigo -> 6-conectado
     vector<Point3i> positions;
     positions.resize(6);
     positions[0] = Point3i(1,0,0);
@@ -840,8 +1095,8 @@ void grid3d::expandWeights()
                 if(cells[i][j][k]->data->vertexContainer) continue;
 
                 // limpiamos del anterior cÃ¡lculo.
-                cells[i][j][k]->data->auxWeights.clear();
-                cells[i][j][k]->data->auxWeights.resize(cells[i][j][k]->data->weights.size());
+                cells[i][j][k]->data->auxInfluences.clear();
+                cells[i][j][k]->data->auxInfluences.resize(cells[i][j][k]->data->influences.size());
 
                 for(int w = 0; w < weightSize; w++)
                 {
@@ -868,7 +1123,7 @@ void grid3d::expandWeights()
                         if(cells[newI][newJ][newK]->getType() == EXTERIOR) continue;
 
                         // Acumulamos el valor de los vecinos.
-                        float v1 = cells[newI][newJ][newK]->data->weights[w];
+						float v1 = cells[newI][newJ][newK]->data->influences[w].weightValue;
                         tempValue += v1;
                         inPos++;
                         //someChanged |= cells[newI][newJ][newK]->weights[w] > 0 || cells[i][j][k]->weights[w] > 0;
@@ -882,7 +1137,7 @@ void grid3d::expandWeights()
                         // Si ha habido cambio...vemos cuanto.
                         if(tempValue > 0)
                         {
-                            cells[i][j][k]->data->auxWeights[w] = tempValue;
+							cells[i][j][k]->data->auxInfluences[w].weightValue = tempValue;
                         }
                     }
                 }
@@ -915,7 +1170,7 @@ void grid3d::expandWeights()
                     diference = fabs(cells[i][j][k]->data->auxWeights[w]- cells[i][j][k]->data->weights[w]);
                     interationVariationArray[w] += diference;
                     meanVar += diference;
-
+					
                     if(cells[i][j][k]->data->auxWeights[w] > 0)
                         cells[i][j][k]->data->weights[w] =  cells[i][j][k]->data->auxWeights[w] ;
                 }
@@ -951,8 +1206,33 @@ void grid3d::expandWeights()
         printf("Iteracion: %d, con valor: %f (%d pesos expandidos).\n", iterations, iterationVariation, expanded);fflush(0);
         iterations++;
     }
-
 	*/
+}
+
+int grid3d::typeCells(Modelo* mesh)
+{
+    // Comprobar que la caja contenedora de la maya estÃ¡ contenida dentro del grid.
+    //assert(mesh.bbox.min > bounding.min);
+    //assert(mesh.bbox.max < bounding.max);
+
+    int TypedCells = 0;
+
+    // recorremos todas las caras y las anadimos al grid -> BOUNDARIES
+    //for(MyMesh::FaceIterator fi = mesh.face.begin(); fi!=mesh.face.end(); ++fi )
+    //    TypedCells += typeCells(*fi);
+
+	for(int i = 0; i< mesh->triangles.size(); i++ )
+	{
+        TypedCells += typeCells(mesh, i);
+	}
+
+    // Marcamos lo que es externo.
+    fillFromCorners();
+
+    // Marcamos lo que es interno.
+    fillInside();
+
+    return TypedCells;
 }
 
 int grid3d::typeCells(MyMesh& mesh)
@@ -979,9 +1259,9 @@ int grid3d::typeCells(MyMesh& mesh)
 Point3i grid3d::cellId(Point3d pt)
 {
     Point3d aux = pt - bounding.min;
-    int x = (int)round(aux.X()/cellSize);
-    int y = (int)round(aux.Y()/cellSize);
-    int z = (int)round(aux.Z()/cellSize);
+    int x = (int)floor(aux.X()/cellSize);
+    int y = (int)floor(aux.Y()/cellSize);
+    int z = (int)floor(aux.Z()/cellSize);
     return Point3i(x,y,z);
 }
 
@@ -992,11 +1272,232 @@ Point3d grid3d::cellCenter(int i,int j,int k)
     return aux;
 }
 
+int grid3d::typeCells(Modelo* m, int triIdx)
+{
+    // A. Anadimos los vertices.
+    Point3i cell[3];
+    //Box3i boundingCells;
+
+    int boundaryCells = 0;
+
+	GraphNodePolygon* tri = m->triangles[triIdx];
+	vector<Point3d> points;
+	points.resize(tri->verts.size());
+	for(int i = 0; i< tri->verts.size(); i++)
+		points[i] = tri->verts[i]->position;
+
+	assert(tri->verts.size() == 3);
+
+    // recogemos los vertices y los marcamos.
+	for(int i = 0; i<points.size(); i++)
+    {
+		cell[i] = cellId(points[i]); // Obtenemos la celda en la que cae el vÃ©rtice
+        //boundingCells.Add(cell[i]);
+
+		int x = cell[i].X();
+		int y = cell[i].Y();
+		int z = cell[i].Z();
+
+        if(cells[x][y][z]->getType() != BOUNDARY)
+        {
+            cells[x][y][z]->setType(BOUNDARY);
+            boundaryCells++;
+        }
+
+		if(cells[x][y][z]->data == NULL)
+			cells[x][y][z]->data = new cellData();
+
+        cells[x][y][z]->data->vertexContainer = true;
+        //cells[cell[i].X()][cell[i].Y()][cell[i].Z()]->weights[face.V(i)->IMark()] = 1.0;
+    }
+
+    // Ahora recorremos celda por celda y vamos pintando el contorno.
+
+    float processCellSize = cellSize/3;
+
+    // 3D Rendering de arestas
+    // cellSize -> lado de cada cubo.
+    // ponemos el valor para las arestas tambiŽn.
+    for(int k = 0; k<tri->verts.size(); k++)
+    {
+        Point3d v = ( points[(k+1)%3] - points[k] );
+
+        //int idvert1 = face.V(k)->IMark();
+        //int idvert2 = face.V((k+1)%3)->IMark();
+        Point3d v1 = points[k];
+        //Point3d v2 = face.V((k+1)%3)->P();
+        //float edgeLength = (v2-v1).Norm();
+
+        int divisions = (int)floor(v.Norm()/processCellSize);
+        Point3d vDir = v/v.Norm();
+        for(int i = 0; i< divisions ; i++)
+        {
+            Point3d intPoint = vDir*i*processCellSize + v1;
+            Point3i cell = cellId(intPoint);
+
+            if(dimensions.X() <= cell.X() || dimensions.Y() <= cell.Y() || dimensions.Z() <= cell.Z() ||
+               0 > cell.X() || 0 > cell.Y() || 0 > cell.Z()      )
+            {
+                printf("Tenemos un punto fuera?? (%d, %d, %d)\n", cell.X(), cell.Y(), cell.Z());
+            }
+            else
+            {
+				cell3d* cellT = cells[cell.X()][cell.Y()][cell.Z()];
+
+                if(cellT->getType() != BOUNDARY)
+                {
+					cellT->setType(BOUNDARY);
+					if(cellT->data == NULL) cellT->data = new cellData();
+                }
+            }
+            boundaryCells++;
+        }
+    }
+
+    // buscamos la aresta mas larga.
+    int largeIdx = 0;
+	Point3d v = (points[(largeIdx+1)%3]-points[largeIdx]);
+    float edgeLong = v.Norm();
+    for(int k = 1; k<3; k++)
+    {
+        v = (points[(k+1)%3]-points[k]);
+        if(edgeLong < v.Norm())
+        {
+            largeIdx = k;
+            edgeLong = v.Norm();
+        }
+    }
+
+    Point3d v1 = Point3d(points[(largeIdx+1)%3] - points[largeIdx]);
+    Point3d v2 = Point3d(points[(largeIdx+2)%3] - points[largeIdx]);
+    Point3d v3 = Point3d(points[(largeIdx+2)%3] - points[(largeIdx+1)%3]);
+
+    Point3d aux = v1^v2;
+    Point3d normal = aux^v1;
+
+    float v1Norm = (float)v1.Norm();
+    float v2Norm = (float)v2.Norm();
+    float v3Norm = (float)v3.Norm();
+    float normalNorm = (float)normal.Norm();
+
+    Point3d v1Dir = v1/v1Norm;
+    Point3d v2Dir = v2/v2Norm;
+    Point3d v3Dir = v3/v3Norm;
+    Point3d normalDir = normal/normalNorm;
+
+    Point3d edgeCenter = v1Dir*(v1Dir*v2) + points[largeIdx];
+    int div1 = (int)ceil((points[largeIdx]-edgeCenter).Norm()/processCellSize);
+    int div2 = (int)ceil((points[(largeIdx+1)%3]-edgeCenter).Norm()/processCellSize);
+
+    for(int i = 1; i< div1 ; i++) // Saltamos el 0 porque es el mismo vertice.
+    {
+        Point3d minPt = v1Dir*i*processCellSize + points[largeIdx];
+        Point3d maxPt = v2Dir*((float)i/(float)div1)*v2Norm + points[largeIdx]; // Suponemos que al ser triangulo rectangulo mantiene proporciones.
+
+        Point3d line = maxPt-minPt;
+        int Ydivs = (int)floor(line.Norm()/processCellSize);
+
+        for(int j = 1; j< Ydivs ; j++) // Saltamos el 0 porque es el mismo vÃ©rtice.
+        {
+            Point3d intPoint = normalDir*j*processCellSize + minPt;
+            Point3i cell = cellId(intPoint);
+
+            if(dimensions.X() <= cell.X() || dimensions.Y() <= cell.Y() || dimensions.Z() <= cell.Z() ||
+               0 > cell.X() || 0 > cell.Y() || 0 > cell.Z()      )
+            {
+                printf("Tenemos un punto fuera?? (%d, %d, %d)\n", cell.X(), cell.Y(), cell.Z());
+            }
+            else
+            {
+				if(cells[cell.X()][cell.Y()][cell.Z()]->data == NULL)
+					cells[cell.X()][cell.Y()][cell.Z()]->data = new cellData();
+
+                cells[cell.X()][cell.Y()][cell.Z()]->setType(BOUNDARY);
+            }
+
+            boundaryCells++;
+        }
+    }
+
+
+    for(int i = 1; i< div2 ; i++) // Saltamos el 0 porque es el mismo vertice.
+    {
+        Point3d minPt = -v1Dir*i*processCellSize + points[(largeIdx+1)%3];
+        Point3d maxPt = v3Dir*((float)i/(float)div2)*v3Norm + points[(largeIdx+1)%3]; // Suponemos que al ser triÃ¡ngulo rectÃ¡ngulo mantiene proporciones.
+
+        Point3d line = maxPt-minPt;
+        int Ydivs = (int)floor(line.Norm()/processCellSize);
+
+        for(int j = 1; j< Ydivs ; j++) // Saltamos el 0 porque es el mismo vÃ©rtice.
+        {
+            Point3d intPoint = normalDir*j*processCellSize + minPt;
+            Point3i cell = cellId(intPoint);
+
+            if(dimensions.X() <= cell.X() || dimensions.Y() <= cell.Y() || dimensions.Z() <= cell.Z() ||
+               0 > cell.X() || 0 > cell.Y() || 0 > cell.Z()      )
+            {
+                printf("Tenemos un punto fuera?? (%d, %d, %d)\n", cell.X(), cell.Y(), cell.Z());
+            }
+            else
+			{
+				if(cells[cell.X()][cell.Y()][cell.Z()]->data == NULL)
+					cells[cell.X()][cell.Y()][cell.Z()]->data = new cellData();
+
+                cells[cell.X()][cell.Y()][cell.Z()]->setType(BOUNDARY);
+			}
+
+            boundaryCells++;
+        }
+    }
+
+    
+    // Podemos ampliar el contorno para estabilizar m‡s el c‡lculo.
+    /*
+	for(int i = 0; i< cells.size(); i++)
+    {
+        for(int j = 0; j< cells[i].size(); j++)
+        {
+            for(int k = 0; k< cells[i][j].size(); k++)
+            {
+                if(cells[i][j][k]->tipo == BOUNDARY && !cells[i][j][k]->changed)
+                {
+
+                    for(int l = -1; l< 2; l++)
+                    {
+                        for(int m = -1; m< 2; m++)
+                        {
+                            for(int n = -1; n< 2; n++)
+                            {
+                                if(l == 0 && m == 0 && n == 0) continue;
+
+
+                                if(l+i < 0 || m+j < 0 || n+k < 0 || dimensions.X() <= l+i || dimensions.Y() <= m+j || dimensions.Z() <= n+k )  continue;
+
+                                if(cells[i][j][k]->tipo == BOUNDARY) continue;
+
+                                if(cells[i+l][j+m][k+n])
+                                {
+                                    cells[i+l][j+m][k+n]->tipo = BOUNDARY;
+                                    cells[i][j][k]->changed = true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    */
+
+     return boundaryCells;
+}
+
 int grid3d::typeCells(MyFace& face)
 {
     // A. Anadimos los vertices.
     Point3i cell[3];
-    Box3i boundingCells;
+    //Box3i boundingCells;
 
     int boundaryCells = 0;
 
@@ -1004,7 +1505,7 @@ int grid3d::typeCells(MyFace& face)
     for(int i = 0; i<3; i++)
     {
         cell[i] = cellId(face.P(i)); // Obtenemos la celda en la que cae el vÃ©rtice
-        boundingCells.Add(cell[i]);
+        //boundingCells.Add(cell[i]);
 
         if(cells[cell[i].X()][cell[i].Y()][cell[i].Z()]->getType() != BOUNDARY)
         {

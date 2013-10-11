@@ -63,7 +63,7 @@ Modelo::Modelo() : Geometry()
     dynCage = NULL;
 
     currentCage = NULL;
-    currentRender = this;
+    //currentRender = this;
 
     embedding.clear();
 	modelVertexDataPoint.clear();
@@ -86,7 +86,7 @@ Modelo::Modelo(unsigned int nodeId) : Geometry(nodeId)
     dynCage = NULL;
 
     currentCage = NULL;
-    currentRender = this;
+    //currentRender = this;
 
     embedding.clear();
 	modelVertexDataPoint.clear();
@@ -112,7 +112,7 @@ Modelo::~Modelo()
     modelCage = NULL;
     dynCage = NULL;
     currentCage = NULL;
-    currentRender = NULL;
+    //currentRender = NULL;
 
 	modelVertexDataPoint.clear();
 	modelVertexBind.clear();
@@ -229,6 +229,296 @@ void Modelo::select(bool bToogle, unsigned int id)
                 currentCage = stillCages[i];
         }
     }
+}
+
+void BuildSurfaceGraphs(Modelo& m, vector<binding*>& bindings)
+{
+	//m->bindings.push_back(new binding(m->vn()));
+
+	vector<GraphNode*>& nodes = m.nodes;
+	vector<GraphNodePolygon*>& triangles = m.triangles;
+
+	/*
+	vector<GraphNode*> nodes;
+	nodes.resize(m.vn);
+	for(int i = 0; i< nodes.size(); i++)
+		nodes[i] = new GraphNode(i);
+
+	MyMesh::FaceIterator fi;
+    int idx = 0;
+    for(fi = m.face.begin(); fi!=m.face.end(); ++fi ) 
+	{
+		int pts[3];
+		for(int i = 0; i< 3; i++)
+			pts[i] = (*fi).V(i)->IMark();
+
+		for(int vert = 0; vert < 3; vert++)
+		{
+			bool found = false;
+
+			for(int con = 0; con < nodes[pts[vert]]->connections.size(); con++)
+			{
+				found |= nodes[pts[vert]]->connections[con]->id == pts[(vert+1)%3];
+			}
+			if(!found)
+			{
+				nodes[pts[vert]]->connections.push_back(nodes[pts[(vert+1)%3]]);
+				nodes[pts[(vert+1)%3]]->connections.push_back(nodes[pts[vert]]);
+			}
+		}
+    }
+	*/
+
+	// Buscamos componentes conexas a la vez que nos quedamos
+	// con los datos para luego crear los grafos.
+	int idDispatcher = -1;
+	vector<int> connIds;
+	vector<bool> visIds;
+	visIds.resize(m.nodes.size(),false);
+	connIds.resize(m.nodes.size(), -1);
+
+	for(unsigned int n = 0; n < nodes.size(); n++)
+	{
+		// todavia no se ha trabajado, debe ser nuevo
+		if(connIds[n] < 0)
+		{
+			// Asignamos ID nuevo
+			idDispatcher++;
+			connIds[n] = idDispatcher;
+
+			// Iniciamos variables de recorrido
+			for(unsigned int v = 0; v < visIds.size(); v++)
+				visIds[v] = false;
+
+			visIds[n] = true;
+
+			vector<int> frontIds; 
+			
+			for(int neigh = 0; neigh < nodes[n]->connections.size(); neigh++)
+				frontIds.push_back(nodes[n]->connections[neigh]->id);
+
+			vector<int> harvestIds; harvestIds.push_back(idDispatcher);
+			propagateIdFromNode(idDispatcher, frontIds, harvestIds, visIds, connIds, nodes);
+		}
+	}
+
+	printf("Count of graphs: %d\n", idDispatcher+1);
+
+	vector<bool> founded;
+	founded.resize(idDispatcher+1, false);
+	for(int conId = 0; conId < connIds.size(); conId++)
+	{
+		bool foundAll = true;
+		for(int i = 0; i<= idDispatcher; i++)
+		{
+			foundAll &= founded[i];
+			if(!founded[i]) 
+			{ 
+				founded[i] = connIds[conId] == i;
+			}
+		}
+		if(foundAll) 
+			break;
+	}
+
+	int relateId = 0;
+	map<int, int> relateGraphId;
+	for(int f = 0; f < founded.size(); f++)
+	{
+		if(founded[f])
+		{
+			relateGraphId[f] = relateId;
+			relateId++;
+		}
+	}
+
+	vector<int> graphNodesCounter;
+	graphNodesCounter.resize(relateId);
+
+	for(int i = 0; i< connIds.size(); i++)
+	{
+		connIds[i] = relateGraphId[connIds[i]];
+		graphNodesCounter[connIds[i]]++;
+	}
+
+	for(int i = 0; i < graphNodesCounter.size(); i++) 
+	{
+		printf("[Connected part %d]-> %d# nodes\n", i, graphNodesCounter[i]);
+	}
+
+	bindings.resize(graphNodesCounter.size());
+	m.modelVertexDataPoint.resize(nodes.size());
+	m.modelVertexBind.resize(nodes.size());
+
+	for(int bbIdx = 0; bbIdx < bindings.size(); bbIdx++)
+	{
+		bindings[bbIdx] = new binding(graphNodesCounter[bbIdx]);
+		bindings[bbIdx]->bindId = bbIdx;
+
+		bindings[bbIdx]->surface.nodes.resize(graphNodesCounter[bbIdx]);
+
+		//for(int i = 0; i< bindings[bbIdx]->surface.nodes.size(); i++)
+		//	bindings[bbIdx]->surface.nodes[i] = new GraphNode(i);
+
+		//vector<GraphNode*> subGraph;
+		//subGraph.resize(nodes.size(), NULL);
+		int count = 0;
+		for(int i = 0; i< nodes.size(); i++)
+		{
+			if(connIds[i] == bbIdx)
+			{
+				bindings[bbIdx]->surface.nodes[count] = nodes[i];
+				bindings[bbIdx]->pointData[count].node = nodes[i];
+
+				m.modelVertexBind[nodes[i]->id] = bbIdx;
+				m.modelVertexDataPoint[nodes[i]->id] = count;
+				count++;
+			}
+
+		}
+
+		assert(count == graphNodesCounter[bbIdx]);
+
+		bindings[bbIdx]->surface.triangles.resize(triangles.size());
+		count = 0;
+		for(int i = 0; i< triangles.size(); i++)
+		{
+			bool found = true;
+			for(int trTemp = 0; trTemp < triangles[i]->verts.size(); trTemp++)
+			{
+				int vertId = triangles[i]->verts[trTemp]->id;
+				found &= (m.modelVertexBind[vertId] == bbIdx);
+			}
+
+			if(found)
+			{
+				bindings[bbIdx]->surface.triangles[count] = triangles[i];
+				count++;
+			}
+		}
+
+		bindings[bbIdx]->surface.triangles.resize(count);
+		
+	}
+
+	/*
+	// Construimos estos dos vectores de referencias para ir más rápido en otras
+	// computaciones.
+	vector<int>& modelVertexDataPoint = m.modelVertexDataPoint;
+	vector<int>& modelVertexBind = m.modelVertexBind;
+
+	modelVertexDataPoint.resize(nodes.size());
+	modelVertexBind.resize(nodes.size());
+
+	int count = 0; 
+	for(int i = 0; i< bindings.size(); i++)
+	{
+		for(int j = 0; j< bindings[i]->pointData.size(); j++)
+		{
+			modelVertexBind[bindings[i]->pointData[j].modelVert] = i;
+			modelVertexDataPoint[bindings[i]->pointData[j].modelVert] = j;
+			count++;
+		}
+	}
+
+	assert(count == nodes.size());
+	*/
+
+	// Recorremos los vertices y acumulamos el area de sus triangulos ponderado por 1/3 que le corresponde.
+    //MyMesh::VertexIterator vi;  idx = 0;
+    //for(vi = m.vert.begin(); vi!=m.vert.end(); ++vi ) 
+	/*for(int vi = 0; vi < m.nodes.size(); vi++)
+	{
+		int idBind = m.modelVertexBind[m.nodes[vi]->id];
+		int idVertexInBind = m.modelVertexDataPoint[m.nodes[vi]->id];
+		m.bindings[idBind]->pointData[idVertexInBind].position = m.nodes[vi]->position;
+    }
+	*/
+
+	// Guardamos una indirección para tener ordenados los pesos... esto podría variar
+	// para optimizar los cálculos.
+	int counter = 0;
+	m.globalIndirection.resize(m.vn());
+	for(int i = 0; i< bindings.size(); i++)
+	{
+		for(int j = 0; j< bindings[i]->pointData.size(); j++)
+		{
+			bindings[i]->globalIndirection[j] = counter;
+			m.globalIndirection[bindings[i]->pointData[j].node->id] = counter;
+			counter++;
+		}
+	}
+
+	// Construimos una matriz de adyacencia que tambien
+	// recoge si una arista es borde(1) o no (2)
+	vector< vector<short> > edges; 
+	edges.resize(m.vn());
+	for(int i = 0; i< edges.size(); i++)
+		edges[i].resize(m.vn(), 0);
+	
+	//MyMesh::FaceIterator fj;
+    //for(fj = m.face.begin(); fj!=m.face.end(); ++fj )
+	for(int fj = 0; fj < m.triangles.size(); fj++ )
+	{
+        vcg::Point3d O, c, s;
+        vcg::Point3i idVerts;
+        for(int i = 0; i<3; i++) // Obtenemos los indices de los vertices de t
+			idVerts[i] = m.triangles[fj]->verts[i]->id;
+
+		for(int i = 0; i<3; i++)
+			edges[idVerts[i]][idVerts[(i+1)%3]]++;
+	}
+
+	for(int i = 0; i< bindings.size(); i++)
+	{
+		for(int pt = 0; pt < bindings[i]->pointData.size(); pt++)
+		{
+			int vert = bindings[i]->pointData[pt].node->id;
+			for(int con = 0; con< bindings[i]->surface.nodes[pt]->connections.size(); con++)
+			{
+				int conected = bindings[i]->surface.nodes[pt]->connections[con]->id;
+				int modelVertConected = bindings[i]->pointData[conected].node->id;
+				int count = edges[vert][modelVertConected]+edges[modelVertConected][vert];
+
+				// Comprobamos si es un borde -> si hay conexion deberia tener valor de mas de uno.
+				bindings[i]->pointData[pt].isBorder |= count < 2;
+				bindings[i]->pointData[conected].isBorder |= count < 2;
+			}
+		}
+	}
+}
+
+void propagateIdFromNode(int id, vector<int>& frontIds,vector<int>& harvestIds,vector<bool>& visIds,vector<int>& connIds,vector<GraphNode*> nodes)
+{
+	while(frontIds.size() > 0)
+	{
+		int newId = frontIds.back();
+		frontIds.pop_back();
+
+		// Si ya ha sido visitado en este pase seguimos.
+		if(visIds[newId]) continue;
+
+		int connId = connIds[newId];
+
+		if(connId < 0)
+		{
+			connIds[newId] = id;
+			visIds[newId] = true;
+			for(unsigned int neigh = 0; neigh < nodes[newId]->connections.size(); neigh++)
+					frontIds.push_back(nodes[newId]->connections[neigh]->id);
+		}
+		else if(connId != id)
+		{
+			for(unsigned int i = 0; i< connIds.size(); i++)
+				if(connIds[i] == connId) 
+				{
+					connIds[i] = id;
+					visIds[newId] = true;
+				}
+
+			harvestIds.push_back(newId);
+		}
+	}
 }
 
 /*

@@ -1,5 +1,7 @@
 #include "object.h"
 
+#include <utils/util.h>
+
 using namespace vcg;
 
 object::object() : node()
@@ -88,8 +90,9 @@ void object::addRotation(double rx, double ry, double rz)
 {
     // Aplicar la rotación, creo que hay que hacerlo con una multiplicacion.
 	Quaternion<double> qAux;
-	qAux.FromEulerAngles(rx, ry, rz);
+	qAux.FromEulerAngles(Deg2Rad(rx), Deg2Rad(ry), Deg2Rad(rz));
 	qrot += qAux;
+	qrot.Normalize();
 	//rot += Point3d(rx, ry, rz);
     dirtyFlag = true;
 }
