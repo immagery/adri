@@ -219,10 +219,16 @@ void JointRender::drawFunc(joint* jt)
 
     glTranslated(jt->pos.X(),jt->pos.Y(),jt->pos.Z());
 
-    glRotatef((GLfloat)jt->orientJoint.Z(),0,0,1);
-    glRotatef((GLfloat)jt->orientJoint.Y(),0,1,0);
-    glRotatef((GLfloat)jt->orientJoint.X(),1,0,0);
+    //glRotatef((GLfloat)jt->orientJoint.Z(),0,0,1);
+    //glRotatef((GLfloat)jt->orientJoint.Y(),0,1,0);
+    //glRotatef((GLfloat)jt->orientJoint.X(),1,0,0);
 
+	double orientAlpha, orientBeta, orientGamma;
+	jt->qOrient.ToEulerAngles(orientAlpha, orientBeta, orientGamma);
+
+	glRotatef((GLfloat)Rad2Deg(orientGamma),0,0,1);
+    glRotatef((GLfloat)Rad2Deg(orientBeta),0,1,0);
+    glRotatef((GLfloat)Rad2Deg(orientAlpha),1,0,0);
 
 	double alpha, beta, gamma;
 	jt->qrot.ToEulerAngles(alpha, beta, gamma);
@@ -268,16 +274,23 @@ void JointRender::computeRestPosRec(joint* jt)
 
     glTranslated(jt->pos.X(),jt->pos.Y(),jt->pos.Z());
 
-    glRotatef((GLfloat)jt->orientJoint.Z(),0,0,1);
-    glRotatef((GLfloat)jt->orientJoint.Y(),0,1,0);
-    glRotatef((GLfloat)jt->orientJoint.X(),1,0,0);
+	double orientAlpha, orientBeta, orientGamma;
+	jt->qOrient.ToEulerAngles(orientAlpha, orientBeta, orientGamma);
+
+	glRotatef((GLfloat)Rad2Deg(orientGamma),0,0,1);
+    glRotatef((GLfloat)Rad2Deg(orientBeta),0,1,0);
+    glRotatef((GLfloat)Rad2Deg(orientAlpha),1,0,0);
+	
+	//glRotatef((GLfloat)jt->orientJoint.Z(),0,0,1);
+    //glRotatef((GLfloat)jt->orientJoint.Y(),0,1,0);
+    //glRotatef((GLfloat)jt->orientJoint.X(),1,0,0);
 
 	double alpha, beta, gamma;
 	jt->qrot.ToEulerAngles(alpha, beta, gamma);
 
-    glRotatef((GLfloat)gamma,0,0,1);
-    glRotatef((GLfloat)beta,0,1,0);
-    glRotatef((GLfloat)alpha,1,0,0);
+    glRotatef((GLfloat)Rad2Deg(gamma),0,0,1);
+    glRotatef((GLfloat)Rad2Deg(beta),0,1,0);
+    glRotatef((GLfloat)Rad2Deg(alpha),1,0,0);
 
     //glRotatef((GLfloat)jt->rot.Z(),0,0,1);
     //glRotatef((GLfloat)jt->rot.Y(),0,1,0);
@@ -316,16 +329,23 @@ void JointRender::computeWorldPosRec(joint* jt)
 
     glTranslated(jt->pos.X(),jt->pos.Y(),jt->pos.Z());
 
-    glRotatef((GLfloat)jt->orientJoint.Z(),0,0,1);
-    glRotatef((GLfloat)jt->orientJoint.Y(),0,1,0);
-    glRotatef((GLfloat)jt->orientJoint.X(),1,0,0);
+	double orientAlpha, orientBeta, orientGamma;
+	jt->qOrient.ToEulerAngles(orientAlpha, orientBeta, orientGamma);
+
+	glRotatef((GLfloat)Rad2Deg(orientGamma),0,0,1);
+    glRotatef((GLfloat)Rad2Deg(orientBeta),0,1,0);
+    glRotatef((GLfloat)Rad2Deg(orientAlpha),1,0,0);
+
+    //glRotatef((GLfloat)jt->orientJoint.Z(),0,0,1);
+    //glRotatef((GLfloat)jt->orientJoint.Y(),0,1,0);
+    //glRotatef((GLfloat)jt->orientJoint.X(),1,0,0);
 
 	double alpha, beta, gamma;
 	jt->qrot.ToEulerAngles(alpha, beta, gamma);
 
-    glRotatef((GLfloat)gamma,0,0,1);
-    glRotatef((GLfloat)beta,0,1,0);
-    glRotatef((GLfloat)alpha,1,0,0);
+    glRotatef((GLfloat)Rad2Deg(gamma),0,0,1);
+    glRotatef((GLfloat)Rad2Deg(beta),0,1,0);
+    glRotatef((GLfloat)Rad2Deg(alpha),1,0,0);
 	
 	//glRotatef((GLfloat)jt->rot.Z(),0,0,1);
     //glRotatef((GLfloat)jt->rot.Y(),0,1,0);

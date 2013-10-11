@@ -13,7 +13,6 @@
 
 void GeometryRender::drawFunc(object* obj)
 {
-	
     // transformaciones
     beforeDraw(obj);
 
@@ -22,7 +21,6 @@ void GeometryRender::drawFunc(object* obj)
     // Pintamos en modo directo el modelo
     if(shtype == T_POLY || shtype == T_XRAY)
     {
-
         float blend = 1;
         if(shtype == T_XRAY)
         {
@@ -37,15 +35,13 @@ void GeometryRender::drawFunc(object* obj)
         if(size<=0)
             glColor4f(color[0]*blend, color[1]*blend, color[2]*blend,blend);
 
-        //MyMesh::FaceIterator fi;
-        //for(fi = geom->face.begin(); fi!= geom->face.end(); ++fi )
 		for(int tr = 0; tr< geom->triangles.size(); tr++ )
 		{
              //glNormal3dv(&(*fi).N()[0]);
              for(int i = 0; i<3; i++)
              {
-				 int pIdx = geom->triangles[tr]->verts[i]->id; //fi->V(i)->IMark();
-
+				 int pIdx = geom->triangles[tr]->verts[i]->id;
+				 glNormal3d(geom->faceNormals[tr].X(), geom->faceNormals[tr].Y(), geom->faceNormals[tr].Z());
                  if(size > 0 && pIdx < size)
                  {
                      if(colors[pIdx].size()== 3)
@@ -60,14 +56,11 @@ void GeometryRender::drawFunc(object* obj)
                         glColor4f(color[0]*blend, color[1]*blend, color[2]*blend,blend);
                  }
 			
-                 glNormal(/*fi->V(i)->N()*/ geom->vertNormals[pIdx]);
+                 //glNormal3d(geom->vertNormals[pIdx].X(), geom->vertNormals[pIdx].Y(), geom->vertNormals[pIdx].Z());
                  glVertex(geom->nodes[pIdx]->position);
              }
          }
         glEnd();
-
-		//if(m_bDrawPoints)
-		//{
 
 		if(spotVertexes.size() > 0)
 		{
@@ -78,10 +71,9 @@ void GeometryRender::drawFunc(object* obj)
 
 			glBegin(GL_POINTS);
 			int countSV= 0;
+
 			// vertices normales
-			//MyMesh::VertexIterator vi;
 			for(int vi = 0; vi < geom->nodes.size(); vi++ )
-			//for(vi = geom->vert.begin(); vi!=geom->vert.end(); ++vi )
 			{
 				int pIdx = geom->nodes[vi]->id;
 
@@ -101,7 +93,6 @@ void GeometryRender::drawFunc(object* obj)
 			glEnd();
 			glEnable(GL_LIGHTING);
 		}
-		//}
 
 		if(spotVertex >= 0)
 		{
@@ -111,9 +102,8 @@ void GeometryRender::drawFunc(object* obj)
 			glPointSize(pointSize*0.9);
 
 			glBegin(GL_POINTS);
+
 			// vertices normales
-			//MyMesh::VertexIterator vi;
-			//for(vi = geom->vert.begin(); vi!=geom->vert.end(); ++vi )
 			for(int vi = 0; vi < geom->nodes.size(); vi++ )
 			{
 				int pIdx = geom->nodes[vi]->id;

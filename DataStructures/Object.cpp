@@ -92,6 +92,7 @@ void object::addRotation(double rx, double ry, double rz)
 	Quaternion<double> qAux;
 	qAux.FromEulerAngles(Deg2Rad(rx), Deg2Rad(ry), Deg2Rad(rz));
 	qrot += qAux;
+	qrot.Normalize();
 	//rot += Point3d(rx, ry, rz);
     dirtyFlag = true;
 }

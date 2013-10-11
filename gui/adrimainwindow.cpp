@@ -283,6 +283,12 @@ void AdriMainWindow::jointDataUpdate(float fvalue, int id)
     distancesSourceValueChange(id);
 }
 
+void AdriMainWindow::changeAuxValueInt(int value)
+{
+	ui->glCustomWidget->valueAux = value;
+	ui->glCustomWidget->paintModelWithData();
+}
+
 void AdriMainWindow::ImportCages()
 {
     /*
@@ -399,7 +405,7 @@ void AdriMainWindow::toogleVisibility(bool toogle)
 
 void AdriMainWindow::DataVisualizationChange(int mode)
 {
-    ui->glCustomWidget->changeVisualizationMode(mode);
+	ui->glCustomWidget->changeVisualizationMode(mode);
 }
 
 

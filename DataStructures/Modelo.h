@@ -19,7 +19,10 @@ public:
 
     Cage* currentCage;
 
-    Geometry* currentRender;
+	// No se que es, pero debe ser para visulizar deformaciones
+    //Geometry* currentRender;
+
+	Geometry* originalModel;
 
     // Cajas para hacer la deformacion
     Cage* modelCage; // Caja envolvente original
@@ -63,5 +66,7 @@ public:
 	int fn() {return triangles.size();}
 };
 
+void BuildSurfaceGraphs(Modelo& m, vector<binding*>& bindings);
+void propagateIdFromNode(int id, vector<int>& frontIds,vector<int>& harvestIds,vector<bool>& visIds,vector<int>& connIds,vector<GraphNode*> nodes);
 
 #endif // MODEL_H

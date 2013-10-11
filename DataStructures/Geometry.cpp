@@ -181,7 +181,7 @@ void Geometry::computeFaceNormals()
 	{
 		Point3d v1 = triangles[i]->verts[1]->position - triangles[i]->verts[0]->position;
 		Point3d v2 = triangles[i]->verts[2]->position - triangles[i]->verts[0]->position;
-		faceNormals[i] = v1.normalized()^v2.normalized();		
+		faceNormals[i] = (v1.normalized()^v2.normalized()).normalized();		
 	}
 }
 

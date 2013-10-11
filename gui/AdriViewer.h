@@ -17,6 +17,7 @@
 #include "DataStructures/skeleton.h"
 #include "DataStructures/Modelo.h"
 #include "DataStructures/AnimationManager.h"
+#include <render/gridRender.h>
 
 #include "SelectionManager.h"
 
@@ -25,21 +26,16 @@
 //#include "Particles.h"
 
 #define INFO_STRING "Info > %1"
-
+#define DEBUG_MODE 0
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
-
-class MainWindow;
 
 using namespace std;
 
-#define DEBUG_MODE 0
-
-
 enum viewingModes { DynCage_Mode = 0, Cages_Mode, BHD_Mode, SimpleModel_Mode};
-
 enum shadingModes { SH_MODE_FLAT = 0, SH_MODE_SMOOTH};
 
 class AdriMainWindow;
+class MainWindow;
 
 class AdriViewer : public QGLViewer
 {
@@ -120,8 +116,10 @@ public:
 	Point3d interiorPoint;
 
     // Primitives
-    MyMesh simpleCube;
-    MyMesh littleCube;
+    //MyMesh simpleCube;
+    //MyMesh littleCube;
+
+	int valueAux;
 
     // Transform
     // Animation
@@ -187,23 +185,28 @@ protected:
 
 public slots:
 
-	void changeVisualizationMode(int mode);
+	virtual void changeVisualizationMode(int mode);
 	void UpdateVertexSource(int id);
 	void ChangeStillCage(int id);
 	void loadSelectableVertex(Cage* cage);
 	void loadSelectVertexCombo(MyMesh& cage);
 	void changeVertexSelection(int id);
 
+	void paintGrid(gridRenderer* grRend);
+
 	void doTests(string fileName, string name, string path);
+
+	void paintModelWithData();
+
+	 float calculateDistancesForISOLines(grid3d* grid, vector<double>&  embeddedPoint);
 
     // GENERAL
     //void ChangeSliceXZ(int slice);
     //void ChangeSliceXY(int slice);
 
-//    void paintModelWithGrid();
-    //void paintModelWithData();
+    void paintModelWithGrid();
     //void paintPlaneWithData(bool compute = false);
-//	void setPlaneData(bool drawPlane, int pointPos, int mode, float sliderPos, int orient);
+	//void setPlaneData(bool drawPlane, int pointPos, int mode, float sliderPos, int orient);
 
     bool readNodes(vector< string >& nodeNames, vector< Point3d >& nodePoints, QString sFile);
     bool readPoints(vector< Point3d >& points, QString sFile);

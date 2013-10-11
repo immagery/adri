@@ -413,7 +413,18 @@ void AdriViewer::readSkeleton(string fileName)
         QString sModelFile = in.readLine(); in.readLine(); in.readLine();
         QString sSkeletonFile = in.readLine(); in.readLine(); in.readLine();
         QString sEmbeddingFile = in.readLine(); in.readLine(); in.readLine();
-        QString newPath(path.c_str());
+		QString sBindingFile, sGridFile;
+		if(!in.atEnd())
+		{
+			sBindingFile = in.readLine(); in.readLine(); in.readLine();
+		}
+		if(!in.atEnd())
+		{
+			sGridFile = in.readLine(); in.readLine(); in.readLine();
+		}
+		modelDefFile.close();
+
+		QString newPath(path.c_str());
         newPath = newPath +"/";
         if(!sPath.isEmpty())
             newPath = newPath+"/"+sPath +"/";
@@ -427,18 +438,17 @@ void AdriViewer::readSkeleton(string fileName)
         // Leer esqueleto
         readSkeleton((newPath+sSkeletonFile).toStdString());
 
+		BuildSurfaceGraphs(*m, m->bindings);
+
         // Leer embedding
         //ReadEmbedding((newPath+sEmbeddingFile).toStdString(), m->embedding);
 		
-        modelDefFile.close();
-		
 		// Skinning
-		QString path = (sGlobalPath.append(sPath).append("binding.txt"));
-		string spath = path.toStdString();
-		escena->loadBindingForModel(m,(newPath.append("binding.txt").toStdString()));
+		//QString path = (sGlobalPath.append(sPath).append("binding.txt"));
+		string sBindingFileFullPath = (newPath+sBindingFile).toStdString();//path.toStdString();
+		escena->loadBindingForModel(m,sBindingFileFullPath);
         escena->skinner->computeRestPositions(escena->skeletons);
 
-		
 		/*SolverSinusoidal* sinY = new SolverSinusoidal(0.1,1.5,0);	sinY->dimension = 1;
 		SolverSinusoidal* sinZ = new SolverSinusoidal(0.2,1,0);	sinZ->dimension = 2;
 		SolverSinusoidal* mouthSolver = new SolverSinusoidal(0.3,1,0); mouthSolver->dimension = 2;
@@ -808,7 +818,8 @@ void AdriViewer::readSkeleton(string fileName)
 		for (int i = 0; i < escena->skeletons[0]->joints.size(); ++i) {
 			 // TOFIX escena->skeletons[0]->joints[i]->rot += rots[i];
 		}*/
-		escena->skinner->computeDeformations(escena->skeletons);
+		//escena->skinner->computeDeformations(escena->skeletons);
+		escena->skinner->computeDeformationsWithSW(escena->skeletons);
 	 }
 
 
@@ -1090,11 +1101,573 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
     //updateGL();
  }
 
+ void AdriViewer::paintModelWithData() {
+    for(unsigned int modelIdx = 0; modelIdx < escena->models.size(); modelIdx++)
+    {
+        Modelo* m = (Modelo*)escena->models[modelIdx];
 
- void AdriViewer::changeVisualizationMode(int mode)
+		if(m->shading->colors.size() != m->vn())
+            m->shading->colors.resize(m->vn());
+
+        m->cleanSpotVertexes();
+
+        double maxdistance = 0.001;
+        vector<double> pointdistances;
+        vector<double> maxdistances;
+        maxdistances.resize(m->bindings.size());
+
+        vector<double> weights;
+        vector<int> weightssort(m->vn());
+        vector<bool> weightsrepresentative(m->vn());
+
+        vector<double> completedistances;
+        double threshold = escena->weightsThreshold;//1/pow(10.0, 3);
+
+		if(escena->iVisMode == VIS_ISODISTANCES || escena->iVisMode == VIS_POINTDISTANCES || escena->iVisMode == VIS_ERROR || escena->iVisMode == VIS_WEIGHT_INFLUENCE)
+        {
+			/*
+            printf("tiempos de computacion para %d vertices: \n", m->vn()); fflush(0);
+
+            clock_t ini, fin;
+            ini = clock();
+
+            weights.resize(m->vn());
+            int currentbinding = 1;
+            pointdistances.resize(m->vn());
+            //pointdistances.resize(m->bindings[currentbinding]->pointdata.size());
+            //mvcsinglebinding(interiorpoint, weights, m->bindings[currentbinding], *m);
+            mvcAllBindings(interiorPoint, weights, m->bindings, *m);
+
+            fin = clock();
+            printf("mean value coordinates: %f ms\n", timelapse(fin,ini)*1000); fflush(0);
+            ini = clock();
+
+            //for(int si = 0; si < weights.size(); si++)
+            //{
+            //	weightssort[si] = si;
+            //}
+            //doublearrangeelements(weights, weightssort, true, threshold);
+            vector<double> stats;
+            doubleArrangeElements_withStatistics(weights, weightssort, stats, threshold);
+
+
+            fin = clock();
+            printf("ordenacion: %f ms\n", timelapse(fin,ini)*1000); fflush(0);
+            ini = clock();
+
+            double prevalue = 0;
+            for(int currentbinding = 0; currentbinding < m->bindings.size(); currentbinding++)
+            {
+                int iniidx = m->bindings[currentbinding]->globalIndirection.front();
+                int finidx = m->bindings[currentbinding]->globalIndirection.back();
+                prevalue += PrecomputeDistancesSingular_sorted(weights, weightssort,  m->bindings[currentbinding]->BihDistances, threshold);
+            }
+
+            fin = clock();
+            printf("precomputo: %f ms\n", timelapse(fin,ini)*1000); fflush(0);
+            ini = clock();
+
+            for(int i = 0; i< m->modelVertexBind.size(); i++)
+            {
+                int ibind = m->modelVertexBind[i];
+                int iniidx = m->bindings[ibind]->globalIndirection.front();
+                int finidx = m->bindings[ibind]->globalIndirection.back();
+
+                int ivertexbind = m->modelVertexDataPoint[i];
+
+                pointdistances[i] = -BiharmonicDistanceP2P_sorted(weights, weightssort, ivertexbind , m->bindings[ibind], 1.0, prevalue, threshold);
+
+                maxdistances[ibind] = max(maxdistances[ibind],pointdistances[i]);
+                maxdistance = max(pointdistances[i], maxdistance);
+            }
+
+            fin = clock();
+            printf("calculo distancias: %f ms\n", timelapse(fin,ini)*1000); fflush(0);
+            ini = clock();
+
+            for(int md = 0; md< maxdistances.size(); md++)
+            {
+                printf("bind %d con maxdist: %f\n", md, maxdistances[md]);
+                fflush(0);
+            }
+			*/
+
+            if(escena->iVisMode == VIS_ERROR)
+            {
+				/*
+                completedistances.resize(m->vn());
+                double prevalue2 = 0;
+                for(int currentbinding = 0; currentbinding < m->bindings.size(); currentbinding++)
+                {
+                    int iniidx = m->bindings[currentbinding]->globalIndirection.front();
+                    int finidx = m->bindings[currentbinding]->globalIndirection.back();
+                    prevalue2 += PrecomputeDistancesSingular_sorted(weights, weightssort,  m->bindings[currentbinding]->BihDistances, -10);
+                }
+
+                for(int i = 0; i< m->modelVertexBind.size(); i++)
+                {
+                    int ibind = m->modelVertexBind[i];
+                    int iniidx = m->bindings[ibind]->globalIndirection.front();
+                    int finidx = m->bindings[ibind]->globalIndirection.back();
+
+                    int ivertexbind = m->modelVertexDataPoint[i];
+                    completedistances[i] = -BiharmonicDistanceP2P_sorted(weights, weightssort, ivertexbind , m->bindings[ibind], 1.0, prevalue2, -10);
+                }
+				*/
+            }
+        }
+
+        double maxError = -9999;
+        if(m->bindings.size() <= 0) continue;
+        for(int currentbinding = 0; currentbinding < m->bindings.size(); currentbinding++)
+        {
+            for(int count = 0; count< m->bindings[currentbinding]->pointData.size(); count++)
+            {
+                if(m->bindings[currentbinding]->pointData[count].isBorder)
+                    m->addSpotVertex(m->bindings[currentbinding]->pointData[count].node->id);
+
+                float value = 0.0;
+                // deberia ser al reves, recorrer el binding y este pinta los puntos del modelo.
+                // hacer un reset antes con el color propio del modelo.
+                binding* bd = m->bindings[currentbinding];
+                PointData& pd = bd->pointData[count];
+                int newvalue = 0;
+                if(escena->iVisMode == VIS_LABELS)
+                {
+                    value = (float)pd.component/(float)m->bindings.size();
+                }
+                else if(escena->iVisMode == VIS_SEGMENTATION)
+                {
+                    newvalue = (pd.segmentId-100)*13;
+                    value = ((float)(newvalue%50))/50.0;
+                }
+                else if(escena->iVisMode == VIS_BONES_SEGMENTATION)
+                {
+                    newvalue = (bd->nodeIds[pd.segmentId]->boneId-100)*13;
+                    //newvalue = (newvalue * 25) % 100;
+                    value = ((float)(newvalue%25))/25.0;
+                }
+                else if(escena->iVisMode == VIS_WEIGHTS)
+                {
+                    //float sum = 0;
+                    value = 0.0;
+
+                    int searchedindex = -1;
+                    for(unsigned int ce = 0; ce < pd.influences.size(); ce++)
+                    {
+                        if(pd.influences[ce].label == escena->desiredVertex)
+                        {
+                            searchedindex = ce;
+                            break;
+                        }
+                        //sum += pd.influences[ce].weightvalue;
+                    }
+                    if(searchedindex >= 0)
+                            value = pd.influences[searchedindex].weightValue;
+
+                    //if (sum < 1)
+                    //	printf("no se cumple la particion de unidad: %f.\n", sum);
+                }
+                else if(escena->iVisMode == VIS_SEG_PASS)
+                {
+                    value = 0.0;
+                    if(bd->nodeIds[pd.segmentId]->boneId == escena->desiredVertex)
+                    {
+                        value = 1.0;
+                    }
+                }
+                else if(escena->iVisMode == VIS_CONFIDENCE_LEVEL)
+                {
+					value = 0.0;
+
+                    int searchedindex = -1;
+                    for(unsigned int ce = 0; ce < pd.influences.size(); ce++)
+                    {
+                        if(pd.influences[ce].label == escena->desiredVertex)
+                        {
+                            searchedindex = ce;
+                            break;
+                        }
+                        //sum += pd.influences[ce].weightvalue;
+                    }
+                    if(searchedindex >= 0)
+					{
+						if(pd.secondInfluences[searchedindex].size()> 0)
+						{
+							if(valueAux < pd.secondInfluences[searchedindex].size())
+								value = pd.secondInfluences[searchedindex][valueAux];
+							else
+								value = pd.secondInfluences[searchedindex][pd.secondInfluences[searchedindex].size()-1];
+						}
+						else
+						{
+							value = 1.0;
+						}
+					}
+
+					/*
+                    value = 0.0;
+                    if(count == escena->desiredVertex)
+                    {
+                        value = 1.0;
+                    }
+                    else
+                    {
+                        for(int elemvecino = 0; elemvecino < bd->surface.nodes[count]->connections.size() ; elemvecino++)
+                        {
+                            if(bd->surface.nodes[count]->connections[elemvecino]->id == escena->desiredVertex)
+                            {
+                                value = 0.5;
+                                break;
+                            }
+                        }
+                    }
+					*/
+                }
+                else if(escena->iVisMode == VIS_ISODISTANCES)
+                {
+                    if(escena->desiredVertex <0 || escena->desiredVertex >= bd->pointData.size())
+                        value = 0;
+                    else
+                    {
+                        if(maxdistance <= 0)
+                            value = 0;
+                        else
+                            value = m->bindings[currentbinding]->BihDistances.get(count,escena->desiredVertex) / maxdistance;
+                    }
+                }
+                else if(escena->iVisMode == VIS_POINTDISTANCES)
+                {
+                    if(maxdistance <= 0)
+                        value = 0;
+                    else
+                    {
+                        int modelvert = m->bindings[currentbinding]->pointData[count].node->id;
+                        value = pointdistances[modelvert] / maxdistances[currentbinding];
+                    }
+                }
+                else if(escena->iVisMode == VIS_ERROR)
+                {
+					value = 0.0;
+
+                    int searchedindex = -1;
+                    for(unsigned int ce = 0; ce < pd.influences.size(); ce++)
+                    {
+                        if(pd.influences[ce].label == escena->desiredVertex)
+                        {
+                            searchedindex = ce;
+                            break;
+                        }
+                        //sum += pd.influences[ce].weightvalue;
+                    }
+                    if(searchedindex >= 0)
+					{
+						if(pd.secondInfluences[searchedindex].size()> 0)
+						{
+							if(valueAux < pd.secondInfluences[searchedindex].size())
+								value = pd.secondInfluences[searchedindex][valueAux]*pd.influences[searchedindex].weightValue;
+							else
+								value = pd.secondInfluences[searchedindex][pd.secondInfluences[searchedindex].size()-1]*pd.influences[searchedindex].weightValue;
+						}
+						else
+						{
+							value = 1.0*pd.influences[searchedindex].weightValue;
+						}
+					}
+                    /*int modelvert = m->bindings[currentbinding]->pointData[count].node->id;
+
+                    if(completedistances[modelvert] > 0)
+                        value = pointdistances[modelvert] - completedistances[modelvert];
+
+                    maxError = max((double)maxError, (double)value);
+					*/
+
+                }
+                else if(escena->iVisMode == VIS_WEIGHT_INFLUENCE)
+                {
+                    int modelVert = m->bindings[currentbinding]->pointData[count].node->id;
+                    value = weights[modelVert];
+                    //if(maxDistance <= 0)
+                    //	value = 0;
+                    //else
+                    //{
+                    //	int modelVert = m->bindings[currentBinding]->pointData[count].modelVert;
+                    //	value = pointDistances[modelVert] / maxDistances[currentBinding];
+                    //}
+                }
+                else
+                {
+                    value = 1.0;
+                }
+
+                float r,g,b;
+                GetColourGlobal(value,0.0,1.0, r, g, b);
+                //QColor c(r,g,b);
+                m->shading->colors[bd->surface.nodes[count]->id].resize(3);
+                m->shading->colors[bd->surface.nodes[count]->id][0] = r;
+                m->shading->colors[bd->surface.nodes[count]->id][1] = g;
+                m->shading->colors[bd->surface.nodes[count]->id][2] = b;
+            }
+        }
+
+        printf("Corte:%f\n", threshold); fflush(0);
+        printf("Error max:%f\n", maxError); fflush(0);
+
+    }
+}
+
+
+ void AdriViewer::paintModelWithGrid()
+{
+   /*
+   if(VERBOSE)
+       printf(">> PaintModelWithGrid (for testing)\n");
+
+   // Cada grid renderer actualizara sus modelos.
+   for(unsigned int vis = 0; vis < escena->visualizers.size(); vis++)
+   {
+       gridRenderer* grRend = (gridRenderer*)escena->visualizers[vis];
+       if(grRend == NULL) continue;
+
+       Modelo* m = grRend->model;
+       if(m == NULL) continue;
+
+       if(grRend == NULL || !grRend->Initialized) return;
+
+       m->shading->colors.resize(m->vn());
+
+       if(grRend->iVisMode == VIS_SEGMENTATION || grRend->iVisMode == VIS_WEIGHTS)
+       {
+           int count = 0;
+           MyMesh::VertexIterator vi;
+           for(vi = m->vert.begin(); vi!=m->vert.end(); ++vi ) {
+               m->shading->colors[count].resize(3);
+               Point3d pt = vi->P();
+
+               Point3i idx = grRend->grid->cellId(pt);
+
+               float value = 0;
+
+               if(grRend->iVisMode == VIS_WEIGHTS)
+               {
+                   int searchedIndex = -1;
+                   for(unsigned int ce = 0; ce < grRend->grid->cells[idx.X()][idx.Y()][idx.Z()]->data->influences.size(); ce++)
+                   {
+                       if(grRend->grid->cells[idx.X()][idx.Y()][idx.Z()]->data->influences[ce].label == grRend->desiredVertex)
+                       {
+                           searchedIndex = ce;
+                           break;
+                       }
+                   }
+
+                   if(searchedIndex >= 0)
+                       value = grRend->grid->cells[idx.X()][idx.Y()][idx.Z()]->data->influences[searchedIndex].weightValue;
+
+               }
+               else if(grRend->iVisMode == VIS_SEGMENTATION)
+               {
+                   if(grRend->grid->cells[idx.X()][idx.Y()][idx.Z()]->data->segmentId >= 0 &&
+                      grRend->grid->cells[idx.X()][idx.Y()][idx.Z()]->data->segmentId < grRend->grid->valueRange)
+                   {
+                       int newValue = (grRend->grid->cells[idx.X()][idx.Y()][idx.Z()]->data->segmentId * 13) % (int)ceil(grRend->grid->valueRange);
+                       value = newValue/grRend->grid->valueRange;
+                   }
+                   else value = 0;
+               }
+
+               assert((grRend->grid->valueRange-1) >= 0);
+               float r,g,b;
+               GetColour(value,0,1, r, g, b);
+               QColor c(r,g,b);
+               m->shading->colors[count][0] = c.redF();
+               m->shading->colors[count][1] = c.blueF();
+               m->shading->colors[count][2] = c.greenF();
+
+               count++;
+           }
+       }
+   }
+   */
+}
+
+ float AdriViewer::calculateDistancesForISOLines(grid3d* grid, vector<double>&  embeddedPoint)
+{
+    float maxDistance = 0;
+    for(int i = 0; i < grid->cells.size(); i++)
+    {
+        for(int j = 0; j < grid->cells[i].size(); j++)
+        {
+            for(int k = 0; k < grid->cells[i][j].size(); k++)
+            {
+                cell3d* cell = grid->cells[i][j][k];
+
+                if(cell->getType() == EXTERIOR || cell->getType() == INTERIOR) continue;
+
+                // TOFIX
+                //cell->data->distanceToPos = distancesFromEbeddedPoints(embeddedPoint, cell->data->embedding);
+                if(cell->data->distanceToPos > maxDistance)
+                    maxDistance = cell->data->distanceToPos;
+            }
+        }
+    }
+
+    return maxDistance;
+}
+
+
+ void AdriViewer::paintGrid(gridRenderer* grRend)
+{
+
+   float maxDistance = 0;
+   if( grRend->iVisMode == VIS_ISODISTANCES || grRend->iVisMode == VIS_ISOLINES)
+   {
+       // Calcular distancia maxima.
+       int findIndex = -1;
+       for(int i = 0; i< grRend->grid->v.embeddedPoints.size(); i++)
+       {
+           if(grRend->grid->v.intPoints[i].boneId == grRend->desiredVertex)
+           {
+               findIndex = i;
+               break;
+           }
+       }
+
+       if(findIndex >= 0)
+       {
+           vector<double>& embeddedPoint = grRend->grid->v.embeddedPoints[findIndex];
+           maxDistance = calculateDistancesForISOLines(grRend->grid, embeddedPoint);
+           //maxDistance = 4000;
+       }
+       if(maxDistance <= 0)
+           maxDistance = 1;
+   }
+
+   for(int i = 0; i < grRend->grid->cells.size(); i++)
+   {
+       for(int j = 0; j < grRend->grid->cells[i].size(); j++)
+       {
+           for(int k = 0; k < grRend->grid->cells[i][j].size(); k++)
+           {
+               int newValue;
+               float colorValue;
+               int idx;
+               float nInterval;
+               float dif;
+               float confidenceLimit;
+
+               cell3d* cell = grRend->grid->cells[i][j][k];
+               if(cell->getType() == EXTERIOR || cell->getType() == INTERIOR) continue;
+
+               switch(grRend->iVisMode)
+               {
+               case VIS_SEGMENTATION:
+                       newValue = (cell->data->segmentId * 25) % (int)ceil(grRend->grid->valueRange);
+                       colorValue = newValue/grRend->grid->valueRange;
+                   break;
+               case VIS_BONES_SEGMENTATION:
+                       newValue = grRend->grid->v.nodeIds[cell->data->segmentId]->boneId;
+                       newValue = (newValue * 25) % (int)ceil(grRend->grid->valueRange);
+                       colorValue = newValue/grRend->grid->valueRange;
+
+                       //if(!cell->data->validated)
+                       //	colorValue = -1;
+                   break;
+               case VIS_SEG_PASS:
+                       if(cell->data->ownerLabel>0 && cell->data->ownerLabel< grRend->grid->valueRange)
+                       {
+                           newValue = grRend->grid->v.nodeIds[cell->data->ownerLabel]->boneId;
+                           newValue = (newValue * 13) % (int)ceil(grRend->grid->valueRange);
+                           colorValue = newValue/grRend->grid->valueRange;
+                       }
+                       else
+                       {
+                           colorValue = 1;
+                       }
+                   break;
+               case VIS_WEIGHTS:
+                       idx = findWeight(cell->data->influences, grRend->desiredVertex);
+
+                       if(idx >= 0)
+                           colorValue = cell->data->influences[idx].weightValue;
+                       else
+                           colorValue = -1;
+               break;
+               case VIS_ISODISTANCES:
+                       colorValue = cell->data->distanceToPos / maxDistance;
+                   break;
+
+               case VIS_ISOLINES:
+                       nInterval = maxDistance/20.0;
+                       dif = cell->data->distanceToPos/nInterval;
+                       dif = dif*nInterval - floor(dif)*nInterval;
+                       if( dif < maxDistance/128)
+                       {
+                           colorValue = -1;
+                       }
+                       else
+                       {
+                           colorValue = cell->data->distanceToPos / maxDistance;
+                       }
+                   break;
+
+               case VIS_CONFIDENCE_LEVEL:
+                       colorValue = cell->data->confidenceLevel;
+                       confidenceLimit = grRend->grid->minConfidenceLevel;
+                       if(colorValue > confidenceLimit )
+                           colorValue = confidenceLimit;
+                       if(colorValue < 0)
+                           colorValue = 0;
+                       colorValue = colorValue/confidenceLimit;
+                   break;
+
+               default:
+                       colorValue = 1;
+                   break;
+               }
+
+               // En escala de grises para parecernos mas a maya
+               float r,g,b;
+               if(colorValue < 0)
+               {
+                   cell->data->color[0] = 0;
+                   cell->data->color[1] = 0;
+                   cell->data->color[2] = 0;
+               }
+               else if(colorValue > 1)
+               {
+                   cell->data->color[0] = 1.0;
+                   cell->data->color[1] = 1.0;
+                   cell->data->color[2] = 1.0;
+               }
+               else
+               {
+                   GetColour(colorValue,0,1,r,g,b);
+                   cell->data->color[0] = r;
+                   cell->data->color[1] = g;
+                   cell->data->color[2] = b;
+               }
+
+           }
+       }
+   }
+}
+
+void AdriViewer::changeVisualizationMode(int mode)
 {
     escena->iVisMode = mode;
-    // TOFIX
+
+	paintModelWithData();   // TODO paint model
+
+    for(unsigned int i = 0; i< escena->visualizers.size(); i++)
+    {
+        if(!escena->visualizers[i] || escena->visualizers[i]->iam != GRIDRENDERER_NODE)
+            continue;
+
+         ((gridRenderer*)escena->visualizers[i])->iVisMode = mode;
+         paintGrid((gridRenderer*)escena->visualizers[i]);
+         paintModelWithGrid();
+         ((gridRenderer*)escena->visualizers[i])->propagateDirtyness();
+    }
 }
 
 void AdriViewer::updateGridRender()
@@ -1132,8 +1705,8 @@ void AdriViewer::updateGridRender()
  void AdriViewer::UpdateVertexSource(int id)
 {
     escena->desiredVertex = id;
+	paintModelWithData();   // TODO paint model
 	updateGridRender();
-    //paintModelWithData();   // TODO paint model
     //paintPlaneWithData();
 
     //updateGridRender();
