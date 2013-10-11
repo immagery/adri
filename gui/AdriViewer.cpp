@@ -147,7 +147,7 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
     frame = 0;
 	aniManager.simulationEnabled = false;
 	aniManager.animationEnabled = false;
-	//particles = new Particles();
+	particles = new Particles();
 	//particles->bake(1500, 1/24.0);
 
 	setSceneCenter(Vec(0,0,0));
@@ -847,16 +847,16 @@ void AdriViewer::readSkeleton(string fileName)
          ((Modelo*)escena->models[i])->drawFunc();
      }
 
-	 /*if (aniManager.simulationEnabled) {
+	 if (aniManager.simulationEnabled) {
 		 double fps = 1.0/this->animationPeriod()*1000;
 		 double currentTime = (double)frame/fps;
-		 int numReps = fps;
+		 int numReps = 10;
 		 for (int k = 0; k < numReps; ++k) particles->solve(currentTime + ((double)k / numReps)*this->animationPeriod()/1000.0);
 		 ++frame;
 	 }
 
 	 if (aniManager.animationEnabled) particles->drawFunc(frame);
-	 else particles->drawFunc();*/
+	 else particles->drawFunc();
 
      glDisable(GL_LIGHTING);
      drawPointLocator(interiorPoint, 1, true);

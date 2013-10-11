@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1336</width>
-    <height>834</height>
+    <height>922</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -710,6 +710,25 @@
             </property>
             <property name="text">
              <string>LOAD</string>
+            </property>
+           </widget>
+           <widget class="QSlider" name="speedDmp">
+            <property name="geometry">
+             <rect>
+              <x>240</x>
+              <y>180</y>
+              <width>160</width>
+              <height>22</height>
+             </rect>
+            </property>
+            <property name="maximum">
+             <number>100</number>
+            </property>
+            <property name="value">
+             <number>80</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
            </widget>
           </widget>
@@ -1976,7 +1995,7 @@
      <x>0</x>
      <y>0</y>
      <width>1336</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFIle">

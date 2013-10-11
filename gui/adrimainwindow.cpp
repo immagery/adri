@@ -141,6 +141,7 @@ AdriMainWindow::AdriMainWindow(QWidget *parent) :
 
 	// Simulation
 	connect(ui->toggleSim, SIGNAL(clicked()), this, SLOT(toggleSimulation()));
+	connect(ui->speedDmp, SIGNAL(valueChanged(int)), this, SLOT(changeSpeedDampingSlider(int)));
 }
 
 
@@ -617,7 +618,7 @@ void AdriMainWindow::changeTransformRotateAmountX(int) {
     if (selectedObject != NULL)
         selectedObject->pos.X() = ui->rotationAmountX->value()/10.0;
 
-	//ui->glCustomWidget->particles->xvalue = ui->rotationAmountX->value()/10.0;
+	ui->glCustomWidget->particles->xvalue = ui->rotationAmountX->value()/10.0;
 
     QString msg = QString::number(ui->rotationAmountX->value());
     ui->rotationEditX->setText(msg);
@@ -649,6 +650,10 @@ void AdriMainWindow::changeTransformRotateAmountZ(int) {
     QString msg = QString::number(ui->rotationAmountZ->value());
     ui->rotationEditZ->setText(msg);
 
+}
+
+void AdriMainWindow::changeSpeedDampingSlider(int) {
+	ui->glCustomWidget->particles->velocityDamping = ui->speedDmp->value() / 100.0;
 }
 
 void AdriMainWindow::resetRotationValues() {

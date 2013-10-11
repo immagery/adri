@@ -85,6 +85,7 @@ public slots:
 
 	// Simulation
 	void toggleSimulation();
+	void changeSpeedDampingSlider(int);
 
 protected:
     virtual void keyPressEvent(QKeyEvent* event);
