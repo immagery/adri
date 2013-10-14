@@ -448,56 +448,6 @@ void AdriViewer::readSkeleton(string fileName)
 		string sBindingFileFullPath = (newPath+sBindingFile).toStdString();//path.toStdString();
 		escena->loadBindingForModel(m,sBindingFileFullPath);
         escena->skinner->computeRestPositions(escena->skeletons);
-
-
-
-		SolverSinusoidal* sinY = new SolverSinusoidal(0.1,3,0);	sinY->dimension = 1;
-		SolverSinusoidal* sinZ = new SolverSinusoidal(0.2,1,0);	sinZ->dimension = 2;
-		SolverSinusoidal* mouthSolver = new SolverSinusoidal(0.3,5,0); mouthSolver->dimension = 2;
-		SolverStatic* solverS = new SolverStatic();
-		SolverVerlet* verlet = new SolverVerlet();
-		int n = escena->skeletons[0]->joints.size();
-		escena->skeletons[0]->joints[0]->computeWorldPos();
-
-		// Colocamos la serpiente en (0,0) y en vertical
-		Point3d trans = Point3d(0,0,0) - escena->skeletons[0]->joints[0]->pos;
-		escena->skeletons[0]->joints[0]->addTranslation(trans.X(), trans.Y(), trans.Z());
-		escena->skeletons[0]->joints[0]->addRotation(0,0,90);
-		escena->skeletons[0]->joints[escena->skeletons[0]->joints.size() - 6]->addRotation(0,0,-90);
-		for (int i = 1; i < n-10; ++i) escena->skeletons[0]->joints[i]->addRotation(0,0,-2*(i/8+1));
-		escena->skeletons[0]->joints[n-6]->addRotation(0,0,35);
-		ReBuildScene();
-
-		// Verlet
-		for (int i = 0; i < n-6; ++i) verlet->addJoint(escena->skeletons[0]->joints[i], i);
-
-		for (int i = 0; i < n; ++i) {
-
-			// Set the static pos
-			//if (i >= n-7) escena->skeletons[0]->joints[i]->rot.Z() -= 10;
-			//else if (i < n-5) escena->skeletons[0]->joints[i]->rot.Z() -= 3;
-
-			// Sinusoidals
-			if (i > 0 && i < n-5 && i%2 == 0) {
-				sinY->addJoint(escena->skeletons[0]->joints[i], i);
-				sinZ->addJoint(escena->skeletons[0]->joints[i], i);
-			}
-			if (i >= n-6 && i % 2 == 0) mouthSolver->addJoint(escena->skeletons[0]->joints[i], i);
-
-			// Static
-			solverS->addJoint(escena->skeletons[0]->joints[i], i);
-			
-		}
-		
-		//solverS->setStatic();
-		verlet->setPositions();
-		//escena->solverManager->addSolver(sinY);
-		//escena->solverManager->addSolver(sinZ);
-		//escena->solverManager->addSolver(mouthSolver);
-		//escena->solverManager->addSolver(verlet);
-		escena->solverManager->verlet = verlet;
-		escena->solverManager->hasVerlet = true;
-		//aniManager.animationEnabled = true;
     }
  }
 
