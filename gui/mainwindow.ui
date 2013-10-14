@@ -1845,6 +1845,19 @@
                 <string>LOAD</string>
                </property>
               </widget>
+              <widget class="QCheckBox" name="RotateTranslate_check">
+               <property name="geometry">
+                <rect>
+                 <x>270</x>
+                 <y>190</y>
+                 <width>131</width>
+                 <height>20</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Rotate / translate</string>
+               </property>
+              </widget>
              </widget>
              <widget class="QWidget" name="tab_4">
               <attribute name="title">

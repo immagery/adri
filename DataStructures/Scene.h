@@ -6,7 +6,6 @@
 #include "skeleton.h"
 #include "Modelo.h"
 #include "Skinning.h"
-#include "solvers/SolverManager.h"
 
 // reservamos unos cuantos números para elementos especiales
 #define FIRST_NODE_ID 100
@@ -82,8 +81,6 @@ class inData
 	}
 };
 
-class SolverManager;
-
 // Total Scene
 class scene
 {
@@ -91,7 +88,6 @@ class scene
     scene()
     {
 		skinner = new Skinning();
-		solverManager = new SolverManager();
         scene::sceneIds = FIRST_NODE_ID;
 		modelLoaded = false;
 		skeletonLoaded = false;
