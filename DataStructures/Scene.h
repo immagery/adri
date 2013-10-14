@@ -189,9 +189,6 @@ class scene
 	// Skinning
 	Skinning* skinner;
 
-	// Solvers
-	SolverManager* solverManager;
-
 	procState state;
 
 	// Scene state flags
