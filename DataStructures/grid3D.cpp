@@ -330,6 +330,37 @@ void grid3d::initwithNoData(Box3d bounding_, Point3i divisions)
     cellSize = bounding.DimX()/divisions.X();
 }
 
+void grid3d::getCoordsFromPoint(Point3d& pt, vector<weight>& weights)
+{
+	weights.clear();
+
+	Point3i originCell = cellId(pt);
+	int i = originCell.X();
+	int j = originCell.Y();
+	int k = originCell.Z();
+
+	if(i < 0 || j < 0 || k < 0 || i >= dimensions.X() || j >= dimensions.Y() || k >= dimensions.Z()) return;
+
+	if(cells[i][j][k]->getType() == INTERIOR || cells[i][j][k]->getType() == BOUNDARY)
+	{
+		if(cells[i][j][k]->data)
+		{
+			weights.resize(cells[i][j][k]->data->influences.size());
+			for(int wind = 0; wind < weights.size(); wind++)
+				weights[wind] = cells[i][j][k]->data->influences[wind];
+		}
+		else
+		{
+			printf("Este punto cae en algun sitio curioso\n");
+			if(cells[i][j][k]->getType() == BOUNDARY)
+			{
+				printf("Es borde...\n");
+			}
+			fflush(0);
+		}
+	}
+}
+
 void grid3d::init(Box3d bounding_, Point3i divisions, int _weightsSize)
 {
 	initBasicData();
@@ -1814,7 +1845,7 @@ void cell3d::SaveToFile(ofstream& myfile)
     myfile.write((const char*) &auxType, sizeof(int));
 
 	// Solo guardamos si es boundary
-	if(getType() == BOUNDARY)
+	if(getType() == BOUNDARY || getType() == INTERIOR)
 		data->SaveToFile(myfile);
 }
 
@@ -1825,7 +1856,7 @@ void cell3d::LoadFromFile(ifstream& myfile)
     setType((T_cell)tipoAux);
 
 	// Solo cargamos si es boundary
-	if(getType() == BOUNDARY)
+	if(getType() == BOUNDARY || getType() == INTERIOR)
 	{
 		if(data == NULL) 
 			data = new cellData();

@@ -107,6 +107,22 @@ void ReadEmbedding(std::string fileName, vector< vector<double> >& V, bool ascii
     fclose(fout);
 }
 
+double BiharmonicDistanceP2P_HC(vector<weight>& weights, int pointIdx, binding* bd, float ext, float precomputedDistance)
+{
+    assert(ext != 0);
+
+	symMatrix& A = bd->BihDistances;
+    
+	double qAp = 0;
+	for(unsigned int i = 0; i< weights.size(); i++)
+	{
+		qAp += weights[i].weightValue*A.get(pointIdx, weights[i].label);
+	}
+
+	double distance = precomputedDistance - (2*qAp);
+    return distance/ext;
+}
+
 double BiharmonicDistanceP2P_sorted(vector<double>& weights, vector<int>& weightsSort, int pointIdx, binding* bd, float ext, float precomputedDistance, double threshold)
 {
     assert(ext != 0);

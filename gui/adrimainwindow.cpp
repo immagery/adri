@@ -28,6 +28,10 @@ AdriMainWindow::AdriMainWindow(QWidget *parent) :
 
     ui->glCustomWidget->parent = this;
 
+	rotationX = 0;
+	rotationY = 0;
+	rotationZ = 0;
+
     // conexiones
     connect(ui->action_importModel, SIGNAL(triggered()), this, SLOT(ImportNewModel()) );
     connect(ui->actionAction_openScene, SIGNAL(triggered()), this, SLOT(OpenNewScene()));
@@ -630,12 +634,21 @@ void AdriMainWindow::changeTransformRotateAmountX(int) {
     //if (selectedObject != NULL)
     //    selectedObject->pos.X() = ui->rotationAmountX->value()/10.0;
 
-	//ui->glCustomWidget->particles->xvalue = ui->rotationAmountX->value()/10.0;
-
-	Quaternion<double> qaux;
-	qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()),Deg2Rad(ui->rotationAmountY->value()),Deg2Rad(ui->rotationAmountZ->value()));
+	//ui->glCustomWidget->particles->xvalue = ui->rotationAmountX->value()/10.0;v 
 	if (selectedObject != NULL)
+	{
+		Quaternion<double> qaux;
+		//qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()-rotationX),0,0);
+		rotationX =  Deg2Rad(ui->rotationAmountX->value());
+		qaux.FromEulerAngles(rotationX, rotationY, rotationZ);
+
+		//rotationX =  ui->rotationAmountX->value();
+		//rotationY =  Deg2Rad(ui->rotationAmountY->value());
+		//rotationZ =  Deg2Rad(ui->rotationAmountZ->value());
+
+		//qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()),Deg2Rad(ui->rotationAmountY->value()),Deg2Rad(ui->rotationAmountZ->value()));
 		selectedObject->qrot = qaux;
+	}
 
     QString msg = QString::number(ui->rotationAmountX->value());
     ui->rotationEditX->setText(msg);
@@ -650,8 +663,16 @@ void AdriMainWindow::changeTransformRotateAmountY(int) {
     if (selectedObject != NULL)
 	{
 		Quaternion<double> qaux;
-		qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()),Deg2Rad(ui->rotationAmountY->value()),Deg2Rad(ui->rotationAmountZ->value()));
-        selectedObject->qrot = qaux;
+		// solo el incremento
+		//qaux.FromEulerAngles(0,Deg2Rad(ui->rotationAmountY->value()-rotationY),0);
+
+		// guardamos el nuevo valor
+		rotationY =  Deg2Rad(ui->rotationAmountY->value());
+		qaux.FromEulerAngles(rotationX, rotationY, rotationZ);
+		//qaux.FromEulerAngles(rotationX,rotationY,rotationZ);
+
+		// Lo aplicamos como incremento
+		selectedObject->qrot = qaux;
 	}
 
     QString msg = QString::number(ui->rotationAmountY->value());
@@ -667,16 +688,20 @@ void AdriMainWindow::changeTransformRotateAmountZ(int) {
 
     //if (selectedObject != NULL)
         //selectedObject->rot.Z() = ui->rotationAmountZ->value();
-
-	Quaternion<double> qaux;
-	float ang01, ang02, ang03;
-	ang01 = Deg2Rad(ui->rotationAmountX->value());
-	ang02 = Deg2Rad(ui->rotationAmountY->value());
-	ang03 = Deg2Rad(ui->rotationAmountZ->value());
-	qaux.FromEulerAngles(ang01,ang02,ang03);
-	
 	if (selectedObject != NULL)
+	{
+
+		Quaternion<double> qaux;
+		//qaux.FromEulerAngles(0,0,Deg2Rad(ui->rotationAmountZ->value()-rotationZ));
+
+		//rotationX =  Deg2Rad(ui->rotationAmountX->value());
+		//rotationY =  Deg2Rad(ui->rotationAmountY->value());
+		rotationZ =  Deg2Rad(ui->rotationAmountZ->value());
+		qaux.FromEulerAngles(rotationX, rotationY, rotationZ);
+		//qaux.FromEulerAngles(rotationX,rotationY,rotationZ);
+
 		selectedObject->qrot = qaux;
+	}
 
     QString msg = QString::number(ui->rotationAmountZ->value());
     ui->rotationEditZ->setText(msg);
@@ -694,6 +719,10 @@ void AdriMainWindow::resetRotationValues() {
     ui->rotationAmountX->setValue(0);
     ui->rotationAmountY->setValue(0);
     ui->rotationAmountZ->setValue(0);
+
+	rotationX = 0;
+	rotationY = 0;
+	rotationZ = 0;
 
 }
 

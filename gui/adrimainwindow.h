@@ -25,6 +25,8 @@ public:
     explicit AdriMainWindow(QWidget *parent = 0);
     ~AdriMainWindow();
 
+	double rotationX, rotationY, rotationZ;
+
 public slots:
     void changeSlider(int);
     void OpenNewScene();

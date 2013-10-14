@@ -93,7 +93,7 @@
            <item>
             <widget class="QTabWidget" name="PreprocessingTab">
              <property name="currentIndex">
-              <number>2</number>
+              <number>3</number>
              </property>
              <widget class="QWidget" name="tab_5">
               <attribute name="title">
@@ -819,6 +819,19 @@
                 <string>Update func</string>
                </property>
               </widget>
+              <widget class="QCheckBox" name="useQuaternions">
+               <property name="geometry">
+                <rect>
+                 <x>30</x>
+                 <y>240</y>
+                 <width>111</width>
+                 <height>17</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Use quaternions</string>
+               </property>
+              </widget>
               <zorder>label</zorder>
               <zorder>label_2</zorder>
               <zorder>alphavalue_in</zorder>
@@ -837,6 +850,7 @@
               <zorder>smoothingPasses</zorder>
               <zorder>groupBox_3</zorder>
               <zorder>prop_function_updt</zorder>
+              <zorder>useQuaternions</zorder>
              </widget>
              <widget class="QWidget" name="tab_8">
               <attribute name="title">
@@ -1226,7 +1240,7 @@
            <item>
             <widget class="QTabWidget" name="tabWidget_2">
              <property name="currentIndex">
-              <number>0</number>
+              <number>1</number>
              </property>
              <widget class="QWidget" name="render">
               <attribute name="title">
@@ -1618,7 +1632,7 @@
                 <rect>
                  <x>240</x>
                  <y>20</y>
-                 <width>151</width>
+                 <width>141</width>
                  <height>20</height>
                 </rect>
                </property>
@@ -1649,7 +1663,7 @@
                 <rect>
                  <x>240</x>
                  <y>50</y>
-                 <width>151</width>
+                 <width>141</width>
                  <height>20</height>
                 </rect>
                </property>
@@ -1680,7 +1694,7 @@
                 <rect>
                  <x>240</x>
                  <y>80</y>
-                 <width>151</width>
+                 <width>141</width>
                  <height>20</height>
                 </rect>
                </property>
@@ -1709,9 +1723,9 @@
               <widget class="QLineEdit" name="rotationEditX">
                <property name="geometry">
                 <rect>
-                 <x>400</x>
+                 <x>390</x>
                  <y>20</y>
-                 <width>21</width>
+                 <width>31</width>
                  <height>20</height>
                 </rect>
                </property>
@@ -1725,9 +1739,9 @@
               <widget class="QLineEdit" name="rotationEditY">
                <property name="geometry">
                 <rect>
-                 <x>400</x>
+                 <x>390</x>
                  <y>50</y>
-                 <width>21</width>
+                 <width>31</width>
                  <height>20</height>
                 </rect>
                </property>
@@ -1741,9 +1755,9 @@
               <widget class="QLineEdit" name="rotationEditZ">
                <property name="geometry">
                 <rect>
-                 <x>400</x>
+                 <x>390</x>
                  <y>80</y>
-                 <width>21</width>
+                 <width>31</width>
                  <height>20</height>
                 </rect>
                </property>
