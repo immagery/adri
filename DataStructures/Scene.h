@@ -82,6 +82,8 @@ class inData
 	}
 };
 
+class SolverManager;
+
 // Total Scene
 class scene
 {

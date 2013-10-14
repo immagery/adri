@@ -17,13 +17,12 @@
 #include "DataStructures/skeleton.h"
 #include "DataStructures/Modelo.h"
 #include "DataStructures/AnimationManager.h"
+#include "Particles.h"
+
 #include <render/gridRender.h>
-
 #include "SelectionManager.h"
-
 #include "DrawObject.h"
 
-#include "Particles.h"
 
 #define INFO_STRING "Info > %1"
 #define DEBUG_MODE 0
@@ -36,6 +35,7 @@ enum shadingModes { SH_MODE_FLAT = 0, SH_MODE_SMOOTH};
 
 class AdriMainWindow;
 class MainWindow;
+class Particles;
 
 class AdriViewer : public QGLViewer
 {

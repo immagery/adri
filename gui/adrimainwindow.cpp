@@ -126,11 +126,14 @@ void AdriMainWindow::connectSignals() {
 	connect(ui->dataSource, SIGNAL(valueChanged(int)), this, SLOT(distancesSourceValueChange(int)));
 	connect(ui->positionPlaneSlider, SIGNAL(sliderMoved(int)), this, SLOT(changeSelPointForPlane(int)));
 
-	// Transform
+	// Transform // Rotation
     connect(ui->rotationAmountX, SIGNAL(valueChanged(int)), this, SLOT(changeTransformRotateAmountX(int)));
     connect(ui->rotationAmountY, SIGNAL(valueChanged(int)), this, SLOT(changeTransformRotateAmountY(int)));
     connect(ui->rotationAmountZ, SIGNAL(valueChanged(int)), this, SLOT(changeTransformRotateAmountZ(int)));
     connect(ui->resetRotation, SIGNAL(clicked()), this, SLOT(resetRotationValues()));
+
+	connect(ui->RotateTranslate_check, SIGNAL(toggled(bool)), this, SLOT(changeRotateTranslateFlag(int)));
+
 
     // Animation
     connect(ui->addKeyframe, SIGNAL(clicked()), this, SLOT(addAnimationKeyframe()));
@@ -148,6 +151,8 @@ void AdriMainWindow::connectSignals() {
 AdriMainWindow::AdriMainWindow(QWidget *parent) :
     QMainWindow(parent), ui(new Ui::MainWindow)
 {
+	rotateTranlsateFlag = false;
+
     /*ui->setupUi(this);
     ui->glCustomWidget->parent = this;
 	connectSignals();*/
@@ -747,7 +752,7 @@ void AdriMainWindow::keyPressEvent(QKeyEvent* event)
     }
 }
 
-void AdriMainWindow::changeTransformRotateAmountX(int) {
+void AdriMainWindow::changeTransformTranslateAmountX(int) {
 
     object *selectedObject = NULL;
     if (ui->glCustomWidget->selMgr.selection.size() > 0)
@@ -771,7 +776,7 @@ void AdriMainWindow::changeTransformRotateAmountX(int) {
 
 }
 
-void AdriMainWindow::changeTransformRotateAmountY(int) {
+void AdriMainWindow::changeTransformTranslateAmountY(int) {
     object *selectedObject = NULL;
     if (ui->glCustomWidget->selMgr.selection.size() > 0)
         selectedObject = ui->glCustomWidget->selMgr.selection.back();
@@ -795,7 +800,7 @@ void AdriMainWindow::changeTransformRotateAmountY(int) {
 
 }
 
-void AdriMainWindow::changeTransformRotateAmountZ(int) {
+void AdriMainWindow::changeTransformTranslateAmountZ(int) {
     object *selectedObject = NULL;
     if (ui->glCustomWidget->selMgr.selection.size() > 0)
         selectedObject = ui->glCustomWidget->selMgr.selection.back();
@@ -824,6 +829,105 @@ void AdriMainWindow::changeTransformRotateAmountZ(int) {
 
 }
 
+void AdriMainWindow::changeTransformRotateAmountX(int x) {
+
+	if(!rotateTranlsateFlag)
+		changeTransformTranslateAmountX(x); 
+
+    object *selectedObject = NULL;
+    if (ui->glCustomWidget->selMgr.selection.size() > 0)
+        selectedObject = ui->glCustomWidget->selMgr.selection.back();
+
+	if (selectedObject != NULL)
+	{
+		Quaternion<double> qaux;
+		//qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()-rotationX),0,0);
+		rotationX =  Deg2Rad(ui->rotationAmountX->value());
+		qaux.FromEulerAngles(rotationX, rotationY, rotationZ);
+
+		//rotationX =  ui->rotationAmountX->value();
+		//rotationY =  Deg2Rad(ui->rotationAmountY->value());
+		//rotationZ =  Deg2Rad(ui->rotationAmountZ->value());
+
+		//qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()),Deg2Rad(ui->rotationAmountY->value()),Deg2Rad(ui->rotationAmountZ->value()));
+		selectedObject->qrot = qaux;
+	}
+
+    QString msg = QString::number(ui->rotationAmountX->value());
+    ui->rotationEditX->setText(msg);
+
+}
+
+void AdriMainWindow::changeTransformRotateAmountY(int x) {
+
+	if(!rotateTranlsateFlag)
+		changeTransformTranslateAmountY(x); 
+
+    object *selectedObject = NULL;
+    if (ui->glCustomWidget->selMgr.selection.size() > 0)
+        selectedObject = ui->glCustomWidget->selMgr.selection.back();
+
+    if (selectedObject != NULL)
+	{
+		Quaternion<double> qaux;
+		// solo el incremento
+		//qaux.FromEulerAngles(0,Deg2Rad(ui->rotationAmountY->value()-rotationY),0);
+
+		// guardamos el nuevo valor
+		rotationY =  Deg2Rad(ui->rotationAmountY->value());
+		qaux.FromEulerAngles(rotationX, rotationY, rotationZ);
+		//qaux.FromEulerAngles(rotationX,rotationY,rotationZ);
+
+		// Lo aplicamos como incremento
+		selectedObject->qrot = qaux;
+	}
+
+			ui->glCustomWidget->particles->yvalue = ui->rotationAmountY->value();
+	if (ui->glCustomWidget->escena->skeletons.size() > 0) {
+
+		ui->glCustomWidget->escena->skeletons[0]->joints[0]->pos.Y() = ui->rotationAmountY->value();
+	}
+
+    QString msg = QString::number(ui->rotationAmountY->value());
+    ui->rotationEditY->setText(msg);
+
+
+}
+
+void AdriMainWindow::changeRotateTranslateFlag(bool toogle)
+{
+	rotateTranlsateFlag = toogle;
+}
+
+void AdriMainWindow::changeTransformRotateAmountZ(int x) {
+
+	if(!rotateTranlsateFlag)
+		changeTransformTranslateAmountZ(x); 
+
+    object *selectedObject = NULL;
+    if (ui->glCustomWidget->selMgr.selection.size() > 0)
+        selectedObject = ui->glCustomWidget->selMgr.selection.back();
+	
+	if (selectedObject != NULL)
+	{
+
+		Quaternion<double> qaux;
+		//qaux.FromEulerAngles(0,0,Deg2Rad(ui->rotationAmountZ->value()-rotationZ));
+
+		//rotationX =  Deg2Rad(ui->rotationAmountX->value());
+		//rotationY =  Deg2Rad(ui->rotationAmountY->value());
+		rotationZ =  Deg2Rad(ui->rotationAmountZ->value());
+		qaux.FromEulerAngles(rotationX, rotationY, rotationZ);
+		//qaux.FromEulerAngles(rotationX,rotationY,rotationZ);
+
+		selectedObject->qrot = qaux;
+	}
+
+    QString msg = QString::number(ui->rotationAmountZ->value());
+    ui->rotationEditZ->setText(msg);
+
+}
+
 void AdriMainWindow::changeSpeedDampingSlider(int) {
 	//ui->glCustomWidget->particles->velocityDamping = ui->speedDmp->value() / 100.0;
 }
@@ -839,6 +943,10 @@ void AdriMainWindow::resetRotationValues() {
     ui->rotationAmountX->setValue(0);
     ui->rotationAmountY->setValue(0);
     ui->rotationAmountZ->setValue(0);
+	
+	rotationX = 0;
+	rotationY = 0;
+	rotationZ = 0;
 
 }
 

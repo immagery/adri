@@ -269,10 +269,10 @@ void Skinning::computeDeformationsWithSW(const vector< skeleton* >& skeletons) {
 								rotDir = Point3d(1,0,0);
 						}
 
-						if(k == 95)
-						{
-							printf("Esta es la interpolacion %f.\n", twistInterpolation); fflush(0);
-						}
+						//if(k == 95)
+						//{
+					//		printf("Esta es la interpolacion %f.\n", twistInterpolation); fflush(0);
+						//}
 
 						//vcg::Quaternion<float> quatAux = vcg::Quaternion<float>(cos(twistInterpolation/2),0,0,0);
 						//vcg::Quaternion<float> quatAux = vcg::Quaternion<float>(1,0,0,0);
