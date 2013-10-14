@@ -21,17 +21,138 @@
 
 using namespace std;
 
+void AdriMainWindow::connectSignals() {
+	// conexiones
+    connect(ui->action_importModel, SIGNAL(triggered()), this, SLOT(ImportNewModel()) );
+    connect(ui->actionAction_openScene, SIGNAL(triggered()), this, SLOT(OpenNewScene()));
+
+    connect(ui->import_cage_s, SIGNAL(triggered()), this, SLOT(ImportCages()) );
+    connect(ui->import_distances, SIGNAL(triggered()), this, SLOT(ImportDistances()) );
+
+    connect(ui->shadingModeSelection, SIGNAL(currentIndexChanged(int)), this, SLOT(ShadingModeChange(int)) );
+
+    connect(ui->colorLayersCheck, SIGNAL(toggled(bool)), this, SLOT(EnableColorLayer(bool)) );
+    connect(ui->ColorLayerSeletion, SIGNAL(valueChanged(int)), this, SLOT(ChangeColorLayerValue(int)) );
+
+    connect(ui->actionImportSegementation, SIGNAL(triggered()), this, SLOT(DoAction()) );
+
+    //connect(ui->prop_function_updt, SIGNAL(released()), this, SLOT(ChangeSourceVertex()));
+
+    connect(ui->DistancesVertSource, SIGNAL(valueChanged(int)), this, SLOT(distancesSourceValueChange(int)));
+
+    connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(CloseApplication()) );
+    //connect(ui->processGC,  SIGNAL(triggered()), ui->glCustomWidget, SLOT(processGreenCoordinates()) );
+    //connect(ui->processHC,  SIGNAL(triggered()), ui->glCustomWidget, SLOT(processHarmonicCoordinates()));
+    //connect(ui->processMVC, SIGNAL(triggered()), ui->glCustomWidget, SLOT(processMeanValueCoordinates()));
+   // connect(ui->processAll, SIGNAL(triggered()), ui->glCustomWidget, SLOT(processAllCoords()));
+    //connect(ui->deformedMeshCheck, SIGNAL(released()), ui->glCustomWidget, SLOT(showDeformedModelSlot()));
+
+	connect(ui->GridDraw_interior, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
+    connect(ui->GridDraw_exterior, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
+    connect(ui->allGrid_button, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
+    connect(ui->gridSlices_button, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
+    connect(ui->SliceSelectorXY, SIGNAL(valueChanged(int)), ui->glCustomWidget, SLOT(ChangeSliceXY(int)));
+    connect(ui->SliceSelectorXZ, SIGNAL(valueChanged(int)), ui->glCustomWidget, SLOT(ChangeSliceXZ(int)));
+
+    connect(ui->cagesComboBox, SIGNAL(currentIndexChanged(int)), ui->glCustomWidget, SLOT(ChangeStillCage(int)));
+    connect(ui->enableStillCage, SIGNAL(toggled(bool)), this, SLOT(enableStillCage(bool)));
+
+    connect(ui->HCGridDraw, SIGNAL(released()), ui->glCustomWidget, SLOT(showHCoordinatesSlot()));
+    connect(ui->GridDraw_boundary, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
+
+    // Actualizaciones del grid.
+    //connect(ui->GridDraw_interior, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
+    //connect(ui->GridDraw_exterior, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
+    //connect(ui->allGrid_button, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
+    //connect(ui->gridSlices_button, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
+    //connect(ui->SliceSelectorXY, SIGNAL(valueChanged(int)), ui->glCustomWidget, SLOT(ChangeSliceXY(int)));
+    //connect(ui->SliceSelectorXZ, SIGNAL(valueChanged(int)), ui->glCustomWidget, SLOT(ChangeSliceXZ(int)));
+
+	//connect(ui->nextStep_button, SIGNAL(released()), ui->glCustomWidget, SLOT(nextProcessStep()));
+	//connect(ui->allNextStep_button, SIGNAL(released()), ui->glCustomWidget, SLOT(allNextProcessSteps()));
+
+    connect(ui->prop_function_updt, SIGNAL(released()), ui->glCustomWidget, SLOT(PropFunctionConf()));
+
+    connect(ui->paintModel_btn, SIGNAL(released()), ui->glCustomWidget, SLOT(paintModelWithGrid()));
+    connect(ui->metricUsedCheck, SIGNAL(released()), ui->glCustomWidget, SLOT(PropFunctionConf()));
+
+    connect(ui->drawInfluences_check, SIGNAL(released()), ui->glCustomWidget, SLOT(showHCoordinatesSlot()));
+
+    connect(ui->coordTab, SIGNAL(currentChanged(int)), ui->glCustomWidget, SLOT(active_GC_vs_HC(int)));
+
+    connect(ui->glCustomWidget, SIGNAL(updateSceneView()), this, SLOT(updateSceneView()));
+    connect(ui->outlinerView, SIGNAL(clicked(QModelIndex)), this, SLOT(selectObject(QModelIndex)));
+
+    connect(ui->actionMove, SIGNAL(triggered()), this, SLOT(toogleMoveTool()));
+    connect(ui->actionSelection, SIGNAL(triggered()), this, SLOT(toogleSelectionTool()));
+    connect(ui->actionRotate, SIGNAL(triggered()), this, SLOT(toogleRotateTool()));
+    connect(ui->visibility_btn, SIGNAL(toggled(bool)), this, SLOT(toogleVisibility(bool)));
+
+	connect(ui->actionDoTests, SIGNAL(triggered()), this, SLOT(LaunchTests()));
+
+    connect(ui->segmentation_btn, SIGNAL(toggled(bool)), this, SLOT(toogleToShowSegmentation(bool)));
+    connect(ui->DataVisualizationCombo, SIGNAL(currentIndexChanged(int)),this, SLOT(DataVisualizationChange(int)) );
+
+    connect(ui->exportWeights_btn, SIGNAL(released()), ui->glCustomWidget, SLOT(exportWeightsToMaya()));
+
+    connect(ui->expansionSlider, SIGNAL(valueChanged(int)), this, SLOT(updateExpansionSlidervalue(int)));
+
+	connect(ui->thresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(updateThresholdSlidervalue(int)));
+	connect(ui->threshold_enable, SIGNAL(toggled(bool)), this, SLOT(enableThreshold(bool)));
+	
+
+    connect(ui->smoothPropagationSlider, SIGNAL(sliderReleased()), this, SLOT(changeSmoothSlider()));
+    connect(ui->smoothPropagationSlider, SIGNAL(valueChanged(int)), this, SLOT(updateSmoothSlidervalue(int)));
+
+	//connect(ui->smoothingPasses, SIGNAL(valueChanged(int)), this, SLOT(changeSmoothingPasses(int)));
+
+	//connect(ui->auxValueInt, SIGNAL(valueChanged(int)), this, SLOT(changeAuxValueInt(int)));
+
+    connect(ui->glCustomWidget, SIGNAL(jointDataShow(float, int)), this , SLOT(jointDataUpdate(float,int)));
+
+	connect(ui->ip_axisX, SIGNAL(valueChanged(int)), this, SLOT(changeInteriorPointPosition()));
+	connect(ui->ip_axisY, SIGNAL(valueChanged(int)), this, SLOT(changeInteriorPointPosition()));
+	connect(ui->ip_axisZ, SIGNAL(valueChanged(int)), this, SLOT(changeInteriorPointPosition()));
+
+	connect(ui->paintModel, SIGNAL(clicked()), this, SLOT(updateModelColors()));
+	connect(ui->paintPlane, SIGNAL(clicked()), this, SLOT(updateClipingPlaneColor()));
+
+	connect(ui->drawPlaneCheck, SIGNAL(clicked()), this, SLOT(updateClipingPlaneData()));
+	connect(ui->PlaneOrientX, SIGNAL(clicked()), this, SLOT(updateClipingPlaneData()));
+	connect(ui->planeOrientY, SIGNAL(clicked()), this, SLOT(updateClipingPlaneData()));
+	connect(ui->planeOrientZ, SIGNAL(clicked()), this, SLOT(updateClipingPlaneData()));
+	connect(ui->PlaneDataCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeVisModeForPlane(int)));
+	
+	connect(ui->dataSource, SIGNAL(valueChanged(int)), this, SLOT(distancesSourceValueChange(int)));
+	connect(ui->positionPlaneSlider, SIGNAL(sliderMoved(int)), this, SLOT(changeSelPointForPlane(int)));
+
+	// Transform
+    connect(ui->rotationAmountX, SIGNAL(valueChanged(int)), this, SLOT(changeTransformRotateAmountX(int)));
+    connect(ui->rotationAmountY, SIGNAL(valueChanged(int)), this, SLOT(changeTransformRotateAmountY(int)));
+    connect(ui->rotationAmountZ, SIGNAL(valueChanged(int)), this, SLOT(changeTransformRotateAmountZ(int)));
+    connect(ui->resetRotation, SIGNAL(clicked()), this, SLOT(resetRotationValues()));
+
+    // Animation
+    connect(ui->addKeyframe, SIGNAL(clicked()), this, SLOT(addAnimationKeyframe()));
+    connect(ui->toggleAnim, SIGNAL(clicked()), this, SLOT(toggleAnimation()));
+    connect(ui->animSlider, SIGNAL(valueChanged(int)), this, SLOT(changeFrame(int)));
+    connect(ui->glCustomWidget, SIGNAL(changedFrame(int)), this, SLOT(changeAnimSlider(int)));
+	connect(ui->saveAnim, SIGNAL(clicked()), this, SLOT(saveAnimation()));
+	connect(ui->loadAnim, SIGNAL(clicked()), this, SLOT(loadAnimation()));
+
+	// Simulation
+	connect(ui->toggleSim, SIGNAL(clicked()), this, SLOT(toggleSimulation()));
+	//connect(ui->speedDmp, SIGNAL(valueChanged(int)), this, SLOT(changeSpeedDampingSlider(int)));
+}
+
 AdriMainWindow::AdriMainWindow(QWidget *parent) :
     QMainWindow(parent), ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
-
+    /*ui->setupUi(this);
     ui->glCustomWidget->parent = this;
+	connectSignals();*/
 
-	rotationX = 0;
-	rotationY = 0;
-	rotationZ = 0;
-
+	/*
     // conexiones
     connect(ui->action_importModel, SIGNAL(triggered()), this, SLOT(ImportNewModel()) );
     connect(ui->actionAction_openScene, SIGNAL(triggered()), this, SLOT(OpenNewScene()));
@@ -152,6 +273,7 @@ AdriMainWindow::AdriMainWindow(QWidget *parent) :
 
 	// Simulation
 	connect(ui->toggleSim, SIGNAL(clicked()), this, SLOT(toggleSimulation()));
+	//connect(ui->speedDmp, SIGNAL(valueChanged(int)), this, SLOT(changeSpeedDampingSlider(int)));*/
 }
 
 
@@ -634,21 +756,15 @@ void AdriMainWindow::changeTransformRotateAmountX(int) {
     //if (selectedObject != NULL)
     //    selectedObject->pos.X() = ui->rotationAmountX->value()/10.0;
 
-	//ui->glCustomWidget->particles->xvalue = ui->rotationAmountX->value()/10.0;v 
-	if (selectedObject != NULL)
-	{
-		Quaternion<double> qaux;
-		//qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()-rotationX),0,0);
-		rotationX =  Deg2Rad(ui->rotationAmountX->value());
-		qaux.FromEulerAngles(rotationX, rotationY, rotationZ);
-
-		//rotationX =  ui->rotationAmountX->value();
-		//rotationY =  Deg2Rad(ui->rotationAmountY->value());
-		//rotationZ =  Deg2Rad(ui->rotationAmountZ->value());
-
-		//qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()),Deg2Rad(ui->rotationAmountY->value()),Deg2Rad(ui->rotationAmountZ->value()));
-		selectedObject->qrot = qaux;
+	ui->glCustomWidget->particles->xvalue = ui->rotationAmountX->value();
+	if (ui->glCustomWidget->escena->skeletons.size() > 0) {
+		ui->glCustomWidget->escena->skeletons[0]->joints[0]->pos.X() = ui->rotationAmountX->value();
 	}
+
+	Quaternion<double> qaux;
+	qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()),Deg2Rad(ui->rotationAmountY->value()),Deg2Rad(ui->rotationAmountZ->value()));
+	if (selectedObject != NULL)
+		selectedObject->qrot = qaux;
 
     QString msg = QString::number(ui->rotationAmountX->value());
     ui->rotationEditX->setText(msg);
@@ -663,16 +779,14 @@ void AdriMainWindow::changeTransformRotateAmountY(int) {
     if (selectedObject != NULL)
 	{
 		Quaternion<double> qaux;
-		// solo el incremento
-		//qaux.FromEulerAngles(0,Deg2Rad(ui->rotationAmountY->value()-rotationY),0);
+		qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()),Deg2Rad(ui->rotationAmountY->value()),Deg2Rad(ui->rotationAmountZ->value()));
+        selectedObject->qrot = qaux;
+	}
 
-		// guardamos el nuevo valor
-		rotationY =  Deg2Rad(ui->rotationAmountY->value());
-		qaux.FromEulerAngles(rotationX, rotationY, rotationZ);
-		//qaux.FromEulerAngles(rotationX,rotationY,rotationZ);
+			ui->glCustomWidget->particles->yvalue = ui->rotationAmountY->value();
+	if (ui->glCustomWidget->escena->skeletons.size() > 0) {
 
-		// Lo aplicamos como incremento
-		selectedObject->qrot = qaux;
+		ui->glCustomWidget->escena->skeletons[0]->joints[0]->pos.Y() = ui->rotationAmountY->value();
 	}
 
     QString msg = QString::number(ui->rotationAmountY->value());
@@ -688,24 +802,30 @@ void AdriMainWindow::changeTransformRotateAmountZ(int) {
 
     //if (selectedObject != NULL)
         //selectedObject->rot.Z() = ui->rotationAmountZ->value();
-	if (selectedObject != NULL)
-	{
 
-		Quaternion<double> qaux;
-		//qaux.FromEulerAngles(0,0,Deg2Rad(ui->rotationAmountZ->value()-rotationZ));
+			ui->glCustomWidget->particles->zvalue = ui->rotationAmountZ->value();
+	if (ui->glCustomWidget->escena->skeletons.size() > 0) {
 
-		//rotationX =  Deg2Rad(ui->rotationAmountX->value());
-		//rotationY =  Deg2Rad(ui->rotationAmountY->value());
-		rotationZ =  Deg2Rad(ui->rotationAmountZ->value());
-		qaux.FromEulerAngles(rotationX, rotationY, rotationZ);
-		//qaux.FromEulerAngles(rotationX,rotationY,rotationZ);
-
-		selectedObject->qrot = qaux;
+		ui->glCustomWidget->escena->skeletons[0]->joints[0]->pos.Z() = ui->rotationAmountZ->value();
 	}
+
+	Quaternion<double> qaux;
+	float ang01, ang02, ang03;
+	ang01 = Deg2Rad(ui->rotationAmountX->value());
+	ang02 = Deg2Rad(ui->rotationAmountY->value());
+	ang03 = Deg2Rad(ui->rotationAmountZ->value());
+	qaux.FromEulerAngles(ang01,ang02,ang03);
+	
+	if (selectedObject != NULL)
+		selectedObject->qrot = qaux;
 
     QString msg = QString::number(ui->rotationAmountZ->value());
     ui->rotationEditZ->setText(msg);
 
+}
+
+void AdriMainWindow::changeSpeedDampingSlider(int) {
+	//ui->glCustomWidget->particles->velocityDamping = ui->speedDmp->value() / 100.0;
 }
 
 void AdriMainWindow::resetRotationValues() {
@@ -719,10 +839,6 @@ void AdriMainWindow::resetRotationValues() {
     ui->rotationAmountX->setValue(0);
     ui->rotationAmountY->setValue(0);
     ui->rotationAmountZ->setValue(0);
-
-	rotationX = 0;
-	rotationY = 0;
-	rotationZ = 0;
 
 }
 

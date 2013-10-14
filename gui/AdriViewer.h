@@ -23,7 +23,7 @@
 
 #include "DrawObject.h"
 
-//#include "Particles.h"
+#include "Particles.h"
 
 #define INFO_STRING "Info > %1"
 #define DEBUG_MODE 0
@@ -125,7 +125,7 @@ public:
     // Animation
     AnimationManager aniManager;
     int frame;
-	//Particles* particles;
+	Particles* particles;
 
     //vector< object*> modelos; // Todos los objetos que tendremos en la escena
     scene* escena; // Escena con jerarquía

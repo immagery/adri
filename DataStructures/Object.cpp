@@ -91,15 +91,8 @@ void object::addRotation(double rx, double ry, double rz)
     // Aplicar la rotación, creo que hay que hacerlo con una multiplicacion.
 	Quaternion<double> qAux;
 	qAux.FromEulerAngles(Deg2Rad(rx), Deg2Rad(ry), Deg2Rad(rz));
-
-	double twist2 = 2*acos(qrot.X());
-	double twist = 2*acos(qAux.X());
-
-	qrot = qAux*qrot;
+	qrot = qAux * qrot;
 	qrot.Normalize();
-
-	double twist3 = 2*acos(qrot.X());
-
 	//rot += Point3d(rx, ry, rz);
     dirtyFlag = true;
 }

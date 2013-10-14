@@ -24,6 +24,7 @@ class AdriMainWindow : public QMainWindow
 public:
     explicit AdriMainWindow(QWidget *parent = 0);
     ~AdriMainWindow();
+	void connectSignals();
 
 	double rotationX, rotationY, rotationZ;
 
@@ -88,6 +89,7 @@ public slots:
 
 	// Simulation
 	void toggleSimulation();
+	void changeSpeedDampingSlider(int);
 
 protected:
     virtual void keyPressEvent(QKeyEvent* event);
