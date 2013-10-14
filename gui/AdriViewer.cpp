@@ -47,9 +47,9 @@
 
 #include <QtCore/QTextStream>
 
-#include "solvers/SolverSinusoidal.h"
-#include "solvers/SolverStatic.h"
-#include "solvers/SolverVerlet.h"
+//#include "solvers/SolverSinusoidal.h"
+//#include "solvers/SolverStatic.h"
+//#include "solvers/SolverVerlet.h"
 
 
 using namespace qglviewer;

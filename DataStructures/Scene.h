@@ -190,7 +190,7 @@ class scene
 	Skinning* skinner;
 
 	// Solvers
-	SolverManager* solverManager;
+	//SolverManager* solverManager;
 
 	procState state;
 
