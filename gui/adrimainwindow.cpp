@@ -145,7 +145,6 @@ void AdriMainWindow::connectSignals() {
 
 	// Simulation
 	connect(ui->toggleSim, SIGNAL(clicked()), this, SLOT(toggleSimulation()));
-	//connect(ui->speedDmp, SIGNAL(valueChanged(int)), this, SLOT(changeSpeedDampingSlider(int)));
 }
 
 AdriMainWindow::AdriMainWindow(QWidget *parent) :
@@ -928,9 +927,6 @@ void AdriMainWindow::changeTransformRotateAmountZ(int x) {
 
 }
 
-void AdriMainWindow::changeSpeedDampingSlider(int) {
-	//ui->glCustomWidget->particles->velocityDamping = ui->speedDmp->value() / 100.0;
-}
 
 void AdriMainWindow::resetRotationValues() {
     object *selectedObject = NULL;

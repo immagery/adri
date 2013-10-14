@@ -47,11 +47,6 @@
 
 #include <QtCore/QTextStream>
 
-//#include "solvers/SolverSinusoidal.h"
-//#include "solvers/SolverStatic.h"
-//#include "solvers/SolverVerlet.h"
-
-
 using namespace qglviewer;
 using namespace vcg;
 
@@ -773,6 +768,9 @@ void AdriViewer::readSkeleton(string fileName)
         glShadeModel(GL_SMOOTH);
      else if(ShadingModeFlag == SH_MODE_FLAT)
         glShadeModel(GL_FLAT);
+
+	 	// Apply skinning
+	escena->skinner->computeDeformationsWithSW(escena->skeletons);
 
 	 // SKINNING I SOLVERS
 	 /*if (escena->skeletons.size() > 0 && aniManager.simulationEnabled) {
