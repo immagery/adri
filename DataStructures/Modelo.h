@@ -37,6 +37,9 @@ public:
 
 	vector<TriangleData> virtualTriangles;
 
+	//Harmonic coords grid
+	grid3d* HCgrid;
+
 	bool computedBindings;
 
 	vector<int> modelVertexDataPoint;

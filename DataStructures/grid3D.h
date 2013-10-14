@@ -257,6 +257,8 @@ public:
     void initwithNoData(Box3d bounding_, Point3i divisions);
     void init(Box3d bounding, Point3i divisions, int weightsSize);
 
+	void getCoordsFromPoint(Point3d& pt, vector<weight>& weights);
+
 	void initBasicData();
 
     void clear();

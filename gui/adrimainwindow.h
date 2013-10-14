@@ -26,6 +26,9 @@ public:
     ~AdriMainWindow();
 	void connectSignals();
 
+	double rotationX, rotationY, rotationZ;
+	bool rotateTranlsateFlag;
+
 public slots:
     void changeSlider(int);
     void OpenNewScene();
@@ -71,11 +74,20 @@ public slots:
 
 	void UpdateScene();
 
-	// Transform: rotation values for joints
+	// Transform: Transform values for joints
     void changeTransformRotateAmountX(int);
     void changeTransformRotateAmountY(int);
     void changeTransformRotateAmountZ(int);
-    void resetRotationValues();
+
+	// Toogle between transform and rotation
+	void changeRotateTranslateFlag(bool toogle);
+	
+	// Rotation: rotation values for joints
+	void changeTransformTranslateAmountX(int);
+    void changeTransformTranslateAmountY(int);
+    void changeTransformTranslateAmountZ(int);
+	
+	void resetRotationValues();
 
     // Animation: keyframe managing, animation I/O
     void addAnimationKeyframe();

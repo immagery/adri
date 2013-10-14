@@ -321,6 +321,7 @@ public:
 		weightsRepresentative.clear();
 
 		cutThreshold.clear();
+		weightsFiltered.clear();
     }
 
 	~binding()
@@ -340,6 +341,7 @@ public:
 		weightsRepresentative.clear();
 
 		cutThreshold.clear();
+		weightsFiltered.clear();
 	}
 
 	binding(int points)
@@ -363,6 +365,7 @@ public:
 		weightsRepresentative.clear();
 
 		cutThreshold.clear();
+		weightsFiltered.clear();
 	}
 
     // Parameters
@@ -387,6 +390,8 @@ public:
     vector< int > traductionTable;
     vector<vector<double> > embeddedPoints;
 	vector<int> globalIndirection;
+
+	vector< vector<weight> > weightsFiltered;
 
 	// Weights sorted to be used as a calculus stoper.
 	vector<vector<int> > weightsSort;

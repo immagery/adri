@@ -64,5 +64,11 @@ double BiharmonicDistanceP2P_sorted(vector<double>& weights,
 									float precomputedDistance,
 									double threshold = 0.00001);
 
+double BiharmonicDistanceP2P_HC(vector<weight>& weights, 
+								int pointIdx, 
+								binding* bd, 
+								float ext, 
+								float precomputedDistance);
+
 
 #endif // INTERIORDISTANCESDATA_H
