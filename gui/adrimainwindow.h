@@ -24,6 +24,7 @@ class AdriMainWindow : public QMainWindow
 public:
     explicit AdriMainWindow(QWidget *parent = 0);
     ~AdriMainWindow();
+	void connectSignals();
 
 public slots:
     void changeSlider(int);
