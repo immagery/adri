@@ -762,7 +762,7 @@ void AdriMainWindow::changeTransformTranslateAmountX(int) {
 
 	ui->glCustomWidget->particles->xvalue = ui->rotationAmountX->value();
 	if (ui->glCustomWidget->escena->skeletons.size() > 0) {
-		ui->glCustomWidget->escena->skeletons[0]->joints[0]->pos.X() = ui->rotationAmountX->value();
+		//ui->glCustomWidget->escena->skeletons[0]->joints[0]->pos.X() = ui->rotationAmountX->value();
 	}
 
 	Quaternion<double> qaux;
@@ -787,10 +787,9 @@ void AdriMainWindow::changeTransformTranslateAmountY(int) {
         selectedObject->qrot = qaux;
 	}
 
-			ui->glCustomWidget->particles->yvalue = ui->rotationAmountY->value();
+	//ui->glCustomWidget->particles->yvalue = ui->rotationAmountY->value();
 	if (ui->glCustomWidget->escena->skeletons.size() > 0) {
-
-		ui->glCustomWidget->escena->skeletons[0]->joints[0]->pos.Y() = ui->rotationAmountY->value();
+		//ui->glCustomWidget->escena->skeletons[0]->joints[0]->pos.Y() = ui->rotationAmountY->value();
 	}
 
     QString msg = QString::number(ui->rotationAmountY->value());
@@ -806,11 +805,9 @@ void AdriMainWindow::changeTransformTranslateAmountZ(int) {
 
     //if (selectedObject != NULL)
         //selectedObject->rot.Z() = ui->rotationAmountZ->value();
-
-			ui->glCustomWidget->particles->zvalue = ui->rotationAmountZ->value();
+	ui->glCustomWidget->particles->zvalue = ui->rotationAmountZ->value();
 	if (ui->glCustomWidget->escena->skeletons.size() > 0) {
-
-		ui->glCustomWidget->escena->skeletons[0]->joints[0]->pos.Z() = ui->rotationAmountZ->value();
+		//ui->glCustomWidget->escena->skeletons[0]->joints[0]->pos.Z() = ui->rotationAmountZ->value();
 	}
 
 	Quaternion<double> qaux;
@@ -884,7 +881,7 @@ void AdriMainWindow::changeTransformRotateAmountY(int x) {
 			ui->glCustomWidget->particles->yvalue = ui->rotationAmountY->value();
 	if (ui->glCustomWidget->escena->skeletons.size() > 0) {
 
-		ui->glCustomWidget->escena->skeletons[0]->joints[0]->pos.Y() = ui->rotationAmountY->value();
+		//ui->glCustomWidget->escena->skeletons[0]->joints[0]->pos.Y() = ui->rotationAmountY->value();
 	}
 
     QString msg = QString::number(ui->rotationAmountY->value());
