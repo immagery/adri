@@ -769,7 +769,7 @@ void AdriViewer::readSkeleton(string fileName)
      else if(ShadingModeFlag == SH_MODE_FLAT)
         glShadeModel(GL_FLAT);
 
-	 	// Apply skinning
+	 // Apply skinning
 	escena->skinner->computeDeformationsWithSW(escena->skeletons);
 
 	 // SKINNING I SOLVERS
@@ -787,16 +787,16 @@ void AdriViewer::readSkeleton(string fileName)
 	escena->skinner->computeDeformationsWithSW(escena->skeletons);*/
 
 	if (aniManager.simulationEnabled) ++frame;
-
-	/*if (aniManager.simulationEnabled) {
+	/*
+	if (aniManager.simulationEnabled) {
 		 double fps = 1.0/this->animationPeriod()*1000;
 		 double currentTime = (double)frame/fps;
 		 int numReps = 10;
 		 for (int k = 0; k < numReps; ++k) particles->solve(currentTime + ((double)k / numReps)*this->animationPeriod()/1000.0);
 		 ++frame;
 	 }
-	 particles->drawFunc();*/
-
+	 particles->drawFunc();
+	 */
 
      /*
      for(unsigned int i = 0; i< escena->shaders.size(); i++)
@@ -1591,13 +1591,15 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
                    break;
                }
 
+			   float errorColor = -1;
+
                // En escala de grises para parecernos mas a maya
                float r,g,b;
                if(colorValue < 0)
                {
-                   cell->data->color[0] = 0;
-                   cell->data->color[1] = 0;
-                   cell->data->color[2] = 0;
+                   cell->data->color[0] = 0.0;
+                   cell->data->color[1] = 0.0;
+                   cell->data->color[2] = 0.0;
                }
                else if(colorValue > 1)
                {
@@ -1659,7 +1661,8 @@ void AdriViewer::updateGridRender()
 
             gr->setSliceXY(parent->ui->SliceSelectorXY->value());
             gr->setSliceXZ(parent->ui->SliceSelectorXZ->value());
-
+						
+			gr->m_iWeightsId = parent->ui->auxValueInt->value();
 			gr->updateGridColorsAndValues();
 
             gr->propagateDirtyness();

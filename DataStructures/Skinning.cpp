@@ -69,13 +69,16 @@ void Skinning::loadBindingForModel (Modelo *m, string path, const vector< skelet
 			int skID = -1;
 			QString skeletonName = list.at(i);
 
-			skeleton* sk = skeletons[0];
-			for (int j = 0; j < sk->joints.size(); ++j) {
-				joint* jt = sk->joints[j];
-				if (jt->sName == skeletonName.toStdString()) {
-					skID = jt->nodeId;
-					break;
-				}
+			for(int skIdx = 0; skIdx < skeletons.size(); skIdx++)
+			{
+				skeleton* sk = skeletons[skIdx];
+				for (int j = 0; j < sk->joints.size(); ++j) {
+					joint* jt = sk->joints[j];
+					if (jt->sName == skeletonName.toStdString()) {
+						skID = jt->nodeId;
+						break;
+					}
+				}	
 			}
 
 

@@ -80,7 +80,7 @@ public slots:
     void changeTransformRotateAmountZ(int);
 
 	// Toogle between transform and rotation
-	void changeRotateTranslateFlag(bool toogle);
+	void changeRotateTranslateFlag(bool);
 	
 	// Rotation: rotation values for joints
 	void changeTransformTranslateAmountX(int);

@@ -363,7 +363,7 @@ void saveBinding(binding* bd, string fileName)
 
 		fprintf(fout, "\n"); fflush(fout);
 
-		for(int infl = 0; infl< bd->pointData[pt].influences.size(); infl++)
+		for(int infl = 0; infl< bd->pointData[pt].secondInfluences.size(); infl++)
 		{
 			fprintf(fout, "%d ", bd->pointData[pt].secondInfluences[infl].size());
 			for(int child = 0; child < bd->pointData[pt].secondInfluences[infl].size(); child++)

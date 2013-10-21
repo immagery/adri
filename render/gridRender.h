@@ -85,9 +85,6 @@ public:
 
 	void updateGridColorsAndValues();
 
-    // asignación del grid a renderizar
-    //void setGrid(grid3d* _grid) {grid = _grid;}
-
     // currentSlice variables and dirt the flag
     void setSliceXY(int sliceXY)
     {

@@ -259,6 +259,8 @@ public:
 
 	void getCoordsFromPoint(Point3d& pt, vector<weight>& weights);
 
+	Point3d getCenterOfCell(int i, int j, int k);
+
 	void initBasicData();
 
     void clear();
