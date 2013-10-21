@@ -17,7 +17,7 @@
 #include "DataStructures/skeleton.h"
 #include "DataStructures/Modelo.h"
 #include "DataStructures/AnimationManager.h"
-#include "Particles.h"
+#include "DataStructures/Particles.h"
 
 #include <render/gridRender.h>
 #include "SelectionManager.h"
