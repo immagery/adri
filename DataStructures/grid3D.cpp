@@ -338,7 +338,7 @@ Point3d grid3d::getCenterOfCell(int i, int j, int k)
 
 void interpolateLinear(vector<weight>& result, vector<weight>& ptminWeights, vector<weight>& ptmaxWeights, float interpolationValue)
 {
-	int maxWeights = max( ptminWeights.size(), ptmaxWeights.size());
+	int maxWeights = ptminWeights.size() + ptmaxWeights.size();
 
 	vector<vector<float>> weightsAux;
 	weightsAux.resize(maxWeights);
@@ -353,6 +353,11 @@ void interpolateLinear(vector<weight>& result, vector<weight>& ptminWeights, vec
 		counter++;
 	}
 
+	for(int wind = counter ; wind < weightsAux.size(); wind++)
+	{
+		weightsAux[wind].push_back(0);
+	}
+
 	// Insertamos los pesos de la otra celda
 	for(int wind = 0; wind < ptmaxWeights.size(); wind++)
 	{
@@ -361,6 +366,7 @@ void interpolateLinear(vector<weight>& result, vector<weight>& ptminWeights, vec
 		if(redirection.count(label) == 0)
 		{
 			redirection[label] = counter;
+			weightsAux[counter].push_back(weightValue);
 			counter++;
 		}
 		else
@@ -375,13 +381,15 @@ void interpolateLinear(vector<weight>& result, vector<weight>& ptminWeights, vec
 	for (std::map<int,int>::iterator it=redirection.begin(); it!=redirection.end(); ++it)
 	{
 		float weightValue = 0;
-		if(weightsAux[it->second].size() == 1)
+		int label = it->first;
+		int idx = it->second;
+		if(weightsAux[idx].size() == 1)
 		{
-			weightValue = weightsAux[it->second][0]*interpolationValue;
+			weightValue = weightsAux[idx][0]*(1-interpolationValue);
 		}
-		else if(weightsAux[it->second].size() == 2)
+		else if(weightsAux[idx].size() == 2)
 		{
-			weightValue = weightsAux[it->second][0]*interpolationValue + weightsAux[it->second][1]*(1-interpolationValue);
+			weightValue = weightsAux[idx][0]*(1-interpolationValue) + weightsAux[idx][1]*interpolationValue;
 		}
 
 		result[counter] = weight(it->first, weightValue);
@@ -401,8 +409,85 @@ void interpolateBiLinear(vector<weight>& result,
 		vector<weight> weights2;
 
 		interpolateLinear(weights1, pt01, pt02, interpolationValue1);
-		interpolateLinear(weights2, pt03, pt04, interpolationValue1);
+		interpolateLinear(weights2, pt04, pt03, interpolationValue1);
 		interpolateLinear(result, weights1, weights2, interpolationValue2);
+}
+
+bool grid3d::isOut(Point3i& pt)
+{
+	return (pt.X() < 0 || pt.Y() < 0 || pt.Z() < 0 ||
+		    pt.X() >= dimensions.X() || pt.Y() >=  dimensions.Y()  || pt.Z() >=  dimensions.Z());
+
+}
+
+bool grid3d::hasData(Point3i& pt)
+{
+	return cells[pt.X()][pt.Y()][pt.Z()]->data != NULL;
+}
+
+void grid3d::copyValues(vector<weight>& weights, vector<weight>& weights_out)
+{
+	weights_out.resize(weights.size());
+	//float sum = 0;
+	for(int i = 0; i< weights_out.size(); i++)
+	{
+		weights_out[i] = weights[i];
+		//sum += weights[i].weightValue;
+	}
+
+	//if (fabs(sum - 1) > 0.0005 )
+	//	printf("There is a problem with that set of weights %f\n", sum); fflush(0);
+}
+
+void interpolateTriLinear(vector<weight>& result,
+						  vector<vector<weight>* >& pts,
+						 float interpolationValue1,
+						 float interpolationValue2,
+						 float interpolationValue3)
+{
+	vector<weight> weights1;
+	vector<weight> weights2;
+	interpolateBiLinear(weights1, 
+						*pts[0],
+						*pts[1], 
+						*pts[2],
+						*pts[3],
+						interpolationValue1, 
+						interpolationValue2);
+
+	interpolateBiLinear(weights2, 
+						*pts[4],
+						*pts[5], 
+						*pts[6],
+						*pts[7],
+						interpolationValue1, 
+						interpolationValue2);
+
+	interpolateLinear(  result, 
+						weights1, 
+						weights2, 
+						interpolationValue3);
+}
+
+void grid3d::getCoordsFromPointSimple(Point3d& pt, vector<weight>& weights)
+{
+	weights.clear();
+
+	Point3i originCell = cellId(pt);
+	int i = originCell.X();
+	int j = originCell.Y();
+	int k = originCell.Z();
+
+	if(i < 0 || j < 0 || k < 0 || i >= dimensions.X() || j >= dimensions.Y() || k >= dimensions.Z()) return;
+
+	if(cells[i][j][k]->getType() != EXTERIOR)
+	{
+		if(cells[i][j][k]->data)
+		{
+			copyValues(cells[i][j][k]->data->influences, weights);
+			return;
+		}
+	}
 }
 
 void grid3d::getCoordsFromPoint(Point3d& pt, vector<weight>& weights)
@@ -420,6 +505,9 @@ void grid3d::getCoordsFromPoint(Point3d& pt, vector<weight>& weights)
 	{
 		if(cells[i][j][k]->data)
 		{
+			//copyValues(cells[i][j][k]->data->influences, weights);
+			//return;
+
 			Point3d c = getCenterOfCell(i,j,k);
 			// Obtenemos el cuadrante en que cae el punto.
 			Point3d dpt = pt - c;
@@ -446,12 +534,48 @@ void grid3d::getCoordsFromPoint(Point3d& pt, vector<weight>& weights)
 				}
 			}
 
-			float margen = 0.001;
+
+			if(isOut(ptmaxIdx) || isOut(ptminIdx))
+			{
+				if(isOut(ptmaxIdx))
+				{
+					if(!isOut(ptminIdx))
+					{
+						if(hasData(ptminIdx))
+							copyValues(cells[ptminIdx[0]][ptminIdx[1]][ptminIdx[2]]->data->influences, weights);
+					}
+					else
+					{
+						// Buscar una celda cerca
+					}
+					return;
+				}
+				else
+				{
+					if(isOut(ptminIdx))
+					{
+						if(hasData(ptmaxIdx))
+							copyValues(cells[ptmaxIdx[0]][ptmaxIdx[1]][ptmaxIdx[2]]->data->influences, weights);
+					}
+					else
+					{
+						// Buscar una celda cerca
+					}
+					return;
+				}
+			}
+
+			if(!hasData(ptminIdx) || !hasData(ptmaxIdx))
+				return;
+
+			float margen = 0.00001;
 			int maxCoincidences = 0;
 			int minCoincidences = 0;
 			bool coincidences[6];
 			for(int comp = 0; comp < 3; comp++)
 			{
+				coincidences[comp] = false;
+				coincidences[comp+3] = false; 
 				if(fabs(ptmin[comp] - pt[comp]) < margen)
 				{
 					minCoincidences++;
@@ -462,19 +586,6 @@ void grid3d::getCoordsFromPoint(Point3d& pt, vector<weight>& weights)
 				{
 					maxCoincidences++;
 					coincidences[comp+3] = true;
-				}
-			}
-
-			// Guardaremos los pesos en esta matriz
-			float cellWeights[2][2][2];
-			for(int cellPos = 0; cellPos < 2; cellPos++)
-			{
-				for(int cellPos2 = 0; cellPos2 < 2; cellPos2++)
-				{
-					for(int cellPos3 = 0; cellPos3 < 2; cellPos3++)
-					{
-						cellWeights[cellPos][cellPos2][cellPos3] = 0.0;
-					}
 				}
 			}
 
@@ -489,17 +600,17 @@ void grid3d::getCoordsFromPoint(Point3d& pt, vector<weight>& weights)
 				int interpCoord1 = -1;
 				int interpCoord2 = -1;
 
-				vector<Point3i> facePoints1(4);
+				vector<Point3i> facePoints1(4); // Cara 1
 				facePoints1[0] = Point3i(ptminIdx[0], ptminIdx[1], ptminIdx[2]);
 				facePoints1[1] = Point3i(ptmaxIdx[0], ptminIdx[1], ptminIdx[2]);
 				facePoints1[2] = Point3i(ptmaxIdx[0], ptmaxIdx[1], ptminIdx[2]);
 				facePoints1[3] = Point3i(ptminIdx[0], ptmaxIdx[1], ptminIdx[2]);
 
-				vector<Point3i> facePoints2(4);
-				facePoints1[0] = Point3i(ptminIdx[0], ptminIdx[1], ptmaxIdx[2]);
-				facePoints1[1] = Point3i(ptmaxIdx[0], ptminIdx[1], ptmaxIdx[2]);
-				facePoints1[2] = Point3i(ptmaxIdx[0], ptmaxIdx[1], ptmaxIdx[2]);
-				facePoints1[3] = Point3i(ptminIdx[0], ptmaxIdx[1], ptmaxIdx[2]);
+				vector<Point3i> facePoints2(4); // Cara 2
+				facePoints2[0] = Point3i(ptminIdx[0], ptminIdx[1], ptmaxIdx[2]);
+				facePoints2[1] = Point3i(ptmaxIdx[0], ptminIdx[1], ptmaxIdx[2]);
+				facePoints2[2] = Point3i(ptmaxIdx[0], ptmaxIdx[1], ptmaxIdx[2]);
+				facePoints2[3] = Point3i(ptminIdx[0], ptmaxIdx[1], ptmaxIdx[2]);
 				
 				vector<float> interpolationValues(3);
 				
@@ -511,9 +622,14 @@ void grid3d::getCoordsFromPoint(Point3d& pt, vector<weight>& weights)
 				for(int ptIdx = 0; ptIdx < 4; ptIdx++)
 				{
 					AllWeights[ptIdx] = &(cells[facePoints1[ptIdx][0]][facePoints1[ptIdx][1]][facePoints1[ptIdx][2]]->data->influences);
-					AllWeights[ptIdx+4] = &(cells[facePoints1[ptIdx+4][0]][facePoints1[ptIdx+4][1]][facePoints1[ptIdx+4][2]]->data->influences);
+					AllWeights[ptIdx+4] = &(cells[facePoints2[ptIdx][0]][facePoints2[ptIdx][1]][facePoints2[ptIdx][2]]->data->influences);
 				}
 
+				interpolateTriLinear(weights, AllWeights,
+									interpolationValues[1],
+									interpolationValues[0],
+									interpolationValues[2]);
+				/*
 				vector<weight> weights1;
 				vector<weight> weights2;
 				interpolateBiLinear(weights1, 
@@ -524,7 +640,7 @@ void grid3d::getCoordsFromPoint(Point3d& pt, vector<weight>& weights)
 									*AllWeights[4],*AllWeights[5],*AllWeights[6], *AllWeights[7],
 									interpolationValues[0], interpolationValues[1]);
 
-				interpolateLinear(weights, weights1, weights2, interpolationValues[2]);
+				interpolateLinear(weights, weights1, weights2, interpolationValues[2]);*/
 
 
 			}
@@ -648,6 +764,10 @@ void grid3d::getCoordsFromPoint(Point3d& pt, vector<weight>& weights)
 			if(cells[i][j][k]->getType() == BOUNDARY)
 			{
 				printf("Es borde...\n");
+			}
+			else
+			{
+				printf("??? algo esta pasando...\n");
 			}
 			fflush(0);
 		}
@@ -879,7 +999,7 @@ int grid3d::fillInside()
     return cellsCount;
 }
 
-#define TERMINATE_CRITERION 0.001
+#define TERMINATE_CRITERION 0.0001
 
 
 void grid3d::cleanZeroInfluences()
@@ -1021,6 +1141,8 @@ void grid3d::normalizeWeightsByDomain()
 
 void grid3d::normalizeWeightsOptimized()
 {
+	int counterTotalCells = 0;
+	int counterZeroCells = 0;
 	float maxValue = -9999, minValue = 9999;
 	for(int i = 0; i< dimensions.X(); i++)
 	{
@@ -1028,8 +1150,11 @@ void grid3d::normalizeWeightsOptimized()
 		{
 			for(int k = 0; k< dimensions.Z(); k++)
 			{
-				if(cells[i][j][k]->getType() == INTERIOR)
+				if(cells[i][j][k]->getType() != EXTERIOR)
 				{
+					if(cells[i][j][k]->getType() == INTERIOR)
+						counterTotalCells++;
+
 					// normalizamos también lo vertices.
 					//if(cells[i][j][k]->data->vertexContainer)
 					//	continue;
@@ -1051,13 +1176,22 @@ void grid3d::normalizeWeightsOptimized()
 					}
 					else
 					{
-						printf("Hay un problema con este peso... es igual a cero la suma.\n"); fflush(0);
+						counterZeroCells++;
+						// Limpiamos, es posible que se haya quedado en cero?
+						if(cells[i][j][k]->data->influences.size() > 0)
+						{
+							if(cells[i][j][k]->getType() == INTERIOR)
+								counterZeroCells++;
+							printf("Hay un problema con este peso... es igual a cero la suma.\n"); fflush(0);
+							cells[i][j][k]->data->influences.clear();
+						}
 					}
 				}
 			}
 		}
 	}
 
+	printf("Total: %d; Zero: %d\n", counterTotalCells, counterZeroCells); fflush(0);
 	printf("MinValue: %f; MaxValue: %f\n", minValue, maxValue); fflush(0);
 }
 
@@ -1242,7 +1376,9 @@ void grid3d::expandWeightsOptimized(Modelo* m)
 		printf("\nExpansion\n"); fflush(0);
 		iterationVariation = TERMINATE_CRITERION*2;
 		int iterationsDone = 0;
-		while(iterationVariation >= TERMINATE_CRITERION)
+		bool cellsAddedFlag = true;
+		float finishValue = 0;
+		while(iterationVariation >= TERMINATE_CRITERION && cellsAddedFlag)
 		{
 			float localVar = 0;
 			for(unsigned int cellCount = 0; cellCount< stepProcessCells.size(); cellCount++)
@@ -1319,14 +1455,17 @@ void grid3d::expandWeightsOptimized(Modelo* m)
 				// Se podria hacer de golpe con un resize 
 				stepProcessCells.push_back(cellsToAdd[cellCount]);
 			}
+
+			cellsAddedFlag = cellsToAdd.size() > 0;
 			cellsToAdd.clear();
 
 			iterationVariation = min(iterationVariation, localVar);
+			finishValue = localVar;
 			//printf("\n%d: Valor de iteracion:%f y acaba en %f\n",iterationsDone, localVar,TERMINATE_CRITERION );fflush(0);
 			iterationsDone++;
 		}
 
-		printf("\nIteraciones: %d\n", iterationsDone );fflush(0);
+		printf("\nIteraciones: %d con valor: %f\n", iterationsDone, finishValue );fflush(0);
 		printf("\nLimpieza\n" );fflush(0);
 
 		double weightThreshold = 1/pow(10,4);

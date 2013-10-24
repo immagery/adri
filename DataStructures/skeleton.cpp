@@ -1,7 +1,7 @@
 #include "skeleton.h"
 #include "Scene.h"
 
-#define VERBOSE false
+//#define VERBOSE false
 
 #include <utils/util.h>
 #include <render/skeletonRender.h>
@@ -604,7 +604,8 @@ int proposeNodes(vector<skeleton*>& skts, vector< DefNode >& nodePoints)
 		joint* jt = skts[nodePointsIdx[j]]->getJoint(nodePoints[j].boneId);
 		if(jt == NULL)
 		{
-			printf("There is a problem.\n"); fflush(0);
+			if(VERBOSE)
+				printf("There is a problem.\n"); fflush(0);
 		}
 		else
 		{

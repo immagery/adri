@@ -14,6 +14,8 @@
 
 using namespace std;
 
+#define VERBOSE false
+
 string   getCurrentTime();
 
 void GetColour(double v,double vmin,double vmax, float& r, float& g, float& b);
