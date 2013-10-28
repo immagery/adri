@@ -322,7 +322,7 @@ void Skinning::computeDeformationsWithSW(const vector< skeleton* >& skeletons) {
 						
 						//Vector3f pruebas(1.0,0,0); 
 						//AngleAxisf(twistInterpolation, pruebas);
-						auxPos = m*auxPos;
+						//auxPos = m*auxPos;
 
 						Vector4f finalPos2(auxPos[0], auxPos[1],auxPos[2],1);
 						Vector4f finalPos = jo->W * finalPos2;

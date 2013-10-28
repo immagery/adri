@@ -7,6 +7,9 @@
 #include "..\render\shadingNode.h"
 #include "..\DataStructures\skeleton.h"
 
+// render size
+#define DEFAULT_SIZE 0.1
+
 using namespace std;
 
 class JointRender : public shadingNode
@@ -29,8 +32,9 @@ class JointRender : public shadingNode
 		void computeWorldPosRec(joint* jt);
 		void computeRestPos(joint* jt);
 		void computeRestPosRec(joint* jt);
-};
 
+		static float jointSize;
+};
 
 void drawLine(double x, double y, double z);
 void drawBone(double l, double r);

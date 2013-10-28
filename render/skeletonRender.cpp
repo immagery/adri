@@ -18,6 +18,8 @@
 
 #include <DataStructures/Skeleton.h>
 
+float JointRender::jointSize = DEFAULT_SIZE;
+
 void SkeletonRender::drawFunc(skeleton* obj)
 {
     // transformaciones
@@ -156,6 +158,18 @@ bool SkeletonRender::updateSkeleton(skeleton* skt)
 }
 
 
+void drawLine(double x1, double y1, double z1, double x2, double y2, double z2)
+{
+    glDisable(GL_LIGHTING);
+    glBegin(GL_LINES);
+
+    glVertex3d(x1,y1,z1);
+    glVertex3d(x2,y2,z2);
+
+    glEnd();
+    glEnable(GL_LIGHTING);
+}
+
 void drawLine(double x, double y, double z)
 {
     glDisable(GL_LIGHTING);
@@ -201,6 +215,13 @@ void drawBone(double l, double r)
 
 }
 
+void drawBoneStick(float radius, Point3d& pos)
+{
+	drawLine(0,0,0, pos.X(), pos.Y(), pos.Z());
+	//drawLine(1,0,0, pos.X(), pos.Y(), pos.Z());
+	//drawLine(1,0,0, pos.X(), pos.Y(), pos.Z());
+}
+
 //JOINT
 void JointRender::drawFunc(joint* jt)
 {    
@@ -214,9 +235,40 @@ void JointRender::drawFunc(joint* jt)
         else
             glColor3f(NORMALR,NORMALG,NORMALB);
 
-        drawLine(jt->pos.X(), jt->pos.Y(),jt->pos.Z());
+		//
+		drawBoneStick(jointSize, jt->pos);
+        //drawLine(jt->pos.X(), jt->pos.Y(),jt->pos.Z());
     }
 
+    //glTranslated(jt->pos.X(),jt->pos.Y(),jt->pos.Z());
+
+	Matrix33d orientMatrix;
+	Matrix33d rotateMatrix;
+	jt->qOrient.ToMatrix(orientMatrix);
+	jt->qrot.ToMatrix(rotateMatrix);
+	Matrix33d oriRot =  (orientMatrix * rotateMatrix);
+
+	Eigen::Matrix4d transformMatrix;
+	transformMatrix << oriRot[0][0] , oriRot[0][1] , oriRot[0][2], jt->pos.X(),
+					   oriRot[1][0] , oriRot[1][1] , oriRot[1][2], jt->pos.Y(),
+					   oriRot[2][0] , oriRot[2][1] , oriRot[2][2], jt->pos.Z(),
+					   0,				0,				0,			1;
+
+    //glRotatef((GLfloat)jt->orientJoint.Z(),0,0,1);
+    //glRotatef((GLfloat)jt->orientJoint.Y(),0,1,0);
+    //glRotatef((GLfloat)jt->orientJoint.X(),1,0,0);
+
+	//double orientAlpha, orientBeta, orientGamma;
+	//jt->qOrient.ToEulerAngles(orientAlpha, orientBeta, orientGamma);
+
+	//glRotatef((GLfloat)Rad2Deg(orientGamma),0,0,1);
+    //glRotatef((GLfloat)Rad2Deg(orientBeta),0,1,0);
+    //glRotatef((GLfloat)Rad2Deg(orientAlpha),1,0,0);
+
+	//double alpha, beta, gamma;
+	//jt->qrot.ToEulerAngles(alpha, beta, gamma);
+
+	transformMatrix.transposeInPlace();
 	Eigen::Matrix4f transformMatrix = jt->world;
 
 	GLdouble multiplyingMatrix[16] = {transformMatrix(0,0), transformMatrix(0,1), transformMatrix(0,2), transformMatrix(0,3),
@@ -234,13 +286,17 @@ void JointRender::drawFunc(joint* jt)
         glColor3f(NORMALR,NORMALG,NORMALB);
 
     // Pintamos 3 los círculos
-    drawTriCircle(12, DEFAULT_SIZE);
+    drawTriCircle(12, jointSize);
 
     // Pintamos los ejes del hueso
-    drawAxisHandle(DEFAULT_SIZE*0.7);
+    drawAxisHandle(jointSize*25);
 
     // Pintamos la pelota de expansion
-    drawExpansionBall(selected, (float)(DEFAULT_SIZE*2*jt->expansion));
+    //drawExpansionBall(selected, (float)(DEFAULT_SIZE*2*jt->expansion));
+	//for(unsigned int i = 0; i< jt->nodes.size(); i++)
+    //{
+    //    drawDeformer(jt->childs[i]->drawFunc());
+    //}
 
     for(unsigned int i = 0; i< jt->childs.size(); i++)
     {

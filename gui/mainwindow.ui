@@ -1213,33 +1213,13 @@
                  <string>%</string>
                 </property>
                </widget>
-               <zorder>axisX_edit</zorder>
-               <zorder>axisY_edit</zorder>
-               <zorder>axisZ_edit</zorder>
-               <zorder>ip_axisX</zorder>
-               <zorder>label_14</zorder>
-               <zorder>ip_axisY</zorder>
-               <zorder>ip_axisZ</zorder>
-               <zorder>paintModel</zorder>
-               <zorder>drawPlaneCheck</zorder>
-               <zorder>PlaneDataCombo</zorder>
-               <zorder>positionPlaneSlider</zorder>
-               <zorder>groupBox</zorder>
-               <zorder>positionPlaneEdit</zorder>
-               <zorder>dataSource</zorder>
-               <zorder>paintPlane</zorder>
-               <zorder>thresholdSlider</zorder>
-               <zorder>threshold_edit</zorder>
-               <zorder>threshold_enable</zorder>
-               <zorder>threshold_enable_adaptative</zorder>
-               <zorder>NodeInfoTab</zorder>
               </widget>
              </widget>
             </item>
             <item>
              <widget class="QTabWidget" name="NodeInfoTab">
               <property name="currentIndex">
-               <number>2</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="render">
                <attribute name="title">
@@ -1299,7 +1279,7 @@
                  <rect>
                   <x>20</x>
                   <y>280</y>
-                  <width>371</width>
+                  <width>351</width>
                   <height>22</height>
                  </rect>
                 </property>
@@ -1625,6 +1605,22 @@
                  <string>Show Local Axis</string>
                 </property>
                 <property name="checked">
+                 <bool>true</bool>
+                </property>
+               </widget>
+               <widget class="QLineEdit" name="skeleton_size_edit">
+                <property name="geometry">
+                 <rect>
+                  <x>260</x>
+                  <y>170</y>
+                  <width>60</width>
+                  <height>20</height>
+                 </rect>
+                </property>
+                <property name="text">
+                 <string>1.0</string>
+                </property>
+                <property name="readOnly">
                  <bool>true</bool>
                 </property>
                </widget>
