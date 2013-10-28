@@ -23,9 +23,7 @@ public:
 	vector<Geometry*> originalModels;
 	vector<Geometry*> deformedModels;
 
-	vector<binding*> bindings;
-    map<pair<int, int>, Point3d> restPositions;
-    // some way to store triplets vertex - bone - position
+	map<int, vector<binding*> > bindings;		// index of model -> vector of bindings for that model
 
 	int quaternionDef;
 };

@@ -8,7 +8,7 @@
 using namespace Eigen;
 
 Skinning::Skinning() {
-    bindings = vector<binding*>(0);
+    bindings = map<int,vector<binding*> >();
 	originalModels = vector<Geometry*>(0);
 	deformedModels = vector<Geometry*>(0);
 
@@ -29,19 +29,16 @@ void Skinning::loadBindingForModel (Modelo *m, string path, const vector< skelet
 		return;
 	}
 
-    //binding * b = new binding();
-	//b->pointData.resize(0);
-    //m->bindings.push_back(b);
-
-	// Connect elements for skinning computation
-	//bindings.push_back(b);
+	int modelIndex = deformedModels.size();
+	bindings[modelIndex] = vector<binding*> ();
 
 	for(int i = 0; i< m->bindings.size(); i++)
-		bindings.push_back(m->bindings[i]);
+		bindings[modelIndex].push_back(m->bindings[i]);
 
 	// De momento trabajamos con el primero
-	//TOFIX
-	binding* bd = bindings[0];
+	// DEBUG: we check the last added binding. What happens if a model has more than two bindings? 
+	// TOFIX a model can have more than 1 binding
+	binding* bd = bindings[modelIndex][0];
 
 	deformedModels.push_back((Geometry*) m);
 	originalModels.push_back(m->originalModel);
@@ -67,23 +64,21 @@ void Skinning::loadBindingForModel (Modelo *m, string path, const vector< skelet
 
         for (int i = 1; i < list.size(); i += 2) {
 			int skID = -1;
-			QString skeletonName = list.at(i);
+			QString jointName = list.at(i);
 
-			for(int skIdx = 0; skIdx < skeletons.size(); skIdx++)
-			{
-				skeleton* sk = skeletons[skIdx];
-				for (int j = 0; j < sk->joints.size(); ++j) {
-					joint* jt = sk->joints[j];
-					if (jt->sName == skeletonName.toStdString()) {
-						skID = jt->nodeId;
-						break;
-					}
-				}	
-			}
-
-
+			// DEBUG: we now search always in the last added skeleton, does this always work?
+			//for(int skIdx = 0; skIdx < skeletons.size(); skIdx++) { }
+			skeleton* sk = skeletons[skeletons.size()-1];
+			for (int j = 0; j < sk->joints.size(); ++j) {
+				joint* jt = sk->joints[j];
+				if (jt->sName == jointName.toStdString()) {
+					skID = jt->nodeId;
+					break;
+				}
+			}	
+			
 			if (skID == -1) {
-				printf("Something bad happened: bone does not exist!\n");
+				printf("Something bad happened: joint does not exist!\n");
 				assert(false);
 			}
 
@@ -92,7 +87,6 @@ void Skinning::loadBindingForModel (Modelo *m, string path, const vector< skelet
 			w.label = skID;
 			w.weightValue = weightValue;
 			point.influences.push_back(w);
-			//printf("%d %f ", skID, weightValue);
         }
 
 		line = in.readLine();
@@ -127,15 +121,21 @@ against all joints and store it.
 void Skinning::computeRestPositions(const vector< skeleton* >& skeletons) {
 	printf("Computing rest positions...");
 
-	skeletons[0]->joints[0]->computeRestPos();
+	//for (int i = 0; i < skeletons.size(); ++i)
+	// This should only be done on the newly added skeleton!
+	skeletons[skeletons.size()-1]->joints[0]->computeRestPos();
 
 	printf(" done\n");
 }
 
+/*
 void Skinning::computeDeformations(const vector< skeleton* >& skeletons) {
 	//for (int v = 0; v < originalModels.size(); ++v) originalModels[v]->shading->visible = false;	 // keep it false ALWAYS
 
-	if (skeletons.size() > 0) skeletons[0]->joints[0]->computeWorldPos();
+	if (skeletons.size() > 0) {
+		//if (!skeletons[0]->joints[0]->dirtyFlag) return;
+		skeletons[0]->joints[0]->computeWorldPos();
+	}
 	bool updated = false;
 
 	for (int i = 0; i < deformedModels.size(); ++i) {		// for every deformed model
@@ -185,23 +185,37 @@ void Skinning::computeDeformations(const vector< skeleton* >& skeletons) {
 		}
 	}
 
+
+
 }
+*/
 
 void Skinning::computeDeformationsWithSW(const vector< skeleton* >& skeletons) {
-
 	// Caluculamos las matrices de Transformacion de cada articulacion
-	if (skeletons.size() > 0) 
-		skeletons[0]->joints[0]->computeWorldPos();
 
+	if (skeletons.size() == 0) return;
+
+	// Check if there's at least one dirty skeleton. In that case, proceed
+	bool oneDirtySkeleton = false;
+	for (int i = 0; i < skeletons.size(); ++i) {
+		if (skeletons[i]->joints[0]->dirtyFlag) {
+			oneDirtySkeleton = true;
+			break;
+		}
+	}
+	if (!oneDirtySkeleton) return;
+	
 	bool updated = false;
 
 	for (int i = 0; i < deformedModels.size(); ++i) {		// for every deformed model
+		if (skeletons[i]->joints[0]->dirtyFlag) skeletons[i]->joints[0]->computeWorldPos();
+		else continue;
+		if (!deformedModels[i]->shading->visible) return;
 		Geometry *m = deformedModels[i];
-		for (int j = 0; j < bindings.size(); ++j) {			// loop through all bindings
-			binding * b = bindings[j];
+		for (int j = 0; j < bindings[i].size(); ++j) {			// loop through all bindings
+			binding * b = bindings[i][j];
 
-			for (int k = 0; k < b->pointData.size(); ++k) // and for each binding, loop over all its points
-			{     
+			for (int k = 0; k < b->pointData.size(); ++k) { // and for each binding, loop over all its points
 				PointData& data = b->pointData[k];
 				GraphNode* node = data.node;
 				int vertexID = node->id;
@@ -352,8 +366,8 @@ void Skinning::computeDeformationsWithSW(const vector< skeleton* >& skeletons) {
 		}
 		if (updated)
 		{
+			
 			m->computeNormals();
 		}
 	}
-
 }

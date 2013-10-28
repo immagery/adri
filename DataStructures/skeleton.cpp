@@ -212,8 +212,11 @@ bool joint::getBoundingBox(Point3d& minAuxPt,Point3d& maxAuxPt)
 
 void joint::computeWorldPos()
 {
-    if(dirtyFlag) update();
-	((JointRender*)shading)->computeWorldPos(this);
+    if(dirtyFlag) {
+		update();
+		//dirtyFlag = false;
+		((JointRender*)shading)->computeWorldPos(this);
+	}
 	/*
     glPushMatrix();
 

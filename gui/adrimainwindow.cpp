@@ -756,23 +756,14 @@ void AdriMainWindow::keyPressEvent(QKeyEvent* event)
 }
 
 void AdriMainWindow::changeTransformTranslateAmountX(int) {
-
     object *selectedObject = NULL;
     if (ui->glCustomWidget->selMgr.selection.size() > 0)
         selectedObject = ui->glCustomWidget->selMgr.selection.back();
 
-    //if (selectedObject != NULL)
-    //    selectedObject->pos.X() = ui->rotationAmountX->value()/10.0;
-
-	ui->glCustomWidget->particles->xvalue = ui->rotationAmountX->value();
-	if (ui->glCustomWidget->escena->skeletons.size() > 0) {
-		ui->glCustomWidget->escena->skeletons[0]->joints[0]->pos.X() = ui->rotationAmountX->value();
+    if (selectedObject != NULL) {
+        selectedObject->pos.X() = ui->rotationAmountX->value();
+		selectedObject->dirtyFlag = true;
 	}
-
-	Quaternion<double> qaux;
-	qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()),Deg2Rad(ui->rotationAmountY->value()),Deg2Rad(ui->rotationAmountZ->value()));
-	if (selectedObject != NULL)
-		selectedObject->qrot = qaux;
 
     QString msg = QString::number(ui->rotationAmountX->value());
     ui->rotationEditX->setText(msg);
@@ -784,23 +775,13 @@ void AdriMainWindow::changeTransformTranslateAmountY(int) {
     if (ui->glCustomWidget->selMgr.selection.size() > 0)
         selectedObject = ui->glCustomWidget->selMgr.selection.back();
 
-    if (selectedObject != NULL)
-	{
-		Quaternion<double> qaux;
-		qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()),Deg2Rad(ui->rotationAmountY->value()),Deg2Rad(ui->rotationAmountZ->value()));
-        selectedObject->qrot = qaux;
-	}
-
-			ui->glCustomWidget->particles->yvalue = ui->rotationAmountY->value();
-	if (ui->glCustomWidget->escena->skeletons.size() > 0) {
-
-		ui->glCustomWidget->escena->skeletons[0]->joints[0]->pos.Y() = ui->rotationAmountY->value();
+    if (selectedObject != NULL) {
+		selectedObject->pos.Y() = ui->rotationAmountY->value();
+		selectedObject->dirtyFlag = true;
 	}
 
     QString msg = QString::number(ui->rotationAmountY->value());
     ui->rotationEditY->setText(msg);
-
-
 }
 
 void AdriMainWindow::changeTransformTranslateAmountZ(int) {
@@ -808,24 +789,10 @@ void AdriMainWindow::changeTransformTranslateAmountZ(int) {
     if (ui->glCustomWidget->selMgr.selection.size() > 0)
         selectedObject = ui->glCustomWidget->selMgr.selection.back();
 
-    //if (selectedObject != NULL)
-        //selectedObject->rot.Z() = ui->rotationAmountZ->value();
-
-			ui->glCustomWidget->particles->zvalue = ui->rotationAmountZ->value();
-	if (ui->glCustomWidget->escena->skeletons.size() > 0) {
-
-		ui->glCustomWidget->escena->skeletons[0]->joints[0]->pos.Z() = ui->rotationAmountZ->value();
+    if (selectedObject != NULL) {
+        selectedObject->pos.Z() = ui->rotationAmountZ->value();
+		selectedObject->dirtyFlag = true;
 	}
-
-	Quaternion<double> qaux;
-	float ang01, ang02, ang03;
-	ang01 = Deg2Rad(ui->rotationAmountX->value());
-	ang02 = Deg2Rad(ui->rotationAmountY->value());
-	ang03 = Deg2Rad(ui->rotationAmountZ->value());
-	qaux.FromEulerAngles(ang01,ang02,ang03);
-	
-	if (selectedObject != NULL)
-		selectedObject->qrot = qaux;
 
     QString msg = QString::number(ui->rotationAmountZ->value());
     ui->rotationEditZ->setText(msg);
@@ -858,6 +825,8 @@ void AdriMainWindow::changeTransformRotateAmountX(int x) {
 
 		//qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()),Deg2Rad(ui->rotationAmountY->value()),Deg2Rad(ui->rotationAmountZ->value()));
 		selectedObject->qrot = qaux;
+		selectedObject->dirtyFlag = true;
+		ui->glCustomWidget->escena->skeletons[0]->joints[0]->dirtyFlag = true;
 	}
 
     QString msg = QString::number(ui->rotationAmountX->value());
@@ -890,6 +859,7 @@ void AdriMainWindow::changeTransformRotateAmountY(int x) {
 
 		// Lo aplicamos como incremento
 		selectedObject->qrot = qaux;
+		selectedObject->dirtyFlag = true;
 	}
 
     QString msg = QString::number(ui->rotationAmountY->value());
@@ -928,6 +898,7 @@ void AdriMainWindow::changeTransformRotateAmountZ(int x) {
 		//qaux.FromEulerAngles(rotationX,rotationY,rotationZ);
 
 		selectedObject->qrot = qaux;
+		selectedObject->dirtyFlag = true;
 	}
 
     QString msg = QString::number(ui->rotationAmountZ->value());
