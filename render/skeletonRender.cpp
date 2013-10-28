@@ -242,7 +242,7 @@ void JointRender::drawFunc(joint* jt)
 
     //glTranslated(jt->pos.X(),jt->pos.Y(),jt->pos.Z());
 
-	Matrix33d orientMatrix;
+	/*Matrix33d orientMatrix;
 	Matrix33d rotateMatrix;
 	jt->qOrient.ToMatrix(orientMatrix);
 	jt->qrot.ToMatrix(rotateMatrix);
@@ -252,7 +252,7 @@ void JointRender::drawFunc(joint* jt)
 	transformMatrix << oriRot[0][0] , oriRot[0][1] , oriRot[0][2], jt->pos.X(),
 					   oriRot[1][0] , oriRot[1][1] , oriRot[1][2], jt->pos.Y(),
 					   oriRot[2][0] , oriRot[2][1] , oriRot[2][2], jt->pos.Z(),
-					   0,				0,				0,			1;
+					   0,				0,				0,			1;*/
 
     //glRotatef((GLfloat)jt->orientJoint.Z(),0,0,1);
     //glRotatef((GLfloat)jt->orientJoint.Y(),0,1,0);
@@ -268,7 +268,7 @@ void JointRender::drawFunc(joint* jt)
 	//double alpha, beta, gamma;
 	//jt->qrot.ToEulerAngles(alpha, beta, gamma);
 
-	transformMatrix.transposeInPlace();
+	//transformMatrix.transposeInPlace();
 	Eigen::Matrix4f transformMatrix = jt->world;
 
 	GLdouble multiplyingMatrix[16] = {transformMatrix(0,0), transformMatrix(0,1), transformMatrix(0,2), transformMatrix(0,3),
