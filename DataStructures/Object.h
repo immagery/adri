@@ -27,6 +27,7 @@ public:
     void resetTransformation();
     virtual void addTranslation(double tx, double ty, double tz);
     virtual void addRotation(double rx, double ry, double rz);
+	virtual void addRotation(Quaternion<double> q);
 
     // node info propagation specification
     virtual bool update();

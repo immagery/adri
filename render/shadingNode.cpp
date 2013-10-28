@@ -31,7 +31,7 @@ bool shadingNode::update(object* obj)
 		obj->tMatrix[2][3] = obj->pos.Z();
 		obj->tMatrix[3][3] = 1.0;
 
-		dirtyFlag = false;
+		obj->dirtyFlag = false;
     }
 
     return true;

@@ -178,7 +178,7 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
     glDepthFunc(GL_LEQUAL);
 
     restoreStateFromFile();
-    setAnimationPeriod(40);
+    setAnimationPeriod(20);
     startAnimation();
 
     //testScene();
@@ -450,6 +450,7 @@ void AdriViewer::readSkeleton(string fileName)
 		
 		// Skinning
 		//QString path = (sGlobalPath.append(sPath).append("binding.txt"));
+		
 		string sBindingFileFullPath = (newPath+sBindingFile).toStdString();//path.toStdString();
 		escena->loadBindingForModel(m,sBindingFileFullPath);
         escena->skinner->computeRestPositions(escena->skeletons);
@@ -774,13 +775,15 @@ void AdriViewer::readSkeleton(string fileName)
  // This function draw the elements using the state parameters.
  void AdriViewer::draw()
  {
+	 //if (escena->skeletons.size() > 0) escena->skeletons[0]->joints[0]->computeWorldPos();
      if(ShadingModeFlag == SH_MODE_SMOOTH)
         glShadeModel(GL_SMOOTH);
      else if(ShadingModeFlag == SH_MODE_FLAT)
         glShadeModel(GL_FLAT);
 
 	 // Apply skinning
-	escena->skinner->computeDeformationsWithSW(escena->skeletons);
+	 
+	 escena->skinner->computeDeformationsWithSW(escena->skeletons);
 
 	 // SKINNING I SOLVERS
 	 /*if (escena->skeletons.size() > 0 && aniManager.simulationEnabled) {

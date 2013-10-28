@@ -29,6 +29,7 @@ class joint : public object
 
 		Eigen::Matrix4f iT;
 		Eigen::Matrix4f W;
+		Eigen::Matrix4f world;
 
         float expansion;
 		float smoothness;

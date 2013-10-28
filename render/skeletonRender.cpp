@@ -13,6 +13,9 @@
 #define SUBSELG 1.0
 #define SUBSELB 1.0
 
+// render size
+#define DEFAULT_SIZE 0.05
+
 #include <DataStructures/Skeleton.h>
 
 float JointRender::jointSize = DEFAULT_SIZE;
@@ -266,6 +269,7 @@ void JointRender::drawFunc(joint* jt)
 	//jt->qrot.ToEulerAngles(alpha, beta, gamma);
 
 	transformMatrix.transposeInPlace();
+	Eigen::Matrix4f transformMatrix = jt->world;
 
 	GLdouble multiplyingMatrix[16] = {transformMatrix(0,0), transformMatrix(0,1), transformMatrix(0,2), transformMatrix(0,3),
 										transformMatrix(1,0), transformMatrix(1,1), transformMatrix(1,2), transformMatrix(1,3),
@@ -274,10 +278,6 @@ void JointRender::drawFunc(joint* jt)
 									};
 
 	glMultMatrixd(multiplyingMatrix);
-
-    //glRotatef((GLfloat)Rad2Deg(gamma),0,0,1);
-    //glRotatef((GLfloat)Rad2Deg(beta),0,1,0);
-    //glRotatef((GLfloat)Rad2Deg(alpha),1,0,0);
 
     // Pintamos un tri-círculo
     if(selected)
@@ -327,7 +327,7 @@ void JointRender::computeRestPosRec(joint* jt)
 	Matrix33d rotateMatrix;
 	jt->qOrient.ToMatrix(orientMatrix);
 	jt->qrot.ToMatrix(rotateMatrix);
-	Matrix33d oriRot =  (orientMatrix * rotateMatrix);
+	Matrix33d oriRot =  (rotateMatrix * orientMatrix);
 
 	Eigen::Matrix4d transformMatrix;
 	transformMatrix << oriRot[0][0] , oriRot[0][1] , oriRot[0][2], jt->pos.X(),
@@ -405,9 +405,9 @@ void JointRender::computeWorldPosRec(joint* jt)
 	Matrix33d rotateMatrix;
 	jt->qOrient.ToMatrix(orientMatrix);
 	jt->qrot.ToMatrix(rotateMatrix);
-	Matrix33d oriRot =  (orientMatrix * rotateMatrix);
+	Matrix33d oriRot =  (rotateMatrix * orientMatrix);
 
-	Eigen::Matrix4d transformMatrix;
+	Eigen::Matrix4f transformMatrix;
 	transformMatrix << oriRot[0][0] , oriRot[0][1] , oriRot[0][2], jt->pos.X(),
 						oriRot[1][0] , oriRot[1][1] , oriRot[1][2], jt->pos.Y(),
 						oriRot[2][0] , oriRot[2][1] , oriRot[2][2], jt->pos.Z(),
@@ -432,6 +432,8 @@ void JointRender::computeWorldPosRec(joint* jt)
 										transformMatrix(2,0), transformMatrix(2,1), transformMatrix(2,2), transformMatrix(2,3),
 										transformMatrix(3,0), transformMatrix(3,1), transformMatrix(3,2), transformMatrix(3,3)
 									};
+
+	jt->world = transformMatrix;
 
 	glMultMatrixd(multiplyingMatrix);
 

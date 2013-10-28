@@ -798,9 +798,9 @@ void AdriMainWindow::changeTransformTranslateAmountX(int)
 
 	// Aplica la traslacion
 	ui->glCustomWidget->particles->xvalue = ui->translationAmountX->value();
-	if (ui->glCustomWidget->escena->skeletons.size() > 0) {
-
-		ui->glCustomWidget->escena->skeletons[0]->joints[0]->pos.X() = ui->translationAmountX->value();
+    if (selectedObject != NULL) {
+        selectedObject->pos.X() = ui->translationAmountX->value();
+		selectedObject->dirtyFlag = true;
 	}
 
     QString msg = QString::number(ui->translationAmountX->value());
@@ -818,11 +818,10 @@ void AdriMainWindow::changeTransformTranslateAmountY(int)
 
 	// Aplica la traslacion
 	ui->glCustomWidget->particles->yvalue = ui->translationAmountY->value();
-	if (ui->glCustomWidget->escena->skeletons.size() > 0) {
-
-		ui->glCustomWidget->escena->skeletons[0]->joints[0]->pos.Y() = ui->translationAmountY->value();
+    if (selectedObject != NULL) {
+		selectedObject->pos.Y() = ui->translationAmountY->value();
+		selectedObject->dirtyFlag = true;
 	}
-
 
     QString msg = QString::number(ui->translationAmountY->value());
     ui->translationEditY->setText(msg);
@@ -837,15 +836,13 @@ void AdriMainWindow::changeTransformTranslateAmountZ(int) {
 
 	// Aplica la traslacion
 	ui->glCustomWidget->particles->zvalue = ui->translationAmountZ->value();
-	if (ui->glCustomWidget->escena->skeletons.size() > 0) {
-
-		ui->glCustomWidget->escena->skeletons[0]->joints[0]->pos.Z() = ui->translationAmountZ->value();
+    if (selectedObject != NULL) {
+        selectedObject->pos.Z() = ui->translationAmountZ->value();
+		selectedObject->dirtyFlag = true;
 	}
-
 
     QString msg = QString::number(ui->translationAmountZ->value());
     ui->translationEditZ->setText(msg);
-
 }
 
 void AdriMainWindow::changeTransformRotateAmountX(int x) 
@@ -855,8 +852,7 @@ void AdriMainWindow::changeTransformRotateAmountX(int x)
     if (ui->glCustomWidget->selMgr.selection.size() > 0)
         selectedObject = ui->glCustomWidget->selMgr.selection.back();
 
-	if (selectedObject != NULL)
-	{
+	if (selectedObject != NULL) {
 		Quaternion<double> qaux;
 		//qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()-rotationX),0,0);
 		rotationX =  Deg2Rad((float)ui->dialX->value()/10.0);
@@ -864,6 +860,8 @@ void AdriMainWindow::changeTransformRotateAmountX(int x)
 
 		//qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()),Deg2Rad(ui->rotationAmountY->value()),Deg2Rad(ui->rotationAmountZ->value()));
 		selectedObject->qrot = qaux;
+		selectedObject->dirtyFlag = true;
+		ui->glCustomWidget->escena->skeletons[0]->joints[0]->dirtyFlag = true;
 	}
 
     QString msg = QString::number(Rad2Deg(rotationX));
@@ -888,6 +886,7 @@ void AdriMainWindow::changeTransformRotateAmountY(int y)
 
 		// Lo aplicamos como incremento
 		selectedObject->qrot = qaux;
+		selectedObject->dirtyFlag = true;
 	}
 
     QString msg = QString::number(Rad2Deg(rotationY));
@@ -912,6 +911,7 @@ void AdriMainWindow::changeTransformRotateAmountZ(int z)
 		qaux.FromEulerAngles(rotationX, rotationY, rotationZ);
 
 		selectedObject->qrot = qaux;
+		selectedObject->dirtyFlag = true;
 	}
 
     QString msg = QString::number(Rad2Deg(rotationZ));

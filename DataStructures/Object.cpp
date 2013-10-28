@@ -98,6 +98,13 @@ void object::addRotation(double rx, double ry, double rz)
     dirtyFlag = true;
 }
 
+void object::addRotation(Quaternion<double> q) {
+	q.Normalize();
+	qrot = q * qrot;
+	qrot.Normalize();
+	dirtyFlag = true;
+}
+
 bool object::propagateDirtyness()
 {
     dirtyFlag = false;
