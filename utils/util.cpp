@@ -163,3 +163,10 @@ double Rad2Deg(double rad)
 {
 	return (rad*360)/(M_PI*2);
 }
+
+vcg::Quaternion<double> rotationBetweenTwoVectors(vcg::Point3d v1, vcg::Point3d v2) {
+	vcg::Quaternion<double> q;
+	q.FromAxis(acos(v1.dot(v2) / (v1.Norm() * v2.Norm())), v1^v2);
+	q.Normalize();
+	return q;
+}

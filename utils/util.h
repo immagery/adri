@@ -37,5 +37,7 @@ double Deg2Rad(double deg);
 
 double Rad2Deg(double rad);
 
+vcg::Quaternion<double> rotationBetweenTwoVectors(vcg::Point3d v1, vcg::Point3d v2);
+
 
 #endif // UTIL_H
