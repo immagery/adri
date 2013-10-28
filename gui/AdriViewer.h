@@ -281,6 +281,7 @@ public slots:
 signals:
     void updateSceneView();
     void jointDataShow(float, int);
+	void jointTransformationValues(float, float,float,float,float,float);
     void changedFrame(int);
 
 private :

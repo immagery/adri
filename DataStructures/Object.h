@@ -15,15 +15,6 @@ class object : public node
 {
 
 public:
-    Point3d pos;
-    //Point3d rot;
-	vcg::Quaternion<double> qrot;
-
-	Matrix44d tMatrix;
-
-    //double tMatrix[16];
-
-    shadingNode* shading;
 
     object();
     object(unsigned int id);
@@ -44,10 +35,22 @@ public:
     void loadIdentity();
 
     // Selection Functions.
-    virtual void select(bool bToogle, unsigned int id);
+    virtual bool select(bool bToogle, unsigned int id);
     virtual Point3d getSelCenter(){ return pos; }
 
-    virtual bool getBoundingBox(Point3d& minAuxPt,Point3d& maxAuxPt){ minAuxPt = minAuxPt; maxAuxPt = maxAuxPt; return false;}
+    virtual bool getBoundingBox(Point3d& minAuxPt,Point3d& maxAuxPt)
+	{ 
+		minAuxPt = minAuxPt; 
+		maxAuxPt = maxAuxPt; 
+		return false;
+	}
+
+	Point3d pos;
+	vcg::Quaternion<double> qrot;
+
+	Matrix44d tMatrix;
+
+    shadingNode* shading;
 
 };
 

@@ -19,8 +19,6 @@ class joint : public object
         joint* father;
         vector< joint* > childs;
         vector< DefNode* > nodes;
-        
-		//Point3d orientJoint;
 
 		vcg::Quaternion<double> qOrient;
 
@@ -38,6 +36,8 @@ class joint : public object
         // For precomputation
         Point3d worldPosition;
 
+		bool enableWeightsComputation;
+
     public:
 
         joint();
@@ -45,14 +45,14 @@ class joint : public object
         joint(joint* _father);
         joint(joint* _father, unsigned int nodeId);
         ~joint();
+
 		void initDefaults();
 
         virtual void drawFunc();
         virtual bool getBoundingBox(Point3d& minAuxPt,
                                     Point3d& maxAuxPt);
 
-        virtual void select(bool bToogle,
-                            int id);
+        virtual void select(bool bToogle, int id);
 
         void computeWorldPos();
 		void computeRestPos();
@@ -62,17 +62,22 @@ class joint : public object
                                  double  ojY,
                                  double  ojZ);
 
-        void setFather(joint* f);
         void setWorldPosition(Point3d pos);
-        void pushChild(joint* child);
-
         Point3d getJointOrientation();
-        joint* getFather();
-        joint* getChild(int id);
-        int getChildCount();
         Point3d getWorldPosition();
 
+		// Hierarchy relations.
+		joint* getFather();
+        joint* getChild(int id);
+        int getChildCount();        
         void getRelatives(vector<joint*>& joints);
+
+		void setFather(joint* f);
+		void pushChild(joint* child);
+
+		virtual bool update();
+		virtual bool propagateDirtyness();
+
 };
 
 class skeleton : public object

@@ -242,6 +242,16 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
                    selMgr.selection.push_back(skt->joints[j]);
                    emit jointDataShow(((joint*)skt->joints[j])->expansion,
                                       ((joint*)skt->joints[j])->nodeId);
+
+				   double alfa,beta,gamma;
+				   ((joint*)skt->joints[j])->qrot.ToEulerAngles(alfa,beta,gamma);
+				   emit jointTransformationValues(((joint*)skt->joints[j])->pos.X(),
+												  ((joint*)skt->joints[j])->pos.Y(),
+												  ((joint*)skt->joints[j])->pos.Z(),
+												  Rad2Deg(alfa),
+												  Rad2Deg(beta),
+												  Rad2Deg(gamma));
+
                 }
             }
 

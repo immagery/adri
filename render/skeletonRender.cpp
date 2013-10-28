@@ -14,7 +14,7 @@
 #define SUBSELB 1.0
 
 // render size
-#define DEFAULT_SIZE 0.05
+#define DEFAULT_SIZE 0.1
 
 #include <DataStructures/Skeleton.h>
 
@@ -227,9 +227,9 @@ void JointRender::drawFunc(joint* jt)
 
 	Eigen::Matrix4d transformMatrix;
 	transformMatrix << oriRot[0][0] , oriRot[0][1] , oriRot[0][2], jt->pos.X(),
-						oriRot[1][0] , oriRot[1][1] , oriRot[1][2], jt->pos.Y(),
-						oriRot[2][0] , oriRot[2][1] , oriRot[2][2], jt->pos.Z(),
-						0,				0,				0,			1;
+					   oriRot[1][0] , oriRot[1][1] , oriRot[1][2], jt->pos.Y(),
+					   oriRot[2][0] , oriRot[2][1] , oriRot[2][2], jt->pos.Z(),
+					   0,				0,				0,			1;
 
     //glRotatef((GLfloat)jt->orientJoint.Z(),0,0,1);
     //glRotatef((GLfloat)jt->orientJoint.Y(),0,1,0);
@@ -269,7 +269,7 @@ void JointRender::drawFunc(joint* jt)
     drawTriCircle(12, DEFAULT_SIZE);
 
     // Pintamos los ejes del hueso
-    drawAxisHandle(DEFAULT_SIZE*0.7);
+    drawAxisHandle(DEFAULT_SIZE*25);
 
     // Pintamos la pelota de expansion
     drawExpansionBall(selected, (float)(DEFAULT_SIZE*2*jt->expansion));

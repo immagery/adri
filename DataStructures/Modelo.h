@@ -56,7 +56,7 @@ public:
 
     virtual void drawFunc();
 
-    virtual void select(bool bToogle, unsigned int id);
+    virtual bool select(bool bToogle, unsigned int id);
 
 	void initGrid();
 
@@ -65,8 +65,8 @@ public:
 	void addSpotVertex(int i);
 	void cleanSpotVertexes();
 
-	int vn() {return nodes.size();}
-	int fn() {return triangles.size();}
+	int vn() {return (int)nodes.size();}
+	int fn() {return (int)triangles.size();}
 };
 
 void BuildSurfaceGraphs(Modelo& m, vector<binding*>& bindings);

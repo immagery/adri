@@ -118,10 +118,12 @@ void object::loadIdentity()
 	}
 }
 
-void object::select(bool bToogle, unsigned int id)
+bool object::select(bool bToogle, unsigned int id)
 {
     if(shading)
         shading->selected = bToogle;
+
+	return bToogle;
 }
 
 bool object::update()

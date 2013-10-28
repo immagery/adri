@@ -22,7 +22,7 @@ double round(double x)
 
 double timelapse(clock_t clock1,clock_t clock2)
 {
-    double diffticks=clock1-clock2;
+	double diffticks=clock2-clock1;
     double diffms=diffticks/CLOCKS_PER_SEC;
     return diffms;
 }
