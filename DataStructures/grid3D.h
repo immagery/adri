@@ -258,6 +258,11 @@ public:
     void init(Box3d bounding, Point3i divisions, int weightsSize);
 
 	void getCoordsFromPoint(Point3d& pt, vector<weight>& weights);
+	void getCoordsFromPointSimple(Point3d& pt, vector<weight>& weights);
+
+	bool hasData(Point3i& pt);
+	bool isOut(Point3i& pt);
+	void copyValues(vector<weight>& weights, vector<weight>& weights_out);
 
 	Point3d getCenterOfCell(int i, int j, int k);
 
@@ -382,4 +387,18 @@ public:
 
 };
 
+void interpolateLinear(vector<weight>& result, vector<weight>& ptminWeights, vector<weight>& ptmaxWeights, float interpolationValue);
+void interpolateBiLinear(vector<weight>& result, 
+						 vector<weight>& pt01, 
+						 vector<weight>& pt02,
+						 vector<weight>& pt03, 
+						 vector<weight>& pt04,
+						 float interpolationValue1,
+						 float interpolationValue2);
+
+void interpolateTriLinear(vector<weight>& result,
+						  vector<vector<weight>* >& pts,
+						 float interpolationValue1,
+						 float interpolationValue2,
+						 float interpolationValue3);
 #endif // GRID3D_H

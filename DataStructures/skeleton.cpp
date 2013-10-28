@@ -1,8 +1,6 @@
 #include "skeleton.h"
 #include "Scene.h"
 
-#define VERBOSE false
-
 #include <utils/util.h>
 #include <render/skeletonRender.h>
 
@@ -16,6 +14,23 @@
 
 #define ratioExpansion_DEF 0.7
 
+
+bool joint::update()
+{
+	return true;
+}
+
+bool joint::propagateDirtyness()
+{
+	dirtyFlag = false;
+	for(int i = 0; i< nodes.size(); i++)
+		nodes[i]->propagateDirtyness();
+
+	for(int i = 0; i< childs.size(); i++)
+		childs[i]->propagateDirtyness();
+
+	return true;
+}
 
 void joint::initDefaults()
 {
@@ -36,6 +51,8 @@ void joint::initDefaults()
 	smoothness = 1;
 
 	shading = new JointRender(this);
+
+	enableWeightsComputation = true;
 }
 
 joint::joint() : object()
@@ -607,7 +624,8 @@ int proposeNodes(vector<skeleton*>& skts, vector< DefNode >& nodePoints)
 		joint* jt = skts[nodePointsIdx[j]]->getJoint(nodePoints[j].boneId);
 		if(jt == NULL)
 		{
-			printf("There is a problem.\n"); fflush(0);
+			if(VERBOSE)
+				printf("There is a problem.\n"); fflush(0);
 		}
 		else
 		{
@@ -641,7 +659,7 @@ int proposeNodes(vector<skeleton*>& skts, vector< DefNode >& nodePoints)
 			else
 			{
 				float length = (skt->joints[i]->father->getWorldPosition()-skt->joints[i]->getWorldPosition()).Norm();
-				if(length < minlength)
+				if(length < minlength && length != 0)
 					minlength = length;
 			}
 		}

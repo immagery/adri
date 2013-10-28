@@ -66,6 +66,7 @@ public slots:
 	void changeInteriorPointPosition();
     void updateExpansionSlidervalue(int);
     void jointDataUpdate(float fvalue, int id);
+	void jointTransformUpdate(float x,float y,float z,float alpha,float beta,float gamma);
 	
 	void changeAuxValueInt(int value);
 
@@ -79,14 +80,11 @@ public slots:
     void changeTransformRotateAmountY(int);
     void changeTransformRotateAmountZ(int);
 
-	// Toogle between transform and rotation
-	void changeRotateTranslateFlag(bool);
-	
 	// Rotation: rotation values for joints
 	void changeTransformTranslateAmountX(int);
     void changeTransformTranslateAmountY(int);
     void changeTransformTranslateAmountZ(int);
-	
+
 	void resetRotationValues();
 
     // Animation: keyframe managing, animation I/O

@@ -174,12 +174,15 @@ void gridRenderer::drawFunc(object* obj)
 							col[1] = cell->data->color[1];
 							col[2] = cell->data->color[2];
 
-							glPointSize(10*cell->data->ownerWeight);
+							if(cell->data->ownerWeight > 0)
+							{
+								glPointSize(10*cell->data->ownerWeight);
 
-							glBegin(GL_POINTS);
-							glColor3f((GLfloat)col[0], (GLfloat)col[1], (GLfloat)col[2]);
-							glVertex3f((GLfloat)o[0], (GLfloat)o[1], (GLfloat)o[2]);
-							glEnd();
+								glBegin(GL_POINTS);
+								glColor3f((GLfloat)col[0], (GLfloat)col[1], (GLfloat)col[2]);
+								glVertex3f((GLfloat)o[0], (GLfloat)o[1], (GLfloat)o[2]);
+								glEnd();
+							}
                         }
                     }
                 }
@@ -313,6 +316,29 @@ bool gridRenderer::update(object* obj)
     return true;
 }
 
+void gridRenderer::updateGridColorsAndValuesRGB()
+{
+	// Actualizamos los colores para no tener que buscar y calcular
+	for(int i = 0; i< grid->dimensions.X(); i++)
+    {
+        for(int j = 0; j< grid->dimensions.Y(); j++)
+        {
+            for(int k = 0; k< grid->dimensions.Z(); k++)
+            {
+                if(grid->cells[i][j][k]->getType() != EXTERIOR )
+                {
+					cell3d* cell = grid->cells[i][j][k];
+
+					if(cell->data->influences.size() != 3) continue;
+
+					cell->data->ownerWeight = 1;
+					cell->data->color = Point3f( cell->data->influences[0].weightValue,  cell->data->influences[1].weightValue,  cell->data->influences[2].weightValue);
+				}
+			}
+		}
+	}
+}
+
 void gridRenderer::updateGridColorsAndValues()
 {
 	float minValue = 99;
@@ -384,6 +410,7 @@ void gridRenderer::updateGridColorsAndValues()
 							float r, g, b;
 							float value = cell->data->ownerWeight;
 							GetColourGlobal( value, minValue, maxValue, r, g, b);
+							cell->data->ownerWeight = (value-minValue)/(maxValue-minValue) * 2;
 							cell->data->color = Point3f( r, g, b);
 							break;
 						}

@@ -85,6 +85,8 @@ public:
 
 	void updateGridColorsAndValues();
 
+	void updateGridColorsAndValuesRGB();
+
     // currentSlice variables and dirt the flag
     void setSliceXY(int sliceXY)
     {

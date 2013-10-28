@@ -40,7 +40,6 @@ class node
     virtual bool propagateDirtyness()
     {
         dirtyFlag = false;
-
         return true;
     }
 

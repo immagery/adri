@@ -191,12 +191,15 @@ void Modelo::drawFunc()
     shading->afterDraw(this);
 }
 
-void Modelo::select(bool bToogle, unsigned int id)
+bool Modelo::select(bool bToogle, unsigned int id)
 {
     //bool lo_tengo = false;
 	bToogle = bToogle;
 
+	bool selected = false;
+
     if(shading) shading->selected = ( id == nodeId);
+	selected = ( id == nodeId);
 
     if(modelCage && modelCage->shading != NULL)
     {
@@ -229,6 +232,8 @@ void Modelo::select(bool bToogle, unsigned int id)
                 currentCage = stillCages[i];
         }
     }
+
+	return selected;
 }
 
 void BuildSurfaceGraphs(Modelo& m, vector<binding*>& bindings)

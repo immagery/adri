@@ -6,7 +6,7 @@
 #include <GL/glew.h>
 #endif
 
-#define VERBOSE false
+//#define VERBOSE false
 
 // Qt libraries
 #include <QtCore/QDir>
@@ -242,6 +242,16 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
                    selMgr.selection.push_back(skt->joints[j]);
                    emit jointDataShow(((joint*)skt->joints[j])->expansion,
                                       ((joint*)skt->joints[j])->nodeId);
+
+				   double alfa,beta,gamma;
+				   ((joint*)skt->joints[j])->qrot.ToEulerAngles(alfa,beta,gamma);
+				   emit jointTransformationValues(((joint*)skt->joints[j])->pos.X(),
+												  ((joint*)skt->joints[j])->pos.Y(),
+												  ((joint*)skt->joints[j])->pos.Z(),
+												  Rad2Deg(alfa),
+												  Rad2Deg(beta),
+												  Rad2Deg(gamma));
+
                 }
             }
 
@@ -1379,8 +1389,8 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
             }
         }
 
-        printf("Corte:%f\n", threshold); fflush(0);
-        printf("Error max:%f\n", maxError); fflush(0);
+        //printf("Corte:%f\n", threshold); fflush(0);
+        //printf("Error max:%f\n", maxError); fflush(0);
 
     }
 }
@@ -1530,18 +1540,21 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
                switch(grRend->iVisMode)
                {
                case VIS_SEGMENTATION:
-                       newValue = (cell->data->segmentId * 25) % (int)ceil(grRend->grid->valueRange);
-                       colorValue = newValue/grRend->grid->valueRange;
+                      /* newValue = (cell->data->segmentId * 25) % (int)ceil(grRend->grid->valueRange);
+                       colorValue = newValue/grRend->grid->valueRange;*/
                    break;
                case VIS_BONES_SEGMENTATION:
+				   /*
                        newValue = grRend->grid->v.nodeIds[cell->data->segmentId]->boneId;
                        newValue = (newValue * 25) % (int)ceil(grRend->grid->valueRange);
                        colorValue = newValue/grRend->grid->valueRange;
+					   */
 
                        //if(!cell->data->validated)
                        //	colorValue = -1;
                    break;
                case VIS_SEG_PASS:
+				   /*
                        if(cell->data->ownerLabel>0 && cell->data->ownerLabel< grRend->grid->valueRange)
                        {
                            newValue = grRend->grid->v.nodeIds[cell->data->ownerLabel]->boneId;
@@ -1552,6 +1565,7 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
                        {
                            colorValue = 1;
                        }
+					   */
                    break;
                case VIS_WEIGHTS:
                        idx = findWeight(cell->data->influences, grRend->desiredVertex);
@@ -1562,10 +1576,11 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
                            colorValue = -1;
                break;
                case VIS_ISODISTANCES:
-                       colorValue = cell->data->distanceToPos / maxDistance;
+                       //colorValue = cell->data->distanceToPos / maxDistance;
                    break;
 
                case VIS_ISOLINES:
+				   /*
                        nInterval = maxDistance/20.0;
                        dif = cell->data->distanceToPos/nInterval;
                        dif = dif*nInterval - floor(dif)*nInterval;
@@ -1577,6 +1592,7 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
                        {
                            colorValue = cell->data->distanceToPos / maxDistance;
                        }
+					   */
                    break;
 
                case VIS_CONFIDENCE_LEVEL:
@@ -1666,7 +1682,9 @@ void AdriViewer::updateGridRender()
             gr->setSliceXZ(parent->ui->SliceSelectorXZ->value());
 						
 			gr->m_iWeightsId = parent->ui->auxValueInt->value();
+			
 			gr->updateGridColorsAndValues();
+			//gr->updateGridColorsAndValuesRGB();
 
             gr->propagateDirtyness();
 			
