@@ -269,7 +269,10 @@ void JointRender::drawFunc(joint* jt)
 	//jt->qrot.ToEulerAngles(alpha, beta, gamma);
 
 	//transformMatrix.transposeInPlace();
+
+
 	Eigen::Matrix4f transformMatrix = jt->world;
+
 
 	GLdouble multiplyingMatrix[16] = {transformMatrix(0,0), transformMatrix(0,1), transformMatrix(0,2), transformMatrix(0,3),
 										transformMatrix(1,0), transformMatrix(1,1), transformMatrix(1,2), transformMatrix(1,3),
@@ -278,6 +281,8 @@ void JointRender::drawFunc(joint* jt)
 									};
 
 	glMultMatrixd(multiplyingMatrix);
+
+	
 
     // Pintamos un tri-círculo
     if(selected)
@@ -388,18 +393,59 @@ void JointRender::computeWorldPos(joint* jt) {
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
-	computeWorldPosRec(jt);
+	computeWorldPosRec(jt, NULL);
 	glPopMatrix();
 }
 
-void JointRender::computeWorldPosRec(joint* jt)
+void JointRender::computeWorldPosRec(joint* jt, joint* father)
 {
     glPushMatrix();
 
+	Eigen::Vector3d fatherTranslation(0,0,0);
+	Eigen::Quaterniond fatherRotation(1,0,0,0);
+	Eigen::Vector3d fatherWP(0,0,0);
+
+	if (father != NULL) {
+		fatherTranslation = father->translation;
+		fatherRotation = father->rotation;
+		fatherWP = Eigen::Vector3d(father->getWorldPosition().X(), father->getWorldPosition().Y(), father->getWorldPosition().Z());
+	}
+
+	Eigen::Quaternion<double> q(jt->qrot.X(), jt->qrot.Y(), jt->qrot.Z(), jt->qrot.W());
+	Eigen::Quaternion<double> qor(jt->qOrient.X(), jt->qOrient.Y(), jt->qOrient.Z(), jt->qOrient.W());
+	printf("Local rotation: %f %f %f %f\n", q.w(), q.x(), q.y(), q.z());
+	printf("Local orient: %f %f %f %f\n", qor.w(), qor.x(), qor.y(), qor.z());
+	q = q * qor;
+	printf("Local rot*orient: %f %f %f %f\n", q.w(), q.x(), q.y(), q.z());
+	Eigen::Vector3d p (jt->pos.X(), jt->pos.Y(), jt->pos.Z());
+
+	if (father == NULL) {
+		jt->translation = q.inverse()._transformVector(p);
+		jt->rotation = q;
+	} else {
+		// Como quiero que la worldPos sea q*translation, una vez la tengo calculo la posición tal que q*trans = worldPos
+		// usando la inversa de q*fatherRotation
+		Eigen::Vector3d fatherPos = (fatherRotation)._transformVector(fatherTranslation);
+		printf("Father position: %f %f %f\n", fatherWP.x(), fatherWP.y(), fatherWP.z());
+		Eigen::Vector3d wwp = fatherWP + fatherRotation.inverse()._transformVector(p);		// lo que me dijiste tu
+		printf("World pos: %f %f %f\n", wwp.x(), wwp.y(), wwp.z());
+		//jt->translation = (q*fatherRotation).inverse()._transformVector( fatherPos + (fatherRotation)._transformVector(p));
+		//jt->translation = (q*fatherRotation).inverse()._transformVector( fatherRotation._transformVector(fatherTranslation) 
+		jt->translation = (q*fatherRotation).inverse()._transformVector(wwp);
+		jt->rotation = q*fatherRotation;
+	}
+
+	printf("Translation: %f %f %f\n", p.x(), p.y(), p.z());
+	printf("JT->Translation: %f %f %f\n", jt->translation.x(), jt->translation.y(), jt->translation.z());
+	printf("JT->Rotation: %f %f %f %f\n", jt->rotation.w(), jt->rotation.x(), jt->rotation.y(), jt->rotation.z());
+
+	Eigen::Vector3d myWorldPos = jt->rotation._transformVector(jt->translation);
+
+
     //glTranslated(jt->pos.X(),jt->pos.Y(),jt->pos.Z());
 
-	double orientAlpha, orientBeta, orientGamma;
-	jt->qOrient.ToEulerAngles(orientAlpha, orientBeta, orientGamma);
+	//double orientAlpha, orientBeta, orientGamma;
+	//jt->qOrient.ToEulerAngles(orientAlpha, orientBeta, orientGamma);
 
 	Matrix33d orientMatrix;
 	Matrix33d rotateMatrix;
@@ -413,17 +459,8 @@ void JointRender::computeWorldPosRec(joint* jt)
 						oriRot[2][0] , oriRot[2][1] , oriRot[2][2], jt->pos.Z(),
 						0,				0,				0,			1;
 
-
-	/*glRotatef((GLfloat)Rad2Deg(orientGamma),0,0,1);
-    glRotatef((GLfloat)Rad2Deg(orientBeta),0,1,0);
-    glRotatef((GLfloat)Rad2Deg(orientAlpha),1,0,0);*/
-
-	double alpha, beta, gamma;
-	jt->qrot.ToEulerAngles(alpha, beta, gamma);
-
-    /*glRotatef((GLfloat)Rad2Deg(gamma),0,0,1);
-    glRotatef((GLfloat)Rad2Deg(beta),0,1,0);
-    glRotatef((GLfloat)Rad2Deg(alpha),1,0,0);*/
+	//double alpha, beta, gamma;
+	//jt->qrot.ToEulerAngles(alpha, beta, gamma);
 
 	transformMatrix.transposeInPlace();
 
@@ -441,6 +478,10 @@ void JointRender::computeWorldPosRec(joint* jt)
     glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
     jt->worldPosition = Point3d(modelview[12],modelview[13],modelview[14]);
 
+
+	printf("World position 1: %f %f %f\n", modelview[12], modelview[13], modelview[14]);
+	printf("World position 2: %f %f %f\n\n", myWorldPos.x(), myWorldPos.y(), myWorldPos.z());
+
 	Eigen::MatrixXf m(4,4);
 	m << modelview[0], modelview[1], modelview[2], modelview[3],
 		modelview[4], modelview[5], modelview[6], modelview[7],
@@ -450,7 +491,7 @@ void JointRender::computeWorldPosRec(joint* jt)
 
     for(unsigned int i = 0; i< jt->childs.size(); i++)
     {
-        computeWorldPosRec(jt->childs[i]);
+        computeWorldPosRec(jt->childs[i], jt);
     }
 
     glPopMatrix();
