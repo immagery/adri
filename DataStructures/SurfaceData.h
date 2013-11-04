@@ -197,6 +197,9 @@ class PointData
     // Global owner node of the cell.
     int segmentId;
 
+	// Distance to the owner cell
+	float segmentDistance;
+
     // Intermediate owner of the cell, and its weight
     int ownerLabel;
     float ownerWeight;

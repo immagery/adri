@@ -49,6 +49,8 @@ public:
 		// This value is used to cut the weights and improve the computations.
 		cuttingThreshold = ADAPTATIVE_CUTTING_VALUE;
 
+		dirtyFlag = true;
+
 	}
 
 	DefNode() : node() 
@@ -110,11 +112,11 @@ public:
 	bool enableWeightsComputation;
 
 	// This structures takes the weights and a sort for better computation
-	vector<float> MVCWeights;
+	vector<double> MVCWeights;
 	vector<int> weightsSort;
 
 	// This value is used to cut the weights and improve the computations.
-	float cuttingThreshold;
+	double cuttingThreshold;
 
 };
 

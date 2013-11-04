@@ -81,6 +81,8 @@ class inData
 	}
 };
 
+class AirRig;
+
 // Total Scene
 class scene
 {
@@ -101,6 +103,8 @@ class scene
 
 		iVisMode = 0;
 		desiredVertex = 0;
+
+		rig = NULL;
     }
 
     ~scene()
@@ -188,6 +192,9 @@ class scene
 
 	// Skinning
 	Skinning* skinner;
+
+	// AirRig
+	AirRig* rig;
 
 	procState state;
 

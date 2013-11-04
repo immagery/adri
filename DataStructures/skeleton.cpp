@@ -471,7 +471,16 @@ bool skeleton::update()
 	if(shading)
 		((SkeletonRender*)shading)->updateSkeleton(this);
 
-    return true;
+	if(dirtyFlag)
+	{
+		// Skeleton elements update
+		   // proposeNodes(bb->bindedSkeletons, bb->intPoints);
+
+
+		return true;
+	}
+
+	return false;
 }
 
 void readSkeletons(string fileName, vector<skeleton*>& skts)

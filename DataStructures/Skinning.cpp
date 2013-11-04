@@ -20,7 +20,7 @@ Skinning::~Skinning()
 {
 }
 
-void Skinning::loadBindingForModel (Modelo *m, string path, const vector< skeleton* >& skeletons) {
+void Skinning::loadBindingForModel(Modelo *m, string path, const vector< skeleton* >& skeletons) {
 	printf("Loading binding data...");
     QFile file(path.c_str());
 	

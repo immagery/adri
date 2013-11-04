@@ -80,6 +80,7 @@ PointData::PointData()
     ownerWeight = 0;
 
     segmentId = -1;
+	segmentDistance = 99999999;
 
     domain = 0.0;
     domainId = -1;
@@ -126,6 +127,7 @@ PointData::PointData(const PointData& pd)
     ownerWeight = pd.ownerWeight;
 
     segmentId = pd.segmentId;
+	segmentDistance =  pd.segmentId;
 
     domain = pd.domain;
     domainId = pd.domainId;
@@ -166,6 +168,9 @@ PointData::PointData(int weightsSize)
     color = Point3f(0,0,0);
 
 	isBorder = false;
+
+	segmentId = -1;
+	segmentDistance = 99999;
 }
 
 // Clear no del todo, no quitamos el labeling de la voxelizacion
@@ -194,6 +199,7 @@ void PointData::clear()
     confidenceLevel = 0;
 
     segmentId = -1;
+	segmentDistance = 99999;
 
     domain = 0.0;
     domainId = -1;
