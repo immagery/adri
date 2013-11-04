@@ -27,6 +27,14 @@ class joint : public object
 		vector< double > embedding;
 		vector< vector< double > > childVector;
 
+		// Modelling
+		Eigen::Vector3d translation;
+		Eigen::Quaternion<double> rotation;
+
+		// Rest modelling
+		Eigen::Vector3d rTranslation;
+		Eigen::Quaternion<double> rRotation;
+
 		Eigen::Matrix4f iT;
 		Eigen::Matrix4f W;
 		Eigen::Matrix4f world;
