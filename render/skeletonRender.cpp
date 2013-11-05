@@ -294,7 +294,7 @@ void JointRender::drawFunc(joint* jt)
     drawTriCircle(12, jointSize);
 
     // Pintamos los ejes del hueso
-    drawAxisHandle(jointSize*25);
+    //drawAxisHandle(jointSize*25);
 
     // Pintamos la pelota de expansion
     //drawExpansionBall(selected, (float)(DEFAULT_SIZE*2*jt->expansion));
@@ -399,6 +399,54 @@ void JointRender::computeWorldPos(joint* jt) {
 
 void JointRender::computeWorldPosRec(joint* jt, joint* father)
 {
+
+	Eigen::Matrix3d rotationMatrix;
+	if(!father)
+	{
+		jt->rTranslation = Eigen::Vector3d(jt->pos.X(), jt->pos.Y(), jt->pos.Z());
+		
+		Eigen::Quaterniond or(jt->qOrient.X(), jt->qOrient.Y(), jt->qOrient.Z(), jt->qOrient.W());
+		Eigen::Quaterniond rot(jt->qrot.X(), jt->qrot.Y(), jt->qrot.Z(), jt->qrot.W());
+		
+		jt->rRotation = or*rot;
+
+		rotationMatrix = jt->rRotation.toRotationMatrix();
+	}
+	else
+	{
+		jt->rTranslation = father->rTranslation + 
+						   father->rRotation._transformVector(Eigen::Vector3d(jt->pos.X(), jt->pos.Y(), jt->pos.Z()));
+		
+		Eigen::Quaterniond or(jt->qOrient.X(), jt->qOrient.Y(), jt->qOrient.Z(), jt->qOrient.W());
+		Eigen::Quaterniond rot(jt->qrot.X(), jt->qrot.Y(), jt->qrot.Z(), jt->qrot.W());
+		
+		jt->rRotation = father->rRotation * or * rot;
+
+		rotationMatrix = (or * rot).toRotationMatrix();
+	}
+
+	
+	//Eigen::Matrix3d rotationMatrix;
+	//rotationMatrix = jt->rRotation.toRotationMatrix();
+
+	Eigen::Matrix4f transformMatrix2;
+	transformMatrix2 << rotationMatrix(0,0) , rotationMatrix(0,1) , rotationMatrix(0,2), jt->pos[0],
+					   rotationMatrix(1,0) , rotationMatrix(1,1) , rotationMatrix(1,2), jt->pos[1],
+					   rotationMatrix(2,0) , rotationMatrix(2,1) , rotationMatrix(2,2), jt->pos[2],
+						0.0,				0.0,				0.0,			1.0;
+
+	transformMatrix2.transposeInPlace();
+	jt->world = transformMatrix2;
+	
+
+	for(unsigned int i = 0; i< jt->childs.size(); i++)
+    {
+        computeWorldPosRec(jt->childs[i], jt);
+    }
+
+	return;
+
+
     glPushMatrix();
 
 	Eigen::Vector3d fatherTranslation(0,0,0);

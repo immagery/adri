@@ -1,6 +1,7 @@
 #include "object.h"
 
 #include <utils/util.h>
+#include <Eigen/Dense>
 
 using namespace vcg;
 
@@ -86,9 +87,60 @@ void object::addTranslation(double tx, double ty, double tz)
     dirtyFlag = true;
 }
 
+void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
+{
+	// extract the rest of turns
+	double a = angle - (floor(angle/360)*360);
+
+	if(a == 0)
+	{
+		q = Eigen::Quaterniond().Identity();
+		return;
+	}
+
+	// This switch changes the case axis
+	Eigen::Vector3d v, Axis2, Axis3;
+	switch(axis)
+	{
+	case 0: // over X
+		Axis2 << 0,1,0;
+		Axis3 << 0,0,1;
+	break;
+	case 1: // over Y
+		Axis2 << 0,0,1;
+		Axis3 << 1,0,0;
+	break;
+	case 2: // over Z
+		Axis2 << 1,0,0;
+		Axis3 << 0,1,0;
+	break;
+	}
+
+	v = Axis2*cos(a)+Axis3*sin(a);
+
+	if(a == 180)
+	{
+		q = Eigen::Quaterniond().setFromTwoVectors(Axis2, Axis3) * 
+			Eigen::Quaterniond().setFromTwoVectors(Axis3, -Axis2);
+	}
+	else if(a < 180)
+	{
+		q = Eigen::Quaterniond().setFromTwoVectors(Axis2, v);
+	}
+	else
+	{
+		q = Eigen::Quaterniond().setFromTwoVectors(Axis2, Axis3) * 
+			Eigen::Quaterniond().setFromTwoVectors(Axis3, -Axis2) *
+			Eigen::Quaterniond().setFromTwoVectors(-Axis2, v);
+	}
+	
+}
+
 void object::addRotation(double rx, double ry, double rz)
 {
+	
     // Aplicar la rotación, creo que hay que hacerlo con una multiplicacion.
+	
 	Quaternion<double> qAux;
 	qAux.FromEulerAngles(Deg2Rad(rx), Deg2Rad(ry), Deg2Rad(rz));
 	qAux.Normalize();
@@ -96,6 +148,22 @@ void object::addRotation(double rx, double ry, double rz)
 	qrot.Normalize();
 	//rot += Point3d(rx, ry, rz);
     dirtyFlag = true;
+	
+	/*
+	Eigen::Quaterniond qX;
+	Eigen::Quaterniond qY;
+	Eigen::Quaterniond qZ;
+
+	getAxisRotationQuaternion(qX, 0, rx);
+	getAxisRotationQuaternion(qY, 1, ry);
+	getAxisRotationQuaternion(qZ, 2, rz);
+
+	Eigen::Quaterniond qrotAux =  qX * qY * qZ * Eigen::Quaterniond(qrot.X(), qrot.Y(), qrot.Z(), qrot.W());
+	qrot = vcg::Quaternion<double>(qrotAux.w(), qrotAux.x(),qrotAux.y(),qrotAux.z());
+	qrot.Normalize();
+	dirtyFlag = true;
+	*/
+
 }
 
 void object::addRotation(Quaternion<double> q) {
