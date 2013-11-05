@@ -26,18 +26,18 @@ class Geometry : public object , public SurfaceGraph
 
         virtual void freezeTransformations();
 
-        virtual Point3d getSelCenter();
-        virtual bool getBoundingBox(Point3d& minAuxPt,Point3d& maxAuxPt);
+        virtual Eigen::Vector3d getSelCenter();
+        virtual bool getBoundingBox(Eigen::Vector3d& minAuxPt,Eigen::Vector3d& maxAuxPt);
 
-		Point3d minBBox;
-		Point3d maxBBox;
+		Eigen::Vector3d minBBox;
+		Eigen::Vector3d maxBBox;
 
 		void computeFaceNormals();
 		void computeVertNormals();
 		void computeNormals();
 
-		vector<Point3d> faceNormals;
-		vector<Point3d> vertNormals;
+		vector<Eigen::Vector3d> faceNormals;
+		vector<Eigen::Vector3d> vertNormals;
 
 };
 

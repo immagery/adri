@@ -56,7 +56,7 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
     selectionMode_ = NONE;
 
     // Scene variables.
-    m_ptCenter.SetZero();
+	m_ptCenter.setZero();
     m_sceneRadius = 500;
 
     m_sceneMin[0] = -m_sceneRadius;
@@ -204,8 +204,8 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
              int id = skt->joints[j]->nodeId;
 
              if (aniManager.objectHasAnimation(id)) {
-                Point3d position = aniManager.getPosition(id, frame);
-                Point3d rotation = aniManager.getRotation(id, frame);
+                Eigen::Vector3d position = aniManager.getPosition(id, frame);
+                Eigen::Vector3d rotation = aniManager.getRotation(id, frame);
                 //TOFIX ((joint*)skt->joints[j])->rot = rotation;
              }
          }
@@ -651,23 +651,23 @@ void AdriViewer::readSkeleton(string fileName)
          }
      }
 
-     Point3d minPt(minX,minY,minZ);
-     Point3d maxPt(maxX,maxY,maxZ);
+     Vector3d minPt(minX,minY,minZ);
+     Vector3d maxPt(maxX,maxY,maxZ);
 
      for(int i = 0; i< 3; i++) m_sceneMin[i] = (float)minPt[i] ;
      for(int i = 0; i< 3; i++) m_sceneMax[i] = (float)maxPt[i] ;
-     m_ptCenter = Point3d((minX+maxX)/2, (minY+maxY)/2, (minZ+maxZ)/2);
+     m_ptCenter = Vector3d((minX+maxX)/2, (minY+maxY)/2, (minZ+maxZ)/2);
 
     // definimos las condiciones de la escena para el GlViewer.
     setSceneBoundingBox(Vec(m_sceneMin[0],m_sceneMin[1],m_sceneMin[2]),Vec(m_sceneMax[0],m_sceneMax[1],m_sceneMax[2]));
 
-    Point3d minPoint(m_sceneMin[0],m_sceneMin[1],m_sceneMin[2]);
+    Vector3d minPoint(m_sceneMin[0],m_sceneMin[1],m_sceneMin[2]);
 
-    setSceneCenter(Vec(m_ptCenter.X(),m_ptCenter.Y(),m_ptCenter.Z()));
-    setSceneRadius((m_ptCenter - minPoint).Norm());
+    setSceneCenter(Vec(m_ptCenter.x(),m_ptCenter.y(),m_ptCenter.z()));
+    setSceneRadius((m_ptCenter - minPoint).norm());
 
     printf("SceneMinMax: (%f,%f,%f)-(%f,%f,%f)\n",m_sceneMin[0],m_sceneMin[1],m_sceneMin[2],m_sceneMax[0],m_sceneMax[1],m_sceneMax[2]);
-    printf("SceneCenter: (%f,%f,%f)\n",m_ptCenter.X(),m_ptCenter.Y(),m_ptCenter.Z());
+    printf("SceneCenter: (%f,%f,%f)\n",m_ptCenter.x(),m_ptCenter.y(),m_ptCenter.z());
 
     showEntireScene();
 

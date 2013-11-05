@@ -6,9 +6,9 @@ using namespace vcg;
 
 object::object() : node()
 {
-    pos = Point3d(0,0,0);
-    //rot = Point3d(0,0,0);
-	qrot = Quaternion<double>(1,0,0,0);
+    pos = Eigen::Vector3d(0,0,0);
+    //rot = Eigen::Vector3d(0,0,0);
+	qrot = Eigen::Quaternion<double>(1,0,0,0);
 
     shading = new shadingNode();
 
@@ -19,9 +19,9 @@ object::object() : node()
 
 object::object(unsigned int id) : node(id)
 {
-    pos = Point3d(0,0,0);
-    //rot = Point3d(0,0,0);
-	qrot = Quaternion<double>(1,0,0,0);
+    pos = Eigen::Vector3d(0,0,0);
+    //rot = Eigen::Vector3d(0,0,0);
+	qrot = Eigen::Quaternion<double>(1,0,0,0);
 
     shading = new shadingNode(id+1);
 
@@ -30,11 +30,11 @@ object::object(unsigned int id) : node(id)
     dirtyFlag = false;
 }
 
-object::object(vcg::Point3d _pos) : node()
+object::object(Eigen::Vector3d _pos) : node()
 {
-    pos = Point3d(_pos);
-    //rot = Point3d(0,0,0);
-	qrot = Quaternion<double>(1,0,0,0);
+    pos = Eigen::Vector3d(_pos);
+    //rot = Eigen::Vector3d(0,0,0);
+	qrot = Eigen::Quaternion<double>(1,0,0,0);
 
     shading = new shadingNode();
 
@@ -44,10 +44,10 @@ object::object(vcg::Point3d _pos) : node()
 }
 
 /*
-object::object(vcg::Point3d _pos, vcg::Point3d _rot) : node()
+object::object(Eigen::Vector3d _pos, Eigen::Vector3d _rot) : node()
 {
-    pos = Point3d(_pos);
-    //rot = Point3d(_rot);
+    pos = Eigen::Vector3d(_pos);
+    //rot = Eigen::Vector3d(_rot);
 	qrot = Quaternion<double>(_qrot);
 
     shading = new shadingNode();
@@ -58,11 +58,11 @@ object::object(vcg::Point3d _pos, vcg::Point3d _rot) : node()
 }
 */
 
-object::object(vcg::Point3d _pos, vcg::Quaternion<double> _qrot) : node()
+object::object(Eigen::Vector3d _pos, Eigen::Quaternion<double> _qrot) : node()
 {
-    pos = Point3d(_pos);
-    //rot = Point3d(_rot);
-	qrot = Quaternion<double>(_qrot);
+    pos = Eigen::Vector3d(_pos);
+    //rot = Eigen::Vector3d(_rot);
+	qrot = Eigen::Quaternion<double>(_qrot);
 
     shading = new shadingNode();
 
@@ -73,35 +73,35 @@ object::object(vcg::Point3d _pos, vcg::Quaternion<double> _qrot) : node()
 
 void object::resetTransformation()
 {
-    pos = Point3d(0,0,0);
-    //rot = Point3d(0,0,0);
-	qrot = Quaternion<double>(1,0,0,0);
+    pos = Eigen::Vector3d(0,0,0);
+    //rot = Eigen::Vector3d(0,0,0);
+	qrot = Eigen::Quaternion<double>(1,0,0,0);
     dirtyFlag = true;
 }
 
 void object::addTranslation(double tx, double ty, double tz)
 {
     // Aplicar la rotación, creo que hay que hacerlo con una multiplicacion.
-    pos += Point3d(tx, ty, tz);
+    pos += Eigen::Vector3d(tx, ty, tz);
     dirtyFlag = true;
 }
 
 void object::addRotation(double rx, double ry, double rz)
 {
     // Aplicar la rotación, creo que hay que hacerlo con una multiplicacion.
-	Quaternion<double> qAux;
-	qAux.FromEulerAngles(Deg2Rad(rx), Deg2Rad(ry), Deg2Rad(rz));
-	qAux.Normalize();
+	Eigen::Quaternion<double> qAux;
+	// TOFIX qAux.FromEulerAngles(Deg2Rad(rx), Deg2Rad(ry), Deg2Rad(rz));
+	qAux.normalize();
 	qrot = qAux * qrot;
-	qrot.Normalize();
-	//rot += Point3d(rx, ry, rz);
+	qrot.normalize();
+	//rot += Eigen::Vector3d(rx, ry, rz);
     dirtyFlag = true;
 }
 
-void object::addRotation(Quaternion<double> q) {
-	q.Normalize();
+void object::addRotation(Eigen::Quaternion<double> q) {
+	q.normalize();
 	qrot = q * qrot;
-	qrot.Normalize();
+	qrot.normalize();
 	dirtyFlag = true;
 }
 
@@ -118,9 +118,9 @@ void object::loadIdentity()
 		for(int j = 0; j< 4; j++)
 		{
 			if(i == j)
-				tMatrix[i][j] = 1;
+				tMatrix(i,j) = 1;
 			else
-				tMatrix[i][j] = 0;
+				tMatrix(i,j) = 0;
 		}
 	}
 }

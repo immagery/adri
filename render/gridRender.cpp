@@ -2,13 +2,13 @@
 #include <render/gridRender.h>
 #include <utils/util.h>
 
-Point3f greenCube(0.5,1.0,0.5);
-Point3f redCube(1.0,0.5,0.5);
-Point3f blueCube(0.5,0.5,1.0);
-Point3f whiteCube(0.8,0.8,0.8);
-Point3f brightWhiteCube(1,1,1);
+Eigen::Vector3f greenCube(0.5,1.0,0.5);
+Eigen::Vector3f redCube(1.0,0.5,0.5);
+Eigen::Vector3f blueCube(0.5,0.5,1.0);
+Eigen::Vector3f whiteCube(0.8,0.8,0.8);
+Eigen::Vector3f brightWhiteCube(1,1,1);
 
-void drawQuad(Point3f orig, Point3f direction1, Point3f direction2, Point3f normal, Point3f color, bool blend)
+void drawQuad(Eigen::Vector3f orig, Eigen::Vector3f direction1, Eigen::Vector3f direction2, Eigen::Vector3f normal, Eigen::Vector3f color, bool blend)
 {
         if(blend)
         {
@@ -23,9 +23,9 @@ void drawQuad(Point3f orig, Point3f direction1, Point3f direction2, Point3f norm
         glBegin(GL_QUADS);
         // queda reconstruir el cubo y ver si se pinta bien y se ha calculado correctamente.
         glNormal3fv(&normal[0]);
-        Point3f pt2 = orig+direction1;
-        Point3f pt3 = orig+direction1+direction2;
-        Point3f pt4 = orig+direction2;
+        Eigen::Vector3f pt2 = orig+direction1;
+        Eigen::Vector3f pt3 = orig+direction1+direction2;
+        Eigen::Vector3f pt4 = orig+direction2;
 
         glVertex3fv(&orig[0]); glVertex3fv(&pt2[0]); glVertex3fv(&pt3[0]); glVertex3fv(&pt4[0]);
 
@@ -41,18 +41,18 @@ void drawQuad(Point3f orig, Point3f direction1, Point3f direction2, Point3f norm
 }
 
 
-void drawCube(Point3d o, double cellSize, Point3f color,vector<bool>& renderSide, bool blend = false, bool lighting = false)
+void drawCube(Eigen::Vector3d o, double cellSize, Eigen::Vector3f color,vector<bool>& renderSide, bool blend = false, bool lighting = false)
 {
-    Point3f v[8];
+    Eigen::Vector3f v[8];
 
-    v[0] = Point3f(o.X(), o.Y()+cellSize, o.Z());
-    v[1] = Point3f(o.X(), o.Y()+cellSize, o.Z()+cellSize);
-    v[2] = Point3f(o.X(), o.Y(), o.Z()+cellSize);
-    v[3] = Point3f(o.X(), o.Y(), o.Z());
-    v[4] = Point3f(o.X()+cellSize, o.Y()+cellSize, o.Z());
-    v[5] = Point3f(o.X()+cellSize, o.Y()+cellSize, o.Z()+cellSize);
-    v[6] = Point3f(o.X()+cellSize, o.Y(), o.Z()+cellSize);
-    v[7] = Point3f(o.X()+cellSize, o.Y(), o.Z());
+    v[0] = Eigen::Vector3f(o.x(), o.y()+cellSize, o.z());
+    v[1] = Eigen::Vector3f(o.x(), o.y()+cellSize, o.z()+cellSize);
+    v[2] = Eigen::Vector3f(o.x(), o.y(), o.z()+cellSize);
+    v[3] = Eigen::Vector3f(o.x(), o.y(), o.z());
+    v[4] = Eigen::Vector3f(o.x()+cellSize, o.y()+cellSize, o.z());
+    v[5] = Eigen::Vector3f(o.x()+cellSize, o.y()+cellSize, o.z()+cellSize);
+    v[6] = Eigen::Vector3f(o.x()+cellSize, o.y(), o.z()+cellSize);
+    v[7] = Eigen::Vector3f(o.x()+cellSize, o.y(), o.z());
 
     if(!lighting)
         glDisable(GL_LIGHTING);
@@ -100,7 +100,7 @@ void drawCube(Point3d o, double cellSize, Point3f color,vector<bool>& renderSide
     if(!lighting) glEnable(GL_LIGHTING);
 }
 
-void drawPointLocator(Point3d pt, float size, bool spot)
+void drawPointLocator(Eigen::Vector3d pt, float size, bool spot)
 {
     glDisable(GL_LIGHTING);
     if(spot)
@@ -115,14 +115,14 @@ void drawPointLocator(Point3d pt, float size, bool spot)
 
     glBegin(GL_LINES);
     // queda reconstruir el cubo y ver si se pinta bien y se ha calculado correctamente.
-    glVertex3f(pt.X()+size, pt.Y(), pt.Z());
-    glVertex3f(pt.X()-size, pt.Y(), pt.Z());
+    glVertex3f(pt.x()+size, pt.y(), pt.z());
+    glVertex3f(pt.x()-size, pt.y(), pt.z());
 
-    glVertex3f(pt.X(), pt.Y()+size, pt.Z());
-    glVertex3f(pt.X(), pt.Y()-size, pt.Z());
+    glVertex3f(pt.x(), pt.y()+size, pt.z());
+    glVertex3f(pt.x(), pt.y()-size, pt.z());
 
-    glVertex3f(pt.X(), pt.Y(), pt.Z()+size);
-    glVertex3f(pt.X(), pt.Y(), pt.Z()-size);
+    glVertex3f(pt.x(), pt.y(), pt.z()+size);
+    glVertex3f(pt.x(), pt.y(), pt.z()-size);
 
     glEnd();
     glEnable(GL_LIGHTING);
@@ -158,18 +158,20 @@ void gridRenderer::drawFunc(object* obj)
 			glPointSize(1);
 			
             // Lo ideal es crear un grid booleano para pintar o no, tener resuelto el test.
-            for(int i = 0; i< grid->dimensions.X(); i++)
+            for(int i = 0; i< grid->dimensions.x(); i++)
             {
-                for(int j = 0; j< grid->dimensions.Y(); j++)
+                for(int j = 0; j< grid->dimensions.y(); j++)
                 {
-                    for(int k = 0; k< grid->dimensions.Z(); k++)
+                    for(int k = 0; k< grid->dimensions.z(); k++)
                     {
                         cell3d* cell = grid->cells[i][j][k];
-                        Point3d o(grid->bounding.min + Point3d(i,j,k)*grid->cellSize + Point3d(0.5,0.5,0.5)*grid->cellSize);
+						// TOFIX
+						Eigen::Vector3d min (grid->bounding.min.X(), grid->bounding.min.Y(), grid->bounding.min.Z());
+                        Eigen::Vector3d o(min + Eigen::Vector3d(i,j,k)*grid->cellSize + Eigen::Vector3d(0.5,0.5,0.5)*grid->cellSize);
 
 						if(cell->getType() != EXTERIOR)
                         {
-							Point3f col;
+							Eigen::Vector3f col;
 							col[0] = cell->data->color[0];
 							col[1] = cell->data->color[1];
 							col[2] = cell->data->color[2];
@@ -217,40 +219,40 @@ void gridRenderer::drawFunc(object* obj)
         {
             if(sliceValuesXY.size() != 0 && sliceValuesXZ.size() != 0)
             {
-                float incremento = (grid->bounding.max.Z()-grid->bounding.min.Z())/grid->dimensions.Z();
+                float incremento = (grid->bounding.max.Z()-grid->bounding.min.Z())/grid->dimensions.z();
                 float posZ = incremento*XYValue/2;
-                Point3f orig(grid->bounding.min.X(), grid->bounding.min.Y(), grid->bounding.min.Z());
-                orig = orig + Point3f(0,0, posZ);
+                Eigen::Vector3f orig(grid->bounding.min.X(), grid->bounding.min.Y(), grid->bounding.min.Z());
+                orig = orig + Eigen::Vector3f(0,0, posZ);
 
-                Point3f dir1(incremento,0,0);
-                Point3f dir2(0,incremento,0);
-                Point3f n(0,0,incremento);
+                Eigen::Vector3f dir1(incremento,0,0);
+                Eigen::Vector3f dir2(0,incremento,0);
+                Eigen::Vector3f n(0,0,incremento);
 
 
-                for( int i = 0; i< grid->dimensions.X(); i++)
+                for( int i = 0; i< grid->dimensions.x(); i++)
                 {
-                    for( int j = 0; j< grid->dimensions.Y(); j++)
+                    for( int j = 0; j< grid->dimensions.y(); j++)
                     {
-                        Point3f o(orig + Point3f(i*incremento,j*incremento,posZ));
+                        Eigen::Vector3f o(orig + Eigen::Vector3f(i*incremento,j*incremento,posZ));
                         drawQuad(o,dir1,dir2,n, sliceValuesXY[i][j], false);
                     }
                 }
 
-                incremento = (grid->bounding.max.Y()-grid->bounding.min.Y())/grid->dimensions.Y();
+                incremento = (grid->bounding.max.Y()-grid->bounding.min.Y())/grid->dimensions.y();
                 float posY = incremento*XZValue/2;
-                orig = Point3f(grid->bounding.min.X(), grid->bounding.min.Y(), grid->bounding.min.Z());
-                orig = orig + Point3f(0,posY,0);
+                orig = Eigen::Vector3f(grid->bounding.min.X(), grid->bounding.min.Y(), grid->bounding.min.Z());
+                orig = orig + Eigen::Vector3f(0,posY,0);
 
-                dir1 = Point3f(incremento,0,0);
-                dir2 = Point3f(0,0,incremento);
-                n = Point3f(0,incremento,0);
+                dir1 = Eigen::Vector3f(incremento,0,0);
+                dir2 = Eigen::Vector3f(0,0,incremento);
+                n = Eigen::Vector3f(0,incremento,0);
 
 
-                for( int i = 0; i< grid->dimensions.X(); i++)
+                for( int i = 0; i< grid->dimensions.x(); i++)
                 {
-                    for( int k = 0; k< grid->dimensions.Z(); k++)
+                    for( int k = 0; k< grid->dimensions.z(); k++)
                     {
-                        Point3f o(orig + Point3f(i*incremento,posY,k*incremento));
+                        Eigen::Vector3f o(orig + Eigen::Vector3f(i*incremento,posY,k*incremento));
                         drawQuad(o,dir1,dir2,n, sliceValuesXZ[i][k], false);
                     }
                 }
@@ -269,15 +271,15 @@ void gridRenderer::drawFunc(object* obj)
 
         for(unsigned int i = 0; i< grid->v.voronoiGraph.size(); i++)
         {
-            Point3d orig = ((DefNode)grid->v.intPoints[i]).pos;
+            Eigen::Vector3d orig = ((DefNode)grid->v.intPoints[i]).pos;
 
             for(unsigned int j = 0; j< grid->v.voronoiGraph[i].size(); j++)
             {
                 if(grid->v.voronoiGraph[i][j])
                 {
                     // queda reconstruir el cubo y ver si se pinta bien y se ha calculado correctamente.
-                    glVertex3f(orig.X(), orig.Y(), orig.Z());
-                    glVertex3f(grid->v.intPoints[j].pos.X(), grid->v.intPoints[j].pos.Y(), grid->v.intPoints[j].pos.Z());
+                    glVertex3f(orig.x(), orig.y(), orig.z());
+                    glVertex3f(grid->v.intPoints[j].pos.x(), grid->v.intPoints[j].pos.y(), grid->v.intPoints[j].pos.z());
                 }
             }
         }
@@ -319,11 +321,11 @@ bool gridRenderer::update(object* obj)
 void gridRenderer::updateGridColorsAndValuesRGB()
 {
 	// Actualizamos los colores para no tener que buscar y calcular
-	for(int i = 0; i< grid->dimensions.X(); i++)
+	for(int i = 0; i< grid->dimensions.x(); i++)
     {
-        for(int j = 0; j< grid->dimensions.Y(); j++)
+        for(int j = 0; j< grid->dimensions.y(); j++)
         {
-            for(int k = 0; k< grid->dimensions.Z(); k++)
+            for(int k = 0; k< grid->dimensions.z(); k++)
             {
                 if(grid->cells[i][j][k]->getType() != EXTERIOR )
                 {
@@ -332,7 +334,7 @@ void gridRenderer::updateGridColorsAndValuesRGB()
 					if(cell->data->influences.size() != 3) continue;
 
 					cell->data->ownerWeight = 1;
-					cell->data->color = Point3f( cell->data->influences[0].weightValue,  cell->data->influences[1].weightValue,  cell->data->influences[2].weightValue);
+					cell->data->color = Eigen::Vector3f( cell->data->influences[0].weightValue,  cell->data->influences[1].weightValue,  cell->data->influences[2].weightValue);
 				}
 			}
 		}
@@ -345,11 +347,11 @@ void gridRenderer::updateGridColorsAndValues()
 	float maxValue = -99;
 
 		// Actualizamos los colores para no tener que buscar y calcular
-	for(int i = 0; i< grid->dimensions.X(); i++)
+	for(int i = 0; i< grid->dimensions.x(); i++)
     {
-        for(int j = 0; j< grid->dimensions.Y(); j++)
+        for(int j = 0; j< grid->dimensions.y(); j++)
         {
-            for(int k = 0; k< grid->dimensions.Z(); k++)
+            for(int k = 0; k< grid->dimensions.z(); k++)
             {
                 if(grid->cells[i][j][k]->getType() != EXTERIOR )
                 {
@@ -368,11 +370,11 @@ void gridRenderer::updateGridColorsAndValues()
 	}
 
 	// Actualizamos los colores para no tener que buscar y calcular
-	for(int i = 0; i< grid->dimensions.X(); i++)
+	for(int i = 0; i< grid->dimensions.x(); i++)
     {
-        for(int j = 0; j< grid->dimensions.Y(); j++)
+        for(int j = 0; j< grid->dimensions.y(); j++)
         {
-            for(int k = 0; k< grid->dimensions.Z(); k++)
+            for(int k = 0; k< grid->dimensions.z(); k++)
             {
                 if(grid->cells[i][j][k]->getType() != EXTERIOR )
                 {
@@ -385,7 +387,7 @@ void gridRenderer::updateGridColorsAndValues()
 						float value = 1.0;
 						cell->data->ownerWeight =  0.3;
 						GetColourGlobal(value,minValue,maxValue, r, g, b);
-						cell->data->color = Point3f(r,g,b);
+						cell->data->color = Eigen::Vector3f(r,g,b);
 					}
 					else
 					{
@@ -393,7 +395,7 @@ void gridRenderer::updateGridColorsAndValues()
 						float value = 0.0;
 						cell->data->ownerWeight = 0.0;
 						GetColourGlobal(value,minValue,maxValue, r, g, b);
-						cell->data->color = Point3f(r,g,b);
+						cell->data->color = Eigen::Vector3f(r,g,b);
 					}
 					continue;*/
 					
@@ -411,7 +413,7 @@ void gridRenderer::updateGridColorsAndValues()
 							float value = cell->data->ownerWeight;
 							GetColourGlobal( value, minValue, maxValue, r, g, b);
 							cell->data->ownerWeight = (value-minValue)/(maxValue-minValue) * 2;
-							cell->data->color = Point3f( r, g, b);
+							cell->data->color = Eigen::Vector3f( r, g, b);
 							break;
 						}
 					}
@@ -420,7 +422,7 @@ void gridRenderer::updateGridColorsAndValues()
 						cell->data->ownerWeight = 0.000;
 						float r,g,b;
 						GetColourGlobal(-1.0,0.0,1.0, r, g, b);
-						cell->data->color = Point3f(r,g,b);
+						cell->data->color = Eigen::Vector3f(r,g,b);
 					}
 				}
 			}
@@ -450,8 +452,8 @@ void gridRenderer::init(int numLabels)
 
 void gridRenderer::updateSlicesForSegmentation(int maxRange)
 {
-	XYValue = floor(((float)m_iCurrentSliceXY/1000.0)*((float)grid->dimensions.Z()));
-	XZValue = floor(((double)(m_iCurrentSliceXZ)/1000.0)*((float)grid->dimensions.Y()));
+	XYValue = floor(((float)m_iCurrentSliceXY/1000.0)*((float)grid->dimensions.z()));
+	XZValue = floor(((double)(m_iCurrentSliceXZ)/1000.0)*((float)grid->dimensions.y()));
 
 	if(dirtyXY)
 	{
@@ -461,24 +463,24 @@ void gridRenderer::updateSlicesForSegmentation(int maxRange)
 			{
 				if(grid->cells[i][j][XYValue]->getType() == EXTERIOR)
 				{
-					sliceValuesXY[i][j].X() = 1.0;
-					sliceValuesXY[i][j].Y() = 1.0;
-					sliceValuesXY[i][j].Z() = 1.0;
+					sliceValuesXY[i][j].x() = 1.0;
+					sliceValuesXY[i][j].y() = 1.0;
+					sliceValuesXY[i][j].z() = 1.0;
 				}
 				else
 				{
 					if(grid->cells[i][j][XYValue]->data->segmentId < 0)
 					{
-						sliceValuesXY[i][j].X() = 0.0;
-						sliceValuesXY[i][j].Y() = 0.0;
-						sliceValuesXY[i][j].Z() = 0.0;
+						sliceValuesXY[i][j].x() = 0.0;
+						sliceValuesXY[i][j].y() = 0.0;
+						sliceValuesXY[i][j].z() = 0.0;
 					}
 					else
 					{
 						//int idOwnerTraduced = tradIds[grid.cells[i][j][XYValue]->data->segmentId];
 						float idOwnerTraduced = (grid->cells[i][j][XYValue]->data->segmentId * 13) % maxRange;
 						GetColour(idOwnerTraduced/maxRange, 0.0,1.0,
-							  sliceValuesXY[i][j].X(), sliceValuesXY[i][j].Y(), sliceValuesXY[i][j].Z());
+							  sliceValuesXY[i][j].x(), sliceValuesXY[i][j].y(), sliceValuesXY[i][j].z());
 					}
 				}
 			}
@@ -494,24 +496,24 @@ void gridRenderer::updateSlicesForSegmentation(int maxRange)
 			{
 				if(grid->cells[i][XZValue][j]->getType() == EXTERIOR)
 				{
-					sliceValuesXZ[i][j].X() = 1.0;
-					sliceValuesXZ[i][j].Y() = 1.0;
-					sliceValuesXZ[i][j].Z() = 1.0;
+					sliceValuesXZ[i][j].x() = 1.0;
+					sliceValuesXZ[i][j].y() = 1.0;
+					sliceValuesXZ[i][j].z() = 1.0;
 				}
 				else
 				{
 					if(grid->cells[i][XZValue][j]->data->ownerLabel<0)
 					{
-						sliceValuesXZ[i][j].X() = 0.0;
-						sliceValuesXZ[i][j].Y() = 0.0;
-						sliceValuesXZ[i][j].Z() = 0.0;
+						sliceValuesXZ[i][j].x() = 0.0;
+						sliceValuesXZ[i][j].y() = 0.0;
+						sliceValuesXZ[i][j].z() = 0.0;
 					}
 					else
 					{
 						//int idOwnerTraduced = tradIds[grid.cells[i][XZValue][j]->data->ownerLabel];
 						float idOwnerTraduced = (grid->cells[i][XZValue][j]->data->segmentId * 13) % maxRange;
 						GetColour(idOwnerTraduced/maxRange, 0.0,1.0,
-								  sliceValuesXZ[i][j].X(), sliceValuesXZ[i][j].Y(), sliceValuesXZ[i][j].Z());
+								  sliceValuesXZ[i][j].x(), sliceValuesXZ[i][j].y(), sliceValuesXZ[i][j].z());
 					}
 				}
 			}
@@ -523,8 +525,8 @@ void gridRenderer::updateSlicesForSegmentation(int maxRange)
 
 void gridRenderer::updateSlicesForVolumeLabels(int maxRange)
 {
-	XYValue = floor(((float)m_iCurrentSliceXY/1000.0)*((float)grid->dimensions.Z()));
-	XZValue = floor(((double)(m_iCurrentSliceXZ)/1000.0)*((float)grid->dimensions.Y()));
+	XYValue = floor(((float)m_iCurrentSliceXY/1000.0)*((float)grid->dimensions.z()));
+	XZValue = floor(((double)(m_iCurrentSliceXZ)/1000.0)*((float)grid->dimensions.y()));
 
 	assert(maxRange != 0);
 
@@ -539,11 +541,11 @@ void gridRenderer::updateSlicesForVolumeLabels(int maxRange)
 		for(unsigned int j = 0; j< sliceValuesXY[i].size(); j++)
 		{
 			if(grid->cells[i][j][XYValue]->getType() == BOUNDARY)
-				sliceValuesXY[i][j] = Point3f(0.8,0.1,0.1);
+				sliceValuesXY[i][j] = Eigen::Vector3f(0.8,0.1,0.1);
 			else if(grid->cells[i][j][XYValue]->getType() == INTERIOR)
-				sliceValuesXY[i][j] = Point3f(0.1,0.8,0.1);
+				sliceValuesXY[i][j] = Eigen::Vector3f(0.1,0.8,0.1);
 			else if(grid->cells[i][j][XYValue]->getType() == EXTERIOR)
-				sliceValuesXY[i][j] = Point3f(0.1,0.1,0.8);
+				sliceValuesXY[i][j] = Eigen::Vector3f(0.1,0.1,0.8);
 		}
 	}
 	dirtyXY = false;
@@ -560,11 +562,11 @@ void gridRenderer::updateSlicesForVolumeLabels(int maxRange)
 		for(unsigned int j = 0; j< sliceValuesXZ[i].size(); j++)
 		{
 			if(grid->cells[i][XZValue][j]->getType() == BOUNDARY)
-				sliceValuesXZ[i][j] = Point3f(0.8,0.1,0.1);
+				sliceValuesXZ[i][j] = Eigen::Vector3f(0.8,0.1,0.1);
 			else if(grid->cells[i][XZValue][j]->getType() == INTERIOR)
-				sliceValuesXZ[i][j] = Point3f(0.1,0.8,0.1);
+				sliceValuesXZ[i][j] = Eigen::Vector3f(0.1,0.8,0.1);
 			else if(grid->cells[i][XZValue][j]->getType() == EXTERIOR)
-				sliceValuesXZ[i][j] = Point3f(0.1,0.1,0.8);
+				sliceValuesXZ[i][j] = Eigen::Vector3f(0.1,0.1,0.8);
 		}
 	}
 
@@ -577,8 +579,8 @@ void gridRenderer::updateSlicesForWeights(float maxRange, int desiredIndex)
 {
 	int searchedIndex = -1;
 
-	XYValue = floor(((float)m_iCurrentSliceXY/1000.0)*((float)grid->dimensions.Z()));
-	XZValue = floor(((double)(m_iCurrentSliceXZ)/1000.0)*((float)grid->dimensions.Y()));
+	XYValue = floor(((float)m_iCurrentSliceXY/1000.0)*((float)grid->dimensions.z()));
+	XZValue = floor(((double)(m_iCurrentSliceXZ)/1000.0)*((float)grid->dimensions.y()));
 
 	if(dirtyXY)
 	{
@@ -588,9 +590,9 @@ void gridRenderer::updateSlicesForWeights(float maxRange, int desiredIndex)
 			{
 				if(grid->cells[i][j][XYValue]->getType() == EXTERIOR)
 				{
-					sliceValuesXY[i][j].X() = 1.0;
-					sliceValuesXY[i][j].Y() = 1.0;
-					sliceValuesXY[i][j].Z() = 1.0;
+					sliceValuesXY[i][j].x() = 1.0;
+					sliceValuesXY[i][j].y() = 1.0;
+					sliceValuesXY[i][j].z() = 1.0;
 				}
 
 				else
@@ -609,10 +611,10 @@ void gridRenderer::updateSlicesForWeights(float maxRange, int desiredIndex)
 
 					if(searchedIndex >= 0)
 						GetColour(grid->cells[i][j][XYValue]->data->influences[searchedIndex].weightValue, 0.0,1.0,
-						  sliceValuesXY[i][j].X(), sliceValuesXY[i][j].Y(), sliceValuesXY[i][j].Z());
+						  sliceValuesXY[i][j].x(), sliceValuesXY[i][j].y(), sliceValuesXY[i][j].z());
 					else
 					{
-						GetColour(0.0,0.0,1.0, sliceValuesXY[i][j].X(), sliceValuesXY[i][j].Y(), sliceValuesXY[i][j].Z());
+						GetColour(0.0,0.0,1.0, sliceValuesXY[i][j].x(), sliceValuesXY[i][j].y(), sliceValuesXY[i][j].z());
 					}
 
 				}
@@ -629,9 +631,9 @@ void gridRenderer::updateSlicesForWeights(float maxRange, int desiredIndex)
 			{
 				if(grid->cells[i][XZValue][j]->getType() == EXTERIOR)
 				{
-					sliceValuesXZ[i][j].X() = 1.0;
-					sliceValuesXZ[i][j].Y() = 1.0;
-					sliceValuesXZ[i][j].Z() = 1.0;
+					sliceValuesXZ[i][j].x() = 1.0;
+					sliceValuesXZ[i][j].y() = 1.0;
+					sliceValuesXZ[i][j].z() = 1.0;
 				}
 				else
 				{
@@ -650,11 +652,11 @@ void gridRenderer::updateSlicesForWeights(float maxRange, int desiredIndex)
 					if(searchedIndex >= 0)
 					{
 						GetColour((float)grid->cells[i][XZValue][j]->data->influences[searchedIndex].weightValue, 0.0,1.0,
-						  sliceValuesXZ[i][j].X(), sliceValuesXZ[i][j].Y(), sliceValuesXZ[i][j].Z());
+						  sliceValuesXZ[i][j].x(), sliceValuesXZ[i][j].y(), sliceValuesXZ[i][j].z());
 					}
 					else
 					{
-						GetColour(0, 0.0,1.0, sliceValuesXZ[i][j].X(), sliceValuesXZ[i][j].Y(), sliceValuesXZ[i][j].Z());
+						GetColour(0, 0.0,1.0, sliceValuesXZ[i][j].x(), sliceValuesXZ[i][j].y(), sliceValuesXZ[i][j].z());
 					}
 				}
 			}
@@ -675,15 +677,15 @@ void gridRenderer::updateSlices()
 
     if(!Initialized)
     {
-        int dimX = grid->dimensions.X();
+        int dimX = grid->dimensions.x();
         sliceValuesXY.clear(); sliceValuesXY.resize(dimX);
-        sliceValuesXZ.resize(grid->dimensions.X());
+        sliceValuesXZ.resize(grid->dimensions.x());
 
         for(unsigned int i = 0; i< sliceValuesXY.size(); i++)
-            sliceValuesXY[i].resize(grid->dimensions.Y());
+            sliceValuesXY[i].resize(grid->dimensions.y());
 
         for(unsigned int i = 0; i< sliceValuesXZ.size(); i++)
-            sliceValuesXZ[i].resize(grid->dimensions.Z());
+            sliceValuesXZ[i].resize(grid->dimensions.z());
 
         Initialized = true;
     }

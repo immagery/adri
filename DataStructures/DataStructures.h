@@ -17,6 +17,6 @@ class MyMesh   : public vcg::tri::TriMesh< std::vector<MyVertex>, std::vector<My
 
 void initModelForCoordinates(MyMesh& mesh);
 void gpUpdateNormals(MyMesh& mesh, bool vertexAlso = false);
-void buildCube(MyMesh& mesh, vcg::Point3d center, double radius);
+void buildCube(MyMesh& mesh, Eigen::Vector3d center, double radius);
 
 #endif // DATASTRUCTURES_H

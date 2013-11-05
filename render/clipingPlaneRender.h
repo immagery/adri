@@ -71,8 +71,8 @@ public:
 		orientation = XY_PLANE;
 		subdivisions = 0;
 
-		minPoint = Point3d(0,0,0);
-		minPoint = Point3d(0,0,0);
+		minPoint = Eigen::Vector3d(0,0,0);
+		minPoint = Eigen::Vector3d(0,0,0);
 
 		weights.clear();
 
@@ -149,14 +149,14 @@ public:
 
 	int selectedPoint;
 
-	Point3d minPoint;
-	Point3d maxPoint;
+	Eigen::Vector3d minPoint;
+	Eigen::Vector3d maxPoint;
 
 	vector< vector<double> > weights;
 
 	// For drawing optimizing
-	vector<vcg::Point3d> points;
-	vector<vcg::Point3f> colors;
+	vector<Eigen::Vector3d> points;
+	vector<Eigen::Vector3f> colors;
 	bool posUpdated;
 
 	visualizatoinMode vmode;

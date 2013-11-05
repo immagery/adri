@@ -23,15 +23,15 @@ void AnimationManager::addKeyFrame (int id, int frame, int tx, int ty, int tz,
     animations[id].addTransform(frame,tx,ty,tz,rx,ry,rz,sx,sy,sz);
 }
 
-Point3d AnimationManager::getPosition (int id, int frame) {
+Eigen::Vector3d AnimationManager::getPosition (int id, int frame) {
     return animations[id].getPosition(frame);
 }
 
-Point3d AnimationManager::getRotation (int id, int frame) {
+Eigen::Vector3d AnimationManager::getRotation (int id, int frame) {
     return animations[id].getRotation(frame);
 }
 
-Point3d AnimationManager::getScaling (int id, int frame) {
+Eigen::Vector3d AnimationManager::getScaling (int id, int frame) {
     return animations[id].getScaling(frame);
 }
 
@@ -40,12 +40,12 @@ void AnimationManager::saveAnimation(string path, scene* escena) {
 	for (map<int,Animation>::iterator it = animations.begin(); it != animations.end(); ++it) {
 		file << "###" << endl;
 		file << escena->findNameById(it->first) << endl;
-		for (map<int,Transform>::iterator itt = it->second.transforms.begin(); itt != it->second.transforms.end(); ++itt) {
+		for (map<int,MyTransform>::iterator itt = it->second.transforms.begin(); itt != it->second.transforms.end(); ++itt) {
 			int keyframe = itt->first;
-			Transform t = itt->second;
-			file << keyframe << " " << t.position.X() << " " << t.position.Y() << " " << t.position.Z();
-			file << " " << t.rotation.X() << " " << t.rotation.Y() << " " << t.rotation.Z();
-			file << " " << t.scaling.X() << " " << t.scaling.Y() << " " << t.scaling.Z() << endl;
+			MyTransform t = itt->second;
+			file << keyframe << " " << t.position.x() << " " << t.position.y() << " " << t.position.z();
+			file << " " << t.rotation.x() << " " << t.rotation.y() << " " << t.rotation.z();
+			file << " " << t.scaling.x() << " " << t.scaling.y() << " " << t.scaling.z() << endl;
 		}
 	}
 	file.close();

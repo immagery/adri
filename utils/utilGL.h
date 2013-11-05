@@ -19,12 +19,15 @@
 #endif
 
 #include <utils/util.h>
+#include <Eigen\Core>
 
 //void joint::update()
 //{
     // Calcular matrix de transformacion
 //    dirtyFlag = false;
 //}
+
+static void glVertex(Eigen::Vector3d v) { glVertex3d(v.x(), v.y(), v.z()); }
 
 static void drawCircle(int res, double r)
 {

@@ -35,9 +35,9 @@ bool joint::propagateDirtyness()
 void joint::initDefaults()
 {
 	father = NULL;
-    qOrient = Quaternion<double>(1,0,0,0);
+    qOrient = Eigen::Quaternion<double>(1,0,0,0);
 	
-	//orientJoint = Point3d(0,0,0);
+	//orientJoint = Eigen::Vector3d(0,0,0);
     childs.clear();
     nodes.clear();
     
@@ -61,7 +61,7 @@ joint::joint() : object()
 
 	/*
     father = NULL;
-    orientJoint = Point3d(0,0,0);
+    orientJoint = Eigen::Vector3d(0,0,0);
     childs.clear();
     nodes.clear();
 
@@ -86,7 +86,7 @@ joint::joint(unsigned int nodeId) : object(nodeId)
 	iam = JOINT_NODE;
 	
 	father = NULL;
-    orientJoint = Point3d(0,0,0);
+    orientJoint = Eigen::Vector3d(0,0,0);
     childs.clear();
     nodes.clear();
 
@@ -109,7 +109,7 @@ joint::joint(joint* _father) : object()
     father = _father;
     
 	/*
-	orientJoint = Point3d(0,0,0);
+	orientJoint = Eigen::Vector3d(0,0,0);
     //JointSkeletonId = 0;
     childs.clear();
     nodes.clear();
@@ -131,8 +131,8 @@ joint::joint(joint* _father) : object()
 joint::joint(joint* _father, unsigned int nodeId) : object(nodeId)
 {
     father = _father;
-    //orientJoint = Point3d(0,0,0);
-	qOrient = Quaternion<double>(1,0,0,0);
+    //orientJoint = Eigen::Vector3d(0,0,0);
+	qOrient = Eigen::Quaternion<double>(1,0,0,0);
     //JointSkeletonId = 0;
     childs.clear();
     nodes.clear();
@@ -158,8 +158,8 @@ joint::~joint()
 
     father = NULL;
 
-    //orientJoint = Point3d(0,0,0);
-	qOrient = Quaternion<double>(1,0,0,0);
+    //orientJoint = Eigen::Vector3d(0,0,0);
+	qOrient = Eigen::Quaternion<double>(1,0,0,0);
 }
 
 void joint::setFather(joint* f)
@@ -198,32 +198,32 @@ joint* joint::getChild(int id)
     return childs[id];
 }
 
-void joint::setWorldPosition(Point3d pos)
+void joint::setWorldPosition(Eigen::Vector3d pos)
 {
     //printf("setWorldPosition\n"); fflush(0);
     worldPosition = pos;
 }
 
-Point3d joint::getWorldPosition()
+Eigen::Vector3d joint::getWorldPosition()
 {
     return worldPosition;
 }
 
 
-bool joint::getBoundingBox(Point3d& minAuxPt,Point3d& maxAuxPt)
+bool joint::getBoundingBox(Eigen::Vector3d& minAuxPt,Eigen::Vector3d& maxAuxPt)
 {
     // Devuelve su longitud más es máximo de todo lo que cuelga
-    maxAuxPt.X() = 0;
+    maxAuxPt.x() = 0;
 
     double maxLongTemp = 0;
     for(unsigned int i = 0; i< childs.size(); i++)
     {
         childs[i]->getBoundingBox(minAuxPt, maxAuxPt);
-        if(maxLongTemp < maxAuxPt.X())
-            maxLongTemp = maxAuxPt.X();
+        if(maxLongTemp < maxAuxPt.x())
+            maxLongTemp = maxAuxPt.x();
     }
 
-    maxAuxPt.X() = pos.Norm() + maxLongTemp;
+    maxAuxPt.x() = pos.norm() + maxLongTemp;
     return true;
 }
 
@@ -249,7 +249,7 @@ void joint::computeWorldPos()
 
     GLdouble modelview[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-    worldPosition = Point3d(modelview[12],modelview[13],modelview[14]);
+    worldPosition = Eigen::Vector3d(modelview[12],modelview[13],modelview[14]);
 
     for(unsigned int i = 0; i< childs.size(); i++)
     {
@@ -267,9 +267,9 @@ void joint::computeRestPos() {
 
 void joint::setJointOrientation(double ojX,double  ojY,double  ojZ)
 {
-	qOrient.FromEulerAngles( Deg2Rad(ojX), Deg2Rad( ojY),  Deg2Rad(ojZ));
-	qOrient.Normalize();
-    //orientJoint = Point3d(ojX, ojY, ojZ);
+	// TOFIX qOrient.FromEulerAngles( Deg2Rad(ojX), Deg2Rad( ojY),  Deg2Rad(ojZ));
+	qOrient.normalize();
+    //orientJoint = Eigen::Vector3d(ojX, ojY, ojZ);
 }
 
 void joint::getRelatives(vector<joint*>& joints)
@@ -395,7 +395,7 @@ void joint::select(bool bToogle, int id)
 
      //root->setJointId(scene::getNewId());
 
-     root->setWorldPosition(Point3d(wpX, wpY, wpZ));
+     root->setWorldPosition(Eigen::Vector3d(wpX, wpY, wpZ));
      skt->joints.push_back(root);
      skt->jointRef[root->nodeId] = root;
 
@@ -441,22 +441,22 @@ void skeleton::drawFunc()
     // Aplicamos las rotaciones y traslaciones pertinentes
 }
 
-bool skeleton::getBoundingBox(Point3d& minAuxPt,Point3d& maxAuxPt)
+bool skeleton::getBoundingBox(Eigen::Vector3d& minAuxPt,Eigen::Vector3d& maxAuxPt)
 {
     // Calculamos la mayor caja que podría darse con la posición
     // inicial del equeleto. Esto es si todos los huesos pueden estirarse.
-    maxAuxPt = Point3d(0,0,0);
+    maxAuxPt = Eigen::Vector3d(0,0,0);
     for(int i = 0; i< root->getChildCount(); i++)
     {
         root->getChild(i)->getBoundingBox(minAuxPt, maxAuxPt);
     }
 
-    double l = maxAuxPt.X() * cos(45*2*M_PI/360);
+    double l = maxAuxPt.x() * cos(45*2*M_PI/360);
     if(l <= 0)
         l = 1;
 
-    minAuxPt = root->pos - Point3d(l,l,l);
-    maxAuxPt = root->pos + Point3d(l,l,l);
+    minAuxPt = root->pos - Eigen::Vector3d(l,l,l);
+    maxAuxPt = root->pos + Eigen::Vector3d(l,l,l);
 
     return true;
 }
@@ -508,23 +508,23 @@ void readSkeletons(string fileName, vector<skeleton*>& skts)
 }
 
 int subdivideBone(joint* parent, joint* child,
-				  //Point3d origen, Point3d fin,
+				  //Eigen::Vector3d origen, Eigen::Vector3d fin,
 				  vector< DefNode >& nodePoints,
 				  vector<int>& ids,
 				  float subdivisionRatio)
 {
 	//float subdivisionRatio = subdivisionRatio_DEF;
-	Point3d origen =  parent->getWorldPosition();
-	Point3d fin = child->getWorldPosition();
+	Eigen::Vector3d origen =  parent->getWorldPosition();
+	Eigen::Vector3d fin = child->getWorldPosition();
 	int boneId = parent->nodeId;
 
-	double longitud= (float)((fin-origen).Norm());
+	double longitud= (float)((fin-origen).norm());
 	double endChop = longitud*endChop_DEF;
 
 	if(longitud == 0)
 		return 0;
 
-	Point3d dir = (fin-origen)/longitud;
+	Eigen::Vector3d dir = (fin-origen)/longitud;
 	longitud = longitud - endChop;
 	int numDivisions = (int)floor(longitud/subdivisionRatio);
 
@@ -532,8 +532,8 @@ int subdivideBone(joint* parent, joint* child,
 	if(numDivisions > 0)
 		newSubdivLength = longitud/ double(numDivisions);
 
-	Point3d newOrigen = origen;
-	Point3d newFin = fin-dir*endChop;
+	Eigen::Vector3d newOrigen = origen;
+	Eigen::Vector3d newFin = fin-dir*endChop;
 
 	// Añadimos los nodos
 	// Saltamos el primer nodo que corresponde a la raíz del joint
@@ -566,7 +566,7 @@ int subdivideBone(joint* parent, joint* child,
 
 	if(VERBOSE)
 	{
-		float error = (float)(newFin - nodePoints.back().pos).Norm();
+		float error = (float)(newFin - nodePoints.back().pos).norm();
 		if(longitud>subdivisionRatio && fabs(error) > pow(10.0, -5))
 		{
 			// TODEBUG
@@ -655,10 +655,10 @@ int proposeNodes(vector<skeleton*>& skts, vector< DefNode >& nodePoints)
 		if(skt->joints[i]->father)
 		{
 			if(minlength < 0)
-				minlength = (skt->joints[i]->father->getWorldPosition()-skt->joints[i]->getWorldPosition()).Norm();
+				minlength = (skt->joints[i]->father->getWorldPosition()-skt->joints[i]->getWorldPosition()).norm();
 			else
 			{
-				float length = (skt->joints[i]->father->getWorldPosition()-skt->joints[i]->getWorldPosition()).Norm();
+				float length = (skt->joints[i]->father->getWorldPosition()-skt->joints[i]->getWorldPosition()).norm();
 				if(length < minlength && length != 0)
 					minlength = length;
 			}

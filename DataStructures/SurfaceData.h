@@ -115,7 +115,7 @@ public:
 	int id;
 	vector<GraphNode* > connections;
 
-	Point3d position;
+	Eigen::Vector3d position;
 
 	bool visited;
 };
@@ -184,12 +184,12 @@ class PointData
     bool vertexContainer;
 
     // Color para representar varias cosas.
-    Point3f color;
+    Eigen::Vector3f color;
 
 	GraphNode* node;
 
 	// Esta es la posición del punto que representa.
-	//Point3d position;
+	//Eigen::Vector3d position;
 
     // Segmentation labels
     vector<double> embedding;

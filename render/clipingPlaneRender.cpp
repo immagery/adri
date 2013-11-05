@@ -1,7 +1,7 @@
 #include "clipingPlaneRender.h"
 #include <utils/utilGL.h>
 
-void drawQuad4Colors(vector<Point3d>& points,vector<Point3f>&  colors, int idx01, int idx02, int idx03, int idx04)
+void drawQuad4Colors(vector<Eigen::Vector3d>& points,vector<Eigen::Vector3f>&  colors, int idx01, int idx02, int idx03, int idx04)
 {     
     glDisable(GL_CULL_FACE);
     glDisable(GL_LIGHTING);
@@ -52,10 +52,10 @@ void clipingPlaneRenderer::drawFunc(object* obj)
 		if(points.size() == 0)
 			return;
 
-		vector<Point3f> colorMate;
+		vector<Eigen::Vector3f> colorMate;
 		colorMate.resize(points.size());
 		for(int pt = 0; pt < points.size(); pt++)
-			colorMate[pt] = Point3f(0.2,0.8,0.2);
+			colorMate[pt] = Eigen::Vector3f(0.2,0.8,0.2);
 		for(int i = 0; i< subdivisions-1; i++)
 		{
 			for(int j = 0; j< subdivisions-1; j++)

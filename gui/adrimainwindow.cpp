@@ -20,6 +20,7 @@
 #include "AdriViewer.h"
 
 using namespace std;
+using namespace Eigen;
 
 void AdriMainWindow::connectSignals() {
 	// conexiones
@@ -853,13 +854,11 @@ void AdriMainWindow::changeTransformRotateAmountX(int x)
         selectedObject = ui->glCustomWidget->selMgr.selection.back();
 
 	if (selectedObject != NULL) {
-		Quaternion<double> qaux;
-		//qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()-rotationX),0,0);
+		Eigen::Quaternion<double> qaux;
 		rotationX =  Deg2Rad((float)ui->dialX->value()/10.0);
-		qaux.FromEulerAngles(rotationX, rotationY, rotationZ);
+		// TOFIXqaux.FromEulerAngles(rotationX, rotationY, rotationZ);
 
-		//qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()),Deg2Rad(ui->rotationAmountY->value()),Deg2Rad(ui->rotationAmountZ->value()));
-		selectedObject->qrot = qaux;
+		//selectedObject->qrot = qaux;
 		selectedObject->dirtyFlag = true;
 		ui->glCustomWidget->escena->skeletons[0]->joints[0]->dirtyFlag = true;
 	}
@@ -878,14 +877,14 @@ void AdriMainWindow::changeTransformRotateAmountY(int y)
 
     if (selectedObject != NULL)
 	{
-		Quaternion<double> qaux;
+		Eigen::Quaternion<double> qaux;
 
 		// guardamos el nuevo valor
 		rotationY =  Deg2Rad((float)ui->dialY->value()/10.0);
-		qaux.FromEulerAngles(rotationX, rotationY, rotationZ);
+		// TOFIX qaux.FromEulerAngles(rotationX, rotationY, rotationZ);
 
 		// Lo aplicamos como incremento
-		selectedObject->qrot = qaux;
+		//selectedObject->qrot = qaux;
 		selectedObject->dirtyFlag = true;
 	}
 
@@ -905,12 +904,12 @@ void AdriMainWindow::changeTransformRotateAmountZ(int z)
 	if (selectedObject != NULL)
 	{
 
-		Quaternion<double> qaux;
+		Eigen::Quaternion<double> qaux;
 
 		rotationZ =  Deg2Rad((float)ui->dialZ->value()/10.0);
-		qaux.FromEulerAngles(rotationX, rotationY, rotationZ);
+		// TOFIX qaux.FromEulerAngles(rotationX, rotationY, rotationZ);
 
-		selectedObject->qrot = qaux;
+		//selectedObject->qrot = qaux;
 		selectedObject->dirtyFlag = true;
 	}
 
