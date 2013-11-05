@@ -782,8 +782,7 @@ void AdriViewer::readSkeleton(string fileName)
         glShadeModel(GL_FLAT);
 
 	 // Apply skinning
-	 
-	 escena->skinner->computeDeformationsWithSW(escena->skeletons);
+	 //escena->skinner->computeDeformationsWithSW(escena->skeletons);
 
 	 // SKINNING I SOLVERS
 	 /*if (escena->skeletons.size() > 0 && aniManager.simulationEnabled) {
@@ -845,7 +844,6 @@ void AdriViewer::readSkeleton(string fileName)
 
          ((Modelo*)escena->models[i])->drawFunc();
      }
-
 
 
      glDisable(GL_LIGHTING);
