@@ -265,12 +265,33 @@ void joint::computeRestPos() {
 	((JointRender*)shading)->computeRestPos(this);
 }
 
-void joint::setJointOrientation(double ojX,double  ojY,double  ojZ)
+void joint::setJointOrientation(double ojX,double  ojY,double  ojZ, bool radians)
 {
-	// TOFIX qOrient.FromEulerAngles( Deg2Rad(ojX), Deg2Rad( ojY),  Deg2Rad(ojZ));
-	qOrient.normalize();
-    //orientJoint = Eigen::Vector3d(ojX, ojY, ojZ);
+
+	Eigen::Quaterniond q[3];
+	double angles[3];
+
+	angles[0] = ojX;
+	angles[1] = ojY;
+	angles[2] = ojZ;
+
+	if(radians)
+	{
+		// Convert to degrees
+		for(int i = 0; i< 3; i++)
+			angles[i] = angles[i]*360/(M_PI*2);
+	}
+
+	// Rotation over each axis
+	for(int i = 0; i< 3; i++)
+		getAxisRotationQuaternion(q[i], i, angles[i]);
+
+	// Concatenate all the values in X-Y-Z order
+	Eigen::Quaterniond qrotAux =  q[2] * q[1] * q[0];
+
+	qOrient = qrotAux; 
 }
+
 
 void joint::getRelatives(vector<joint*>& joints)
 {
@@ -389,14 +410,16 @@ void joint::select(bool bToogle, int id)
 
      root->sName = str;
      root->resetTransformation();
-     root->addTranslation(posX, posY, posZ);
-     root->addRotation(rotX, rotY, rotZ);
+     //root->addTranslation(posX, posY, posZ);
+     
+	 root->setTranslation(posX, posY, posZ);
+	 root->setRotation(rotX, rotY, rotZ, false);
      root->setJointOrientation(ojX,ojY,ojZ);
 
      //root->setJointId(scene::getNewId());
-
-     root->setWorldPosition(Eigen::Vector3d(wpX, wpY, wpZ));
+     //root->setWorldPosition(Eigen::Vector3d(wpX, wpY, wpZ));
      skt->joints.push_back(root);
+
      skt->jointRef[root->nodeId] = root;
 
      for(int i = 0; i< num1; i++)
@@ -474,8 +497,7 @@ bool skeleton::update()
 	if(dirtyFlag)
 	{
 		// Skeleton elements update
-		   // proposeNodes(bb->bindedSkeletons, bb->intPoints);
-
+		// proposeNodes(bb->bindedSkeletons, bb->intPoints);
 
 		return true;
 	}
@@ -508,6 +530,12 @@ void readSkeletons(string fileName, vector<skeleton*>& skts)
          skt->root = new joint(scene::getNewId());
 
          readBone(fin, skt, skt->root);
+
+		 // Actualizar transformacion de reposo
+		 skt->root->computeRestPos();
+
+		 // Actualizar valores en 
+		 skt->root->dirtyFlag = true;
          skt->update();
 
          skts.push_back(skt);

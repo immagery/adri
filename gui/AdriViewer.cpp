@@ -243,13 +243,24 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
                                       ((joint*)skt->joints[j])->nodeId);
 
 				   double alfa,beta,gamma;
-				   /* TOFIX ((joint*)skt->joints[j])->qrot.ToEulerAngles(alfa,beta,gamma);
-				   emit jointTransformationValues(((joint*)skt->joints[j])->pos.X(),
-												  ((joint*)skt->joints[j])->pos.Y(),
-												  ((joint*)skt->joints[j])->pos.Z(),
-												  Rad2Deg(alfa),
-												  Rad2Deg(beta),
-												  Rad2Deg(gamma)); */
+				   
+				   //((joint*)skt->joints[j])->qrot.ToEulerAngles(alfa,beta,gamma);
+
+				  /* vcg::Quaternion<double> qAux(((joint*)skt->joints[j])->qrot.W(), 
+												((joint*)skt->joints[j])->qrot.X(),
+												((joint*)skt->joints[j])->qrot.Y(),
+												((joint*)skt->joints[j])->qrot.Z());*/
+
+				   //((joint*)skt->joints[j])->qrot.ToEulerAngles(alfa,beta,gamma);
+
+				   toEulerAngles(((joint*)skt->joints[j])->qrot, alfa, beta, gamma);
+
+				   emit jointTransformationValues(((joint*)skt->joints[j])->pos[0],
+												  ((joint*)skt->joints[j])->pos[1],
+												  ((joint*)skt->joints[j])->pos[2],
+												  alfa,
+												  beta,
+												  gamma);
 
                 }
             }
@@ -400,7 +411,7 @@ void AdriViewer::readSkeleton(string fileName)
 {
     readSkeletons(fileName, escena->skeletons);
 
-     emit updateSceneView();
+    emit updateSceneView();
  }
 
  void AdriViewer::readScene(string fileName, string name, string path)

@@ -224,7 +224,7 @@ void drawBoneStick(float radius, Eigen::Vector3d& pos)
 
 //JOINT
 void JointRender::drawFunc(joint* jt)
-{    
+{   
     glColor3f(1.0,1.0,1.0);
     glPushMatrix();
 
@@ -294,8 +294,8 @@ void JointRender::drawFunc(joint* jt)
     drawTriCircle(12, jointSize);
 
     // Pintamos los ejes del hueso
-    //drawAxisHandle(jointSize*25);
-
+    drawAxisHandle(jointSize*25);
+	
     // Pintamos la pelota de expansion
     //drawExpansionBall(selected, (float)(DEFAULT_SIZE*2*jt->expansion));
 	//for(unsigned int i = 0; i< jt->nodes.size(); i++)
@@ -319,8 +319,59 @@ void JointRender::computeRestPos(joint* jt) {
 	glPopMatrix();
 }
 
-void JointRender::computeRestPosRec(joint* jt)
+void JointRender::computeRestPosRec(joint* jt, joint* father)
 {
+	Eigen::Matrix3d rotationMatrix;
+	if(!father)
+	{
+		jt->rTranslation = Eigen::Vector3d(jt->pos.X(), jt->pos.Y(), jt->pos.Z());
+		
+		vcg::Quaternion<double> qAuxTemp;
+		qAuxTemp.FromEulerAngles(0,0,90);
+		
+		Eigen::Quaterniond or(jt->qOrient[0], jt->qOrient[1], jt->qOrient[2], jt->qOrient[3]);
+		Eigen::Quaterniond rot(jt->qrot[0], jt->qrot[1], jt->qrot[2], jt->qrot[3]);
+		
+		jt->rRotation = rot * or;
+
+		rotationMatrix = jt->rRotation.toRotationMatrix();
+	}
+	else
+	{
+		jt->rTranslation = father->rTranslation + 
+						   father->rRotation._transformVector(Eigen::Vector3d(jt->pos.X(), jt->pos.Y(), jt->pos.Z()));
+		
+		Eigen::Quaterniond or(jt->qOrient[0], jt->qOrient[1], jt->qOrient[2], jt->qOrient[3]);
+		Eigen::Quaterniond rot(jt->qrot[0], jt->qrot[1], jt->qrot[2], jt->qrot[3]);
+		
+		jt->rRotation =  father->rRotation * rot * or;
+
+		rotationMatrix = ( rot * or ).toRotationMatrix();
+		//rotationMatrix = jt->rRotation.toRotationMatrix();
+	}
+
+	
+	//Eigen::Matrix3d rotationMatrix;
+	//rotationMatrix = jt->rRotation.toRotationMatrix();
+
+	Eigen::Matrix4f transformMatrix2;
+	transformMatrix2 << rotationMatrix(0,0) , rotationMatrix(0,1) , rotationMatrix(0,2), jt->pos[0],
+					   rotationMatrix(1,0) , rotationMatrix(1,1) , rotationMatrix(1,2), jt->pos[1],
+					   rotationMatrix(2,0) , rotationMatrix(2,1) , rotationMatrix(2,2), jt->pos[2],
+						0.0,				0.0,				0.0,			1.0;
+
+	transformMatrix2.transposeInPlace();
+	jt->iT = transformMatrix2.inverse().transpose();
+	
+	jt->worldPosition = Point3d(jt->rTranslation[0],jt->rTranslation[1],jt->rTranslation[2]);
+
+	for(unsigned int i = 0; i< jt->childs.size(); i++)
+    {
+        computeRestPosRec(jt->childs[i], jt);
+    }
+
+	return;
+
     glPushMatrix();
 
     //glTranslated(jt->pos.X(),jt->pos.Y(),jt->pos.Z());
@@ -403,26 +454,26 @@ void JointRender::computeWorldPosRec(joint* jt, joint* father)
 	Eigen::Matrix3d rotationMatrix;
 	if(!father)
 	{
-		jt->rTranslation = jt->pos;
+		jt->translation = jt->pos;
 		
 		Eigen::Quaterniond or = jt->qOrient;
 		Eigen::Quaterniond rot = jt->qrot;
 		
-		jt->rRotation = or*rot;
+		jt->rotation =  rot*or;
 
-		rotationMatrix = jt->rRotation.toRotationMatrix();
+		rotationMatrix = jt->rotation.toRotationMatrix();
 	}
 	else
 	{
-		jt->rTranslation = father->rTranslation + 
-						   father->rRotation._transformVector(jt->pos);
+		jt->translation = father->translation + 
+						   father->rotation._transformVector(jt->pos);
 		
 		Eigen::Quaterniond or = jt->qOrient;
 		Eigen::Quaterniond rot = jt->qrot;
 		
-		jt->rRotation = father->rRotation * or * rot;
+		jt->rotation =  father->rotation * rot * or;
 
-		rotationMatrix = (or * rot).toRotationMatrix();
+		rotationMatrix = ( rot*or).toRotationMatrix();
 	}
 
 	
@@ -431,12 +482,15 @@ void JointRender::computeWorldPosRec(joint* jt, joint* father)
 
 	Eigen::Matrix4f transformMatrix2;
 	transformMatrix2 << rotationMatrix(0,0) , rotationMatrix(0,1) , rotationMatrix(0,2), jt->pos[0],
-					   rotationMatrix(1,0) , rotationMatrix(1,1) , rotationMatrix(1,2), jt->pos[1],
-					   rotationMatrix(2,0) , rotationMatrix(2,1) , rotationMatrix(2,2), jt->pos[2],
+					    rotationMatrix(1,0) , rotationMatrix(1,1) , rotationMatrix(1,2), jt->pos[1],
+					    rotationMatrix(2,0) , rotationMatrix(2,1) , rotationMatrix(2,2), jt->pos[2],
 						0.0,				0.0,				0.0,			1.0;
 
 	transformMatrix2.transposeInPlace();
 	jt->world = transformMatrix2;
+
+	jt->worldPosition = jt->translation;
+	jt->W = transformMatrix2.transpose();
 	
 
 	for(unsigned int i = 0; i< jt->childs.size(); i++)

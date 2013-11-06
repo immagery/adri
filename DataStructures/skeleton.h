@@ -70,7 +70,8 @@ class joint : public object
         // GETTERS & SETTERS
         void setJointOrientation(double ojX,
                                  double  ojY,
-                                 double  ojZ);
+                                 double  ojZ,
+								 bool radians = false);
 
         void setWorldPosition(Eigen::Vector3d pos);
         Eigen::Vector3d getJointOrientation();
