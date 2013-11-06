@@ -53,13 +53,13 @@ void Geometry::saveModel(string fileName, string name, string ext, string path)
 
     if(ext.compare("off") == 0)
     {
-        //vcg::tri::io::ExporterOFF<MyMesh>::Save(*this,fileName.c_str());
+        // tri::io::ExporterOFF<MyMesh>::Save(*this,fileName.c_str());
     }
     else if(ext.compare("ply") == 0)
     {
         printf("PlyFile: to do SaveModel\n"); fflush(0);
            //model.Clear();
-           //vcg::tri::io::ImporterPLY<MyMesh>::Open(model,fileName.toStdString().c_str());
+           // tri::io::ImporterPLY<MyMesh>::Open(model,fileName.toStdString().c_str());
            //gpUpdateNormals(model, false);
            //loadedModel = true;
     }
@@ -70,7 +70,7 @@ void Geometry::saveModel(string fileName, string name, string ext, string path)
         m_.modeloOriginal.Clear();
         m_.dynCage.Clear();
         m_.cage.Clear();
-        //vcg::tri::io::ImporterOBJ<MyMesh>::Open(model,fileName.toStdString().c_str());
+        // tri::io::ImporterOBJ<MyMesh>::Open(model,fileName.toStdString().c_str());
         gpUpdateNormals(m_.modeloOriginal, false);
         loadedModel = true;
         */
@@ -96,11 +96,11 @@ void Geometry::loadModel(string fileName, string name, string ext, string path)
 	if(ext.compare("obj") == 0)
     {
 		/*
-		vcg::tri::io::ImporterOBJ<MyMesh>::Info infoImp;
-		vcg::tri::io::ImporterOBJ<MyMesh>::Open(*this,fileName.c_str(), infoImp);
+		 tri::io::ImporterOBJ<MyMesh>::Info infoImp;
+		 tri::io::ImporterOBJ<MyMesh>::Open(*this,fileName.c_str(), infoImp);
 
-		vcg::tri::UpdateTopology<MyMesh>::VertexFace(*this);
-        vcg::tri::UpdateBounding<MyMesh>::Box(*this);
+		 tri::UpdateTopology<MyMesh>::VertexFace(*this);
+         tri::UpdateBounding<MyMesh>::Box(*this);
 
         gpUpdateNormals(*this, true);
         dirtyFlag = false;
@@ -115,7 +115,7 @@ void Geometry::loadModel(string fileName, string name, string ext, string path)
     else if(ext.compare("ply") == 0)
     {
            //model.Clear();
-           //vcg::tri::io::ImporterPLY<MyMesh>::Open(model,fileName.toStdString().c_str());
+           // tri::io::ImporterPLY<MyMesh>::Open(model,fileName.toStdString().c_str());
            //gpUpdateNormals(model, false);
            //loadedModel = true;
     }
@@ -126,7 +126,7 @@ void Geometry::loadModel(string fileName, string name, string ext, string path)
         m_.modeloOriginal.Clear();
         m_.dynCage.Clear();
         m_.cage.Clear();
-        //vcg::tri::io::ImporterOBJ<MyMesh>::Open(model,fileName.toStdString().c_str());
+        // tri::io::ImporterOBJ<MyMesh>::Open(model,fileName.toStdString().c_str());
         gpUpdateNormals(m_.modeloOriginal, false);
         loadedModel = true;
         */

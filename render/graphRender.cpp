@@ -20,10 +20,10 @@ void GraphRender::drawFunc(object* obj)
 	{
 		for(int con = 0; con < geom->nodes[node]->connections.size(); con++)
 		{
-			glVertex3f(geom->nodes[node]->position.X(),geom->nodes[node]->position.Y(),geom->nodes[node]->position.Z());
-			glVertex3f( geom->nodes[node]->connections[con]->position.X(),
-						geom->nodes[node]->connections[con]->position.Y(),
-						geom->nodes[node]->connections[con]->position.Z());
+			glVertex3f(geom->nodes[node]->position.x(),geom->nodes[node]->position.y(),geom->nodes[node]->position.z());
+			glVertex3f( geom->nodes[node]->connections[con]->position.x(),
+						geom->nodes[node]->connections[con]->position.y(),
+						geom->nodes[node]->connections[con]->position.z());
 		}
 	}
 	glEnd();
@@ -42,7 +42,7 @@ void GraphRender::drawFunc(object* obj)
 		if(colors.size() > 0 && colors[pIdx].size()== 3)
 			glColor4f(colors[pIdx][0], colors[pIdx][1], colors[pIdx][2], 1.0);
 
-		glVertex3f(geom->nodes[vi]->position.X(),geom->nodes[vi]->position.Y(),geom->nodes[vi]->position.Z());
+		glVertex3f(geom->nodes[vi]->position.x(),geom->nodes[vi]->position.y(),geom->nodes[vi]->position.z());
 	}
 	glEnd();
 	glEnable(GL_LIGHTING);

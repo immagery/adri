@@ -43,7 +43,7 @@ bool MVCDeformer::processCoords()
 {
 	/*
     targetModel->Clear();
-    vcg::tri::Append<MyMesh, MyMesh>::Mesh(*targetModel,*sourceModel, false);
+     tri::Append<MyMesh, MyMesh>::Mesh(*targetModel,*sourceModel, false);
 
     string sMVCSavedGrid = sourceModel->sModelPath;
     sMVCSavedGrid.append("/").append(sourceModel->sName).append("_").append(MVC_COMP_FILE_NAME);
@@ -105,7 +105,7 @@ bool HCDeformer::processCoords()
         return false;
 
     targetModel->Clear();
-    vcg::tri::Append<MyMesh, MyMesh>::Mesh(*targetModel,*sourceModel, false);
+     tri::Append<MyMesh, MyMesh>::Mesh(*targetModel,*sourceModel, false);
 
     //unsigned int resolution = pow(2,7);
     unsigned int resolution = (int)pow(2.0,7);
@@ -172,7 +172,7 @@ bool GCDeformer::processCoords()
         return false;
 
     targetModel->Clear();
-    vcg::tri::Append<MyMesh, MyMesh>::Mesh(*targetModel,*sourceModel, false); // Quizás no funciona porque no es exactamente MyMesh
+     tri::Append<MyMesh, MyMesh>::Mesh(*targetModel,*sourceModel, false); // Quizás no funciona porque no es exactamente MyMesh
 
     string sGCSavedCoords = sourceModel->sModelPath;
     sGCSavedCoords.append("/").append(sourceModel->sName).append("_").append(GC_COMP_FILE_NAME);

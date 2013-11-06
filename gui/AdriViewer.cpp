@@ -246,7 +246,7 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
 				   
 				   //((joint*)skt->joints[j])->qrot.ToEulerAngles(alfa,beta,gamma);
 
-				  /* vcg::Quaternion<double> qAux(((joint*)skt->joints[j])->qrot.W(), 
+				  /*  Quaternion<double> qAux(((joint*)skt->joints[j])->qrot.W(), 
 												((joint*)skt->joints[j])->qrot.X(),
 												((joint*)skt->joints[j])->qrot.Y(),
 												((joint*)skt->joints[j])->qrot.Z());*/
@@ -1441,7 +1441,7 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
                m->shading->colors[count].resize(3);
                Eigen::Vector3d pt = vi->P();
 
-               Point3i idx = grRend->grid->cellId(pt);
+               Vector3i idx = grRend->grid->cellId(pt);
 
                float value = 0;
 

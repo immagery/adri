@@ -531,7 +531,7 @@ bool Modelo::processGreenCoordinates()
 {
 
     newModeloGC.Clear();
-    vcg::tri::Append<MyMesh, MyMesh>::Mesh(newModeloGC,modeloOriginal, false);
+     tri::Append<MyMesh, MyMesh>::Mesh(newModeloGC,modeloOriginal, false);
 
     string sGCSavedCoords = sModelPath;
     sGCSavedCoords.append("/").append(name).append("_").append(GC_COMP_FILE_NAME);
@@ -558,7 +558,7 @@ bool Modelo::processGreenCoordinates()
 bool Modelo::processHarmonicCoordinates()
 {
     newModeloHC.Clear();
-    vcg::tri::Append<MyMesh, MyMesh>::Mesh(newModeloHC,modeloOriginal, false);
+     tri::Append<MyMesh, MyMesh>::Mesh(newModeloHC,modeloOriginal, false);
 
     //unsigned int resolution = pow(2,7);
     unsigned int resolution = pow(2,7);
@@ -587,7 +587,7 @@ bool Modelo::processHarmonicCoordinates()
 bool Modelo::processMeanValueCoordinates()
 {
     newModeloMVC.Clear();
-    vcg::tri::Append<MyMesh, MyMesh>::Mesh(newModeloMVC,modeloOriginal, false);
+     tri::Append<MyMesh, MyMesh>::Mesh(newModeloMVC,modeloOriginal, false);
 
     string sMVCSavedGrid = sModelPath;
     sMVCSavedGrid.append("/").append(name).append("_").append(MVC_COMP_FILE_NAME);

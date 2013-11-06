@@ -188,7 +188,7 @@ void PointData::clear()
 
     // TO DEBUG
     //vertexContainer;
-    //Point3f color;
+    //Vector3f color;
     color = Eigen::Vector3f(0,0,0);
 
     // No tocaria

@@ -151,7 +151,7 @@ void Skinning::computeDeformations(const vector< skeleton* >& skeletons) {
 				PointData data = b->pointData[k];
 				GraphNode* node = data.node;
 				int vertexID = node->id;
-				Point3d finalPosition (0,0,0);
+				Vector3d finalPosition (0,0,0);
 				float totalWeight = 0;
 				for (int kk = 0; kk < data.influences.size(); ++kk) {   // and check all joints associated to them
 					int skID = data.influences[kk].label;
@@ -163,10 +163,10 @@ void Skinning::computeDeformations(const vector< skeleton* >& skeletons) {
 							{
 							//joint* joint = skeletons[s]->joints[t];
 							//if (joint->nodeId == skID) {
-								Point3d restPosition = originalModels[i]->nodes[vertexID]->position;
+								Vector3d restPosition = originalModels[i]->nodes[vertexID]->position;
 								MatrixXf restPos(4,1); restPos << restPosition.X(), restPosition.Y(), restPosition.Z(), 1;
 								MatrixXf finalPos =  joint->W * joint->iT * restPos;
-								finalPosition = finalPosition + Point3d(finalPos(0,0), finalPos(1,0), finalPos(2,0)) * data.influences[kk].weightValue;
+								finalPosition = finalPosition + Vector3d(finalPos(0,0), finalPos(1,0), finalPos(2,0)) * data.influences[kk].weightValue;
 								totalWeight += data.influences[kk].weightValue;
 								break;
 							}
@@ -273,7 +273,7 @@ void Skinning::computeDeformationsWithSW(const vector< skeleton* >& skeletons) {
 								//double val01,val02,val03;
 								//jo->childs[jointChild]->qrot.ToEulerAngles(val01,val02,val03);
 
-								//vcg::Quaternion<double> quatAuxInt = vcg::Quaternion<double>(cos(twist/2),0,0,0);
+								// Quaternion<double> quatAuxInt =  Quaternion<double>(cos(twist/2),0,0,0);
 								//quatAux += quatAuxInt * data.secondInfluences[kk][jointChild];
 								twistInterpolation += twist*(1-data.secondInfluences[kk][jointChild]);
 
@@ -294,8 +294,8 @@ void Skinning::computeDeformationsWithSW(const vector< skeleton* >& skeletons) {
 					//		printf("Esta es la interpolacion %f.\n", twistInterpolation); fflush(0);
 						//}
 
-						//vcg::Quaternion<float> quatAux = vcg::Quaternion<float>(cos(twistInterpolation/2),0,0,0);
-						//vcg::Quaternion<float> quatAux = vcg::Quaternion<float>(1,0,0,0);
+						// Quaternion<float> quatAux =  Quaternion<float>(cos(twistInterpolation/2),0,0,0);
+						// Quaternion<float> quatAux =  Quaternion<float>(1,0,0,0);
 
 						//Matrix44f twistMatrix;
 						//quatAux.Normalize();
@@ -321,7 +321,7 @@ void Skinning::computeDeformationsWithSW(const vector< skeleton* >& skeletons) {
 						//m = AngleAxisf(twistInterpolation, Vector3f::UnitX());
 						//Vector3f pruebas = Vector3f::UnitX();
 						//pruebas += Vector3f(rotDir.X(),rotDir.Y(),rotDir.Z());
-						//rotDir = Point3d(1.000, 0.0, 0.0);
+						//rotDir = Vector3d(1.000, 0.0, 0.0);
 						
 						//Vector3f pruebas(1.0,0,0); 
 						//AngleAxisf(twistInterpolation, pruebas);
@@ -348,7 +348,7 @@ void Skinning::computeDeformationsWithSW(const vector< skeleton* >& skeletons) {
 
 						float weight = data.influences[kk].weightValue;
 						finalPosition = finalPosition + Eigen::Vector3d(finalPos(0), finalPos(1), finalPos(2)) * weight;
-						//finalPosition = finalPosition + Point3d(finalPos(0), auxPos(1), auxPos(2)) * weight;
+						//finalPosition = finalPosition + Vector3d(finalPos(0), auxPos(1), auxPos(2)) * weight;
 
 						totalWeight += data.influences[kk].weightValue;
 					}

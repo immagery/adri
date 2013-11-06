@@ -26,7 +26,7 @@ public:
     object(Eigen::Vector3d _pos);
 
 	object(Eigen::Vector3d _pos, Eigen::Quaternion<double> _qrot);
-    //object(vcg::Eigen::Vector3d _pos, vcg::Eigen::Vector3d _rot);
+    //object( Eigen::Vector3d _pos,  Eigen::Vector3d _rot);
 
     // transformation functions
     void resetTransformation();
@@ -63,6 +63,6 @@ public:
 
 };
 
-void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle);
+//void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle);
 
 #endif // OBJECT_H

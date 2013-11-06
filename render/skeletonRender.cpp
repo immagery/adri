@@ -324,13 +324,9 @@ void JointRender::computeRestPosRec(joint* jt, joint* father)
 	Eigen::Matrix3d rotationMatrix;
 	if(!father)
 	{
-		jt->rTranslation = Eigen::Vector3d(jt->pos.X(), jt->pos.Y(), jt->pos.Z());
-		
-		vcg::Quaternion<double> qAuxTemp;
-		qAuxTemp.FromEulerAngles(0,0,90);
-		
-		Eigen::Quaterniond or(jt->qOrient[0], jt->qOrient[1], jt->qOrient[2], jt->qOrient[3]);
-		Eigen::Quaterniond rot(jt->qrot[0], jt->qrot[1], jt->qrot[2], jt->qrot[3]);
+		jt->rTranslation = jt->pos;
+		Eigen::Quaterniond or = jt->qOrient;
+		Eigen::Quaterniond rot = jt->qrot;
 		
 		jt->rRotation = rot * or;
 
@@ -339,10 +335,10 @@ void JointRender::computeRestPosRec(joint* jt, joint* father)
 	else
 	{
 		jt->rTranslation = father->rTranslation + 
-						   father->rRotation._transformVector(Eigen::Vector3d(jt->pos.X(), jt->pos.Y(), jt->pos.Z()));
+						   father->rRotation._transformVector(jt->pos);
 		
-		Eigen::Quaterniond or(jt->qOrient[0], jt->qOrient[1], jt->qOrient[2], jt->qOrient[3]);
-		Eigen::Quaterniond rot(jt->qrot[0], jt->qrot[1], jt->qrot[2], jt->qrot[3]);
+		Eigen::Quaterniond or = jt->qOrient;
+		Eigen::Quaterniond rot = jt->qrot;
 		
 		jt->rRotation =  father->rRotation * rot * or;
 
@@ -363,7 +359,7 @@ void JointRender::computeRestPosRec(joint* jt, joint* father)
 	transformMatrix2.transposeInPlace();
 	jt->iT = transformMatrix2.inverse().transpose();
 	
-	jt->worldPosition = Point3d(jt->rTranslation[0],jt->rTranslation[1],jt->rTranslation[2]);
+	jt->worldPosition = jt->rTranslation;
 
 	for(unsigned int i = 0; i< jt->childs.size(); i++)
     {

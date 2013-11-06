@@ -5,6 +5,8 @@
 #include <Eigen/Geometry>
 #include <Eigen/Core>
 
+using namespace Eigen;
+
 object::object() : node()
 {
     pos = Eigen::Vector3d(0,0,0);
@@ -45,7 +47,7 @@ object::object(Eigen::Vector3d _pos) : node()
 }
 
 /*
-object::object(vcg::Eigen::Vector3d _pos, vcg::Eigen::Vector3d _rot) : node()
+object::object( Eigen::Vector3d _pos,  Eigen::Vector3d _rot) : node()
 {
     pos = Eigen::Vector3d(_pos);
     //rot = Eigen::Vector3d(_rot);
@@ -83,7 +85,7 @@ void object::resetTransformation()
 void object::setTranslation(double tx, double ty, double tz)
 {
     // Aplicar la rotación, creo que hay que hacerlo con una multiplicacion.
-    pos = Point3d(tx, ty, tz);
+    pos = Vector3d(tx, ty, tz);
     dirtyFlag = true;
 }
 
@@ -94,6 +96,7 @@ void object::addTranslation(double tx, double ty, double tz)
     dirtyFlag = true;
 }
 
+/*
 void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
 {
 	// extract the rest of turns
@@ -166,6 +169,7 @@ void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
 	}
 	
 }
+*/
 
 void object::setRotation(double rx, double ry, double rz, bool radians)
 {
@@ -191,7 +195,7 @@ void object::setRotation(double rx, double ry, double rz, bool radians)
 	Eigen::Quaterniond qrotAux =  q[2] * q[1] * q[0];
 
 	// TOFIX: remove eigen rotations
-	qrot = qrotAux; //vcg::Quaternion<double>(qrotAux.w(), qrotAux.x(),qrotAux.y(),qrotAux.z());
+	qrot = qrotAux; // Quaternion<double>(qrotAux.w(), qrotAux.x(),qrotAux.y(),qrotAux.z());
 
 	int test = 0;
 }

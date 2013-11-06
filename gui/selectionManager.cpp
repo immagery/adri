@@ -28,7 +28,7 @@ void selectionManager::drawFunc()
 bool selectionManager::update()
 {
 	/*
-    Point3d selCenter(0,0,0);
+    Vector3d selCenter(0,0,0);
     bool loaded = false;
     int elements = 0;
 
