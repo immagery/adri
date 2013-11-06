@@ -5,6 +5,8 @@
 #include <render/shadingNode.h>
 #include "Node.h"
 
+#include <Eigen\Dense>
+
 using namespace std;
 using namespace vcg;
 
@@ -26,7 +28,10 @@ public:
     // transformation functions
     void resetTransformation();
     virtual void addTranslation(double tx, double ty, double tz);
+	virtual void setTranslation(double tx, double ty, double tz);
     virtual void addRotation(double rx, double ry, double rz);
+	virtual void setRotation(double rx, double ry, double rz, bool radians = true);
+	
 	virtual void addRotation(vcg::Quaternion<double> q);
 
     // node info propagation specification
@@ -54,5 +59,7 @@ public:
     shadingNode* shading;
 
 };
+
+void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle);
 
 #endif // OBJECT_H

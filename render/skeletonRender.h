@@ -31,7 +31,7 @@ class JointRender : public shadingNode
 		void computeWorldPos(joint* jt);
 		void computeWorldPosRec(joint* jt, joint* father);
 		void computeRestPos(joint* jt);
-		void computeRestPosRec(joint* jt);
+		void computeRestPosRec(joint* jt, joint* father = NULL);
 
 		static float jointSize;
 };

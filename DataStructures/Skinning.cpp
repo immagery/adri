@@ -123,7 +123,10 @@ void Skinning::computeRestPositions(const vector< skeleton* >& skeletons) {
 
 	//for (int i = 0; i < skeletons.size(); ++i)
 	// This should only be done on the newly added skeleton!
-	skeletons[skeletons.size()-1]->joints[0]->computeRestPos();
+	for(int i = 0; i< skeletons.size(); i++)
+	{
+		skeletons[i]->root->computeRestPos();
+	}
 
 	printf(" done\n");
 }

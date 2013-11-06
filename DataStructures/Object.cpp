@@ -80,6 +80,13 @@ void object::resetTransformation()
     dirtyFlag = true;
 }
 
+void object::setTranslation(double tx, double ty, double tz)
+{
+    // Aplicar la rotación, creo que hay que hacerlo con una multiplicacion.
+    pos = Point3d(tx, ty, tz);
+    dirtyFlag = true;
+}
+
 void object::addTranslation(double tx, double ty, double tz)
 {
     // Aplicar la rotación, creo que hay que hacerlo con una multiplicacion.
@@ -106,7 +113,7 @@ void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
 	Eigen::Vector3d v, Axis2, Axis3;
 	switch(axis)
 	{
-	case 2: // over X
+	case 0: // over X
 		Axis2 << 0,1,0;
 		Axis3 << 0,0,1;
 	break;
@@ -114,7 +121,7 @@ void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
 		Axis2 << 0,0,1;
 		Axis3 << 1,0,0;
 	break;
-	case 0: // over Z
+	case 2: // over Z
 		Axis2 << 1,0,0;
 		Axis3 << 0,1,0;
 	break;
@@ -126,8 +133,7 @@ void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
 	{
 		if(a == 180)
 		{
-			q = Eigen::Quaterniond().setFromTwoVectors(Axis2, Axis3) * 
-				Eigen::Quaterniond().setFromTwoVectors(Axis3, -Axis2);
+			q = Eigen::Quaterniond().setFromTwoVectors(Axis3, -Axis2) * Eigen::Quaterniond().setFromTwoVectors(Axis2, Axis3);
 		}
 		else if(a < 180)
 		{
@@ -135,17 +141,17 @@ void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
 		}
 		else if(a > 180)
 		{
-			q = Eigen::Quaterniond().setFromTwoVectors(Axis2, Axis3) * 
-				Eigen::Quaterniond().setFromTwoVectors(Axis3, -Axis2) *
-				Eigen::Quaterniond().setFromTwoVectors(-Axis2, v);
+			q = Eigen::Quaterniond().setFromTwoVectors(-Axis2, v) * 
+				Eigen::Quaterniond().setFromTwoVectors(Axis3, -Axis2) * 
+				Eigen::Quaterniond().setFromTwoVectors(Axis2, Axis3);
 		}
 	}
 	else
 	{
 		if(a == -180)
 		{
-			q = Eigen::Quaterniond().setFromTwoVectors(Axis2, -Axis3) * 
-				Eigen::Quaterniond().setFromTwoVectors(-Axis3, -Axis2);
+			q = Eigen::Quaterniond().setFromTwoVectors(-Axis3, -Axis2) *
+				Eigen::Quaterniond().setFromTwoVectors(Axis2, -Axis3);
 		}
 		else if(a > -180)
 		{
@@ -153,12 +159,41 @@ void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
 		}
 		else if(a > -360)
 		{
-			q = Eigen::Quaterniond().setFromTwoVectors(Axis2, -Axis3) * 
+			q = Eigen::Quaterniond().setFromTwoVectors(-Axis2, v) *
 				Eigen::Quaterniond().setFromTwoVectors(-Axis3, -Axis2) *
-				Eigen::Quaterniond().setFromTwoVectors(-Axis2, v);
+				Eigen::Quaterniond().setFromTwoVectors(Axis2, -Axis3);
 		}
 	}
 	
+}
+
+void object::setRotation(double rx, double ry, double rz, bool radians)
+{
+	Eigen::Quaterniond q[3];
+	double angles[3];
+
+	angles[0] = rx;
+	angles[1] = ry;
+	angles[2] = rz;
+
+	if(radians)
+	{
+		// Convert to degrees
+		for(int i = 0; i< 3; i++)
+			angles[i] = angles[i]*360/(M_PI*2);
+	}
+
+	// Rotation over each axis
+	for(int i = 0; i< 3; i++)
+		getAxisRotationQuaternion(q[i], i, angles[i]);
+
+	// Concatenate all the values in X-Y-Z order
+	Eigen::Quaterniond qrotAux =  q[2] * q[1] * q[0];
+
+	// TOFIX: remove eigen rotations
+	qrot = vcg::Quaternion<double>(qrotAux.w(), qrotAux.x(),qrotAux.y(),qrotAux.z());
+
+	int test = 0;
 }
 
 void object::addRotation(double rx, double ry, double rz)
@@ -184,8 +219,12 @@ void object::addRotation(double rx, double ry, double rz)
 	getAxisRotationQuaternion(qZ, 2, rz);
 
 	Eigen::Quaterniond qrotAux =  qZ * qY * qX;
-	Eigen::Quaterniond qrotAux2 = qrotAux* Eigen::Quaterniond(qrot.W(), qrot.X(), qrot.Y(), qrot.Z());
-	qrot = vcg::Quaternion<double>(qrotAux2.x(),qrotAux2.y(),qrotAux2.z(),qrotAux2.w());
+	Eigen::Quaterniond qrotAux2 = qrotAux* Eigen::Quaterniond(qrot.X(), qrot.Y(), qrot.Z(), qrot.W());
+	qrot = vcg::Quaternion<double>(qrotAux2.w(),qrotAux2.x(),qrotAux2.y(),qrotAux2.z());
+
+	vcg::Quaternion<double> temp(1,0,0,0);
+
+
 	dirtyFlag = true;
 
 }

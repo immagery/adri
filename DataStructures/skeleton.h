@@ -69,7 +69,8 @@ class joint : public object
         // GETTERS & SETTERS
         void setJointOrientation(double ojX,
                                  double  ojY,
-                                 double  ojZ);
+                                 double  ojZ,
+								 bool radians = false);
 
         void setWorldPosition(Point3d pos);
         Point3d getJointOrientation();
