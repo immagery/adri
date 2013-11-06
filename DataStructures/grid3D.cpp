@@ -10,7 +10,6 @@
 #include <fstream>
 
 using namespace std;
-using namespace vcg;
 
 int findWeight(vector<weight>& weights, int label)
 {
@@ -293,7 +292,7 @@ grid3d::grid3d()
     initBasicData();
 }
 
-void grid3d::initwithNoData(Box3d bounding_, Eigen::Vector3i divisions)
+void grid3d::initwithNoData(MyBox3 bounding_, Eigen::Vector3i divisions)
 {
 	initBasicData();
 
@@ -333,9 +332,7 @@ void grid3d::initwithNoData(Box3d bounding_, Eigen::Vector3i divisions)
 
 Eigen::Vector3d grid3d::getCenterOfCell(int i, int j, int k)
 {
-	// TOFIX
-	Eigen::Vector3d min(bounding.min.X(), bounding.min.Y(), bounding.min.Z());
-	return min + Eigen::Vector3d(((float)i+0.5)*cellSize, ((float)j+0.5)*cellSize,((float)k+0.5)*cellSize);
+	return bounding.min + Eigen::Vector3d(((float)i+0.5)*cellSize, ((float)j+0.5)*cellSize,((float)k+0.5)*cellSize);
 }
 
 void interpolateLinear(vector<weight>& result, vector<weight>& ptminWeights, vector<weight>& ptmaxWeights, float interpolationValue)
@@ -776,7 +773,7 @@ void grid3d::getCoordsFromPoint(Eigen::Vector3d& pt, vector<weight>& weights)
 	}
 }
 
-void grid3d::init(Box3d bounding_, Eigen::Vector3i divisions, int _weightsSize)
+void grid3d::init(MyBox3 bounding_, Eigen::Vector3i divisions, int _weightsSize)
 {
 	initBasicData();
 
@@ -813,7 +810,7 @@ void grid3d::init(Box3d bounding_, Eigen::Vector3i divisions, int _weightsSize)
     cellSize = bounding.DimX()/divisions.x();
 }
 
-grid3d::grid3d(Box3d bounding_, Eigen::Vector3i divisions, int _weightsSize)
+grid3d::grid3d(MyBox3 bounding_, Eigen::Vector3i divisions, int _weightsSize)
 {
     // comprobamos que las dimensiones tengan sentido
     assert(divisions.x() != 0 || divisions.y() != 0 || divisions.z() != 0);
@@ -1725,9 +1722,7 @@ int grid3d::typeCells(MyMesh& mesh)
 
 Eigen::Vector3i grid3d::cellId(Eigen::Vector3d pt)
 {
-	// TOFIX
-
-    Eigen::Vector3d aux = pt - Eigen::Vector3d(bounding.min.X(), bounding.min.Y(), bounding.min.Z());
+    Eigen::Vector3d aux = pt - bounding.min;
     int x = (int)floor(aux.x()/cellSize);
     int y = (int)floor(aux.y()/cellSize);
     int z = (int)floor(aux.z()/cellSize);
@@ -1736,8 +1731,7 @@ Eigen::Vector3i grid3d::cellId(Eigen::Vector3d pt)
 
 Eigen::Vector3d grid3d::cellCenter(int i,int j,int k)
 {
-	// TOFIX
-    Eigen::Vector3d aux = Eigen::Vector3d(bounding.min.X(), bounding.min.Y(), bounding.min.Z());
+    Eigen::Vector3d aux = bounding.min;
     aux += Eigen::Vector3d(cellSize*(i+0.5),cellSize*(j+0.5),cellSize*(k+0.5));
     return aux;
 }
@@ -2201,10 +2195,7 @@ void grid3d::LoadGridFromFile(string sFileName)
         Eigen::Vector3d minPt,maxPt ;
         myfile.read( (char*) &minPt, sizeof(double)*3);
         myfile.read( (char*) &maxPt, sizeof(double)*3);
-		// TOFIX
-		Point3d minPtt(minPt.x(), minPt.y(), minPt.z());
-		Point3d maxPtt(maxPt.x(), maxPt.y(), maxPt.z());
-        bounding = Box3d(minPtt, maxPtt);
+        bounding = MyBox3(minPt, maxPt);
 
         myfile.read( (char*) &valueRange, sizeof(float));
 

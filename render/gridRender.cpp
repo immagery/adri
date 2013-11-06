@@ -165,9 +165,7 @@ void gridRenderer::drawFunc(object* obj)
                     for(int k = 0; k< grid->dimensions.z(); k++)
                     {
                         cell3d* cell = grid->cells[i][j][k];
-						// TOFIX
-						Eigen::Vector3d min (grid->bounding.min.X(), grid->bounding.min.Y(), grid->bounding.min.Z());
-                        Eigen::Vector3d o(min + Eigen::Vector3d(i,j,k)*grid->cellSize + Eigen::Vector3d(0.5,0.5,0.5)*grid->cellSize);
+                        Eigen::Vector3d o(grid->bounding.min + Eigen::Vector3d(i,j,k)*grid->cellSize + Eigen::Vector3d(0.5,0.5,0.5)*grid->cellSize);
 
 						if(cell->getType() != EXTERIOR)
                         {
@@ -219,9 +217,9 @@ void gridRenderer::drawFunc(object* obj)
         {
             if(sliceValuesXY.size() != 0 && sliceValuesXZ.size() != 0)
             {
-                float incremento = (grid->bounding.max.Z()-grid->bounding.min.Z())/grid->dimensions.z();
+                float incremento = (grid->bounding.max.z()-grid->bounding.min.z())/grid->dimensions.z();
                 float posZ = incremento*XYValue/2;
-                Eigen::Vector3f orig(grid->bounding.min.X(), grid->bounding.min.Y(), grid->bounding.min.Z());
+                Eigen::Vector3f orig(grid->bounding.min.x(), grid->bounding.min.y(), grid->bounding.min.z());
                 orig = orig + Eigen::Vector3f(0,0, posZ);
 
                 Eigen::Vector3f dir1(incremento,0,0);
@@ -238,9 +236,9 @@ void gridRenderer::drawFunc(object* obj)
                     }
                 }
 
-                incremento = (grid->bounding.max.Y()-grid->bounding.min.Y())/grid->dimensions.y();
+                incremento = (grid->bounding.max.y()-grid->bounding.min.y())/grid->dimensions.y();
                 float posY = incremento*XZValue/2;
-                orig = Eigen::Vector3f(grid->bounding.min.X(), grid->bounding.min.Y(), grid->bounding.min.Z());
+                orig = Eigen::Vector3f(grid->bounding.min.x(), grid->bounding.min.y(), grid->bounding.min.z());
                 orig = orig + Eigen::Vector3f(0,posY,0);
 
                 dir1 = Eigen::Vector3f(incremento,0,0);

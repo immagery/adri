@@ -8,7 +8,7 @@
 
 //#include <wrap/io_trimesh/import.h>
 //#include <wrap/io_trimesh/export.h>
-#include "wrap/gl/trimesh.h"
+//#include "wrap/gl/trimesh.h"
 
 #include <DataStructures/Modelo.h> 
 

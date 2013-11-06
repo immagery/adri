@@ -8,8 +8,6 @@
 #include <DataStructures/object.h>
 #include <stdio.h>
 
-using namespace vcg;
-
 enum visualizatoinMode {VIS_WEIGHTS_ONPLANE = 0, VIS_DISTANCES};
 
 #define XY_PLANE false

@@ -8,9 +8,12 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <map>
+
+#include "Box3.h"
 
 using namespace std;
-using namespace vcg;
+//using namespace vcg;
 
 class skeleton;
 
@@ -252,10 +255,10 @@ public:
     // constructor
     grid3d();
 
-    grid3d(Box3d bounding, Eigen::Vector3i divisions, int weightsSize);
+    grid3d(MyBox3 bounding, Eigen::Vector3i divisions, int weightsSize);
 
-    void initwithNoData(Box3d bounding_, Eigen::Vector3i divisions);
-    void init(Box3d bounding, Eigen::Vector3i divisions, int weightsSize);
+    void initwithNoData(MyBox3 bounding_, Eigen::Vector3i divisions);
+    void init(MyBox3 bounding, Eigen::Vector3i divisions, int weightsSize);
 
 	void getCoordsFromPoint(Eigen::Vector3d& pt, vector<weight>& weights);
 	void getCoordsFromPointSimple(Eigen::Vector3d& pt, vector<weight>& weights);
@@ -279,7 +282,8 @@ public:
     int res;
 
     // Bounding box del grid (vcg)
-    Box3d bounding;
+    //Box3d bounding;
+	MyBox3 bounding;
 
     // Numero de vertices representados en el grid
     int weightSize;

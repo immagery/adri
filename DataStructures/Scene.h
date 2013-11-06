@@ -34,7 +34,7 @@ class defInfo
 	public:
 
 	int id;
-	Point3d position;
+	Eigen::Vector3d position;
 	float smooth;
 	float expansion;
 	int relation[2];
@@ -44,7 +44,7 @@ class defInfo
 		id = -1;
 		smooth = 1;
 		expansion = 1;
-		position = Point3d(0,0,0);
+		position = Eigen::Vector3d(0,0,0);
 		relation[0] = -1;
 		relation[1] = -1;
 	}
@@ -223,7 +223,7 @@ class scene
 class camera : object
 {
     public:
-        vcg::Point3d target;
+        Eigen::Vector3d target;
 };
 
 #endif // SCENE_H

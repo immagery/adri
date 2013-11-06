@@ -465,8 +465,8 @@ void BuildSurfaceGraphs(Modelo& m, vector<binding*>& bindings)
     //for(fj = m.face.begin(); fj!=m.face.end(); ++fj )
 	for(int fj = 0; fj < m.triangles.size(); fj++ )
 	{
-        vcg::Point3d O, c, s;
-        vcg::Point3i idVerts;
+        Eigen::Vector3d O, c, s;
+        Eigen::Vector3i idVerts;
         for(int i = 0; i<3; i++) // Obtenemos los indices de los vertices de t
 			idVerts[i] = m.triangles[fj]->verts[i]->id;
 

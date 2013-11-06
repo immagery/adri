@@ -48,7 +48,6 @@
 #include <QtCore/QTextStream>
 
 using namespace qglviewer;
-using namespace vcg;
 
 AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::WindowFlags flags)
         : QGLViewer(parent, shareWidget, flags)
@@ -893,7 +892,7 @@ void AdriViewer::drawSceneGrid(int lines, double width) {
 
 void AdriViewer::startManipulation()
 {
-  Vec averagePosition;
+  /*Vec averagePosition;
   ManipulatedFrameSetConstraint* mfsc = (ManipulatedFrameSetConstraint*)(manipulatedFrame()->constraint());
   mfsc->clearSet();
 
@@ -904,7 +903,7 @@ void AdriViewer::startManipulation()
     }
 
   if (selection_.size() > 0)
-    manipulatedFrame()->setPosition(averagePosition / selection_.size());
+    manipulatedFrame()->setPosition(averagePosition / selection_.size());*/
 }
 
 //   S e l e c t i o n   t o o l s
@@ -1058,8 +1057,8 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
 }
 
 
- void AdriViewer::loadSelectVertexCombo(MyMesh& cage)
- {
+ //void AdriViewer::loadSelectVertexCombo(MyMesh& cage)
+ //{
      //QString vertName("Vertice %1");
      //parent->ui->selectElementComboLabel->setText("Vertices de la caja");
 
@@ -1069,7 +1068,7 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
      //    parent->ui->selectElementCombo->addItem(vertName.arg(idx), QVariant(idx++));
 
      //connect(parent->ui->selectElementCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeVertexSelection(int)));
- }
+ //}
 
  void AdriViewer::changeVertexSelection(int id)
  {

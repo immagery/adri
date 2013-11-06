@@ -5,11 +5,11 @@
 class Particles : public object {
 public:
 	SurfaceGraph *graph;
-	vector<vector<Point3d> > positions;		// baked simulation
+	vector<vector<Eigen::Vector3d> > positions;		// baked simulation
 
-	vector<Point3d> restPositions;
-	vector<Point3d> currentPositions;
-	vector<Point3d> lastPositions;
+	vector<Eigen::Vector3d> restPositions;
+	vector<Eigen::Vector3d> currentPositions;
+	vector<Eigen::Vector3d> lastPositions;
 
 	double lastTime;
 
@@ -24,7 +24,7 @@ public:
 	void drawFunc();
 	void bake(int maxFrames, double deltaTimePerFrame);
 	void solve(double time);
-	void applyChange(Point3d deltaPos, double deltaTime, int i);
-	Point3d idealRestPosition(int i);
+	void applyChange(Eigen::Vector3d deltaPos, double deltaTime, int i);
+	Eigen::Vector3d idealRestPosition(int i);
 };
 

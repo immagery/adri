@@ -87,6 +87,16 @@ Eigen::Quaternion<double> fromEulerAngles(double alpha, double beta, double gamm
 	return q;
 }
 
+void toEulerAngles(const Eigen::Quaterniond& q, double& alpha, double& beta, double& gamma) {
+	alpha = atan2( 2*(q.w()*q.x() + q.y()*q.z()), 1 - 2*(q.x()*q.x() + q.y()*q.y()) );
+	beta = asin(2*(q.w()*q.y() - q.z()*q.x()));
+	gamma = atan2( 2*(q.w()*q.z() + q.x()*q.y()), 1 - 2*(q.y()*q.y() + q.z()*q.z()) );
+
+	alpha *= 180 / M_PI;
+	beta *= 180 / M_PI;
+	gamma *= 180 / M_PI;
+}
+
 // devuelve el signo del valor de entrada.
 double sign(double v)
 {

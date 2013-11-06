@@ -1,13 +1,6 @@
 #include "Geometry.h"
 #include "..\render\geometryRender.h"
 
-#include <vcg/complex/allocate.h>
-#include <vcg/complex/algorithms/update/normal.h>
-#include <vcg/complex/algorithms/update/bounding.h>
-
-#include <wrap/io_trimesh/import.h>
-#include <wrap/io_trimesh/export.h>
-//#include "wrap/gl/trimesh.h"
 
 Geometry::Geometry() : object()
 {

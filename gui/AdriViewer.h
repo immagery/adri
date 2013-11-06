@@ -190,7 +190,7 @@ public slots:
 	void UpdateVertexSource(int id);
 	void ChangeStillCage(int id);
 	void loadSelectableVertex(Cage* cage);
-	void loadSelectVertexCombo(MyMesh& cage);
+	//void loadSelectVertexCombo(MyMesh& cage);
 	void changeVertexSelection(int id);
 
 	void paintGrid(gridRenderer* grRend);

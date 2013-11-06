@@ -39,6 +39,7 @@ double Deg2Rad(double deg);
 double Rad2Deg(double rad);
 
 Eigen::Quaternion<double> fromEulerAngles(double alpha, double beta, double gamma);
+void toEulerAngles (const Eigen::Quaterniond& q, double& alpha, double& beta, double& gamma);
 void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle);
 
 #endif // UTIL_H

@@ -21,7 +21,7 @@ private :
   QList<DrawObject*> objects_;
 
 public:
-  MyMesh* newCage;
+  //MyMesh* newCage;
   bool transformed;
 
 };

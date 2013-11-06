@@ -854,11 +854,11 @@ void AdriMainWindow::changeTransformRotateAmountX(int x)
         selectedObject = ui->glCustomWidget->selMgr.selection.back();
 
 	if (selectedObject != NULL) {
-		Eigen::Quaternion<double> qaux;
 		rotationX =  Deg2Rad((float)ui->dialX->value()/10.0);
-		// TOFIXqaux.FromEulerAngles(rotationX, rotationY, rotationZ);
+		Eigen::Quaternion<double> qaux = fromEulerAngles( rotationX, rotationY, rotationZ);
+		
 
-		//selectedObject->qrot = qaux;
+		selectedObject->qrot = qaux;
 		selectedObject->dirtyFlag = true;
 		ui->glCustomWidget->escena->skeletons[0]->joints[0]->dirtyFlag = true;
 	}

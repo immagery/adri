@@ -1,6 +1,6 @@
 #include "ioWeights.h"
 
-void saveWeightsToMaya(Geometry* mesh, vector< vector<float> >& meshWeights,vector<string>& names, vector<Point3d>& points, string sFile)
+void saveWeightsToMaya(Geometry* mesh, vector< vector<float> >& meshWeights,vector<string>& names, vector<Eigen::Vector3d>& points, string sFile)
 {
 	//TODO
 	assert(false);

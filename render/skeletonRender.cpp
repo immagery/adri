@@ -328,16 +328,16 @@ void JointRender::computeRestPosRec(joint* jt)
 	//double orientAlpha, orientBeta, orientGamma;
 	//jt->qOrient.ToEulerAngles(orientAlpha, orientBeta, orientGamma);
 
-	Matrix33d orientMatrix;
-	Matrix33d rotateMatrix;
+	Eigen::Matrix3d orientMatrix;
+	Eigen::Matrix3d rotateMatrix;
 	//jt->qOrient.ToMatrix(orientMatrix);
 	//jt->qrot.ToMatrix(rotateMatrix);
-	Matrix33d oriRot =  (rotateMatrix * orientMatrix);
+	Eigen::Matrix3d oriRot =  (rotateMatrix * orientMatrix);
 
 	Eigen::Matrix4d transformMatrix;
-	transformMatrix << oriRot[0][0] , oriRot[0][1] , oriRot[0][2], jt->pos.x(),
-						oriRot[1][0] , oriRot[1][1] , oriRot[1][2], jt->pos.y(),
-						oriRot[2][0] , oriRot[2][1] , oriRot[2][2], jt->pos.z(),
+	transformMatrix << oriRot(0,0) , oriRot(0,1) , oriRot(0,2), jt->pos.x(),
+						oriRot(1,0) , oriRot(1,1) , oriRot(1,2), jt->pos.y(),
+						oriRot(2,0) , oriRot(2,1) , oriRot(2,2), jt->pos.z(),
 						0,				0,				0,			1;
 
 
@@ -495,16 +495,16 @@ void JointRender::computeWorldPosRec(joint* jt, joint* father)
 	//double orientAlpha, orientBeta, orientGamma;
 	//jt->qOrient.ToEulerAngles(orientAlpha, orientBeta, orientGamma);
 
-	Matrix33d orientMatrix;
-	Matrix33d rotateMatrix;
+	Eigen::Matrix3d orientMatrix;
+	Eigen::Matrix3d rotateMatrix;
 	//jt->qOrient.ToMatrix(orientMatrix);
 	//jt->qrot.ToMatrix(rotateMatrix);
-	Matrix33d oriRot =  (rotateMatrix * orientMatrix);
+	Eigen::Matrix3d oriRot =  (rotateMatrix * orientMatrix);
 
 	Eigen::Matrix4f transformMatrix;
-	transformMatrix << oriRot[0][0] , oriRot[0][1] , oriRot[0][2], jt->pos.x(),
-						oriRot[1][0] , oriRot[1][1] , oriRot[1][2], jt->pos.y(),
-						oriRot[2][0] , oriRot[2][1] , oriRot[2][2], jt->pos.z(),
+	transformMatrix << oriRot(0,0) , oriRot(0,1) , oriRot(0,2), jt->pos.x(),
+						oriRot(1,0) , oriRot(1,1) , oriRot(1,2), jt->pos.y(),
+						oriRot(2,0) , oriRot(2,1) , oriRot(2,2), jt->pos.z(),
 						0,				0,				0,			1;
 
 	//double alpha, beta, gamma;
