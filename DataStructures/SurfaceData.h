@@ -10,7 +10,6 @@
 #include "skeleton.h"
 
 using namespace std;
-using namespace vcg;
 
 class symMatrix
 {

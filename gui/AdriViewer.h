@@ -114,7 +114,7 @@ public:
     bool bHComputed;
     bool bMVCComputed;
 
-	Point3d interiorPoint;
+	Eigen::Vector3d interiorPoint;
 
     // Primitives
     //MyMesh simpleCube;
@@ -143,9 +143,9 @@ public:
     vector<float> selectionValuesForColorHC;
     vector<float> selectionValuesForColorMVC;
 
-    Vector2f maxMinGC;
-    Vector2f maxMinHC;
-    Vector2f maxMinMVC;
+    Eigen::Vector2f maxMinGC;
+    Eigen::Vector2f maxMinHC;
+    Eigen::Vector2f maxMinMVC;
 
     vector< vector<QColor> > vertexColorLayers;
 
@@ -209,8 +209,8 @@ public slots:
     //void paintPlaneWithData(bool compute = false);
 	//void setPlaneData(bool drawPlane, int pointPos, int mode, float sliderPos, int orient);
 
-    bool readNodes(vector< string >& nodeNames, vector< Point3d >& nodePoints, QString sFile);
-    bool readPoints(vector< Point3d >& points, QString sFile);
+    bool readNodes(vector< string >& nodeNames, vector< Eigen::Vector3d >& nodePoints, QString sFile);
+    bool readPoints(vector< Eigen::Vector3d >& points, QString sFile);
 
     //void exportWeightsToMaya();
 

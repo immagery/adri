@@ -6,7 +6,10 @@
 #include <Eigen\Core>
 #include <Eigen\Geometry>
 
+#include <vcg/complex/complex.h>
+
 using namespace std;
+using namespace vcg;
 
 // Each element of the scene
 // Contains data of the transformation

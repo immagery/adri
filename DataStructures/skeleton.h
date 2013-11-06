@@ -6,6 +6,7 @@
 #include <Eigen/Dense>
 #include <Eigen/Core>
 
+#include <vcg\math\quaternion.h>
 #include <map>
 
 class DefNode;

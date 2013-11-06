@@ -265,7 +265,7 @@ void Skinning::computeDeformationsWithSW(const vector< skeleton* >& skeletons) {
 
 								double twist, angle1, angle2; 
 								//jo->childs[jointChild]->qrot.ToAxis(twist2,axis);
-								jo->childs[jointChild]->qrot.ToEulerAngles(twist, angle1, angle2);
+								//jo->childs[jointChild]->qrot.ToEulerAngles(twist, angle1, angle2);
 
 								//double val01,val02,val03;
 								//jo->childs[jointChild]->qrot.ToEulerAngles(val01,val02,val03);

@@ -135,7 +135,7 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
 
 	CurrentProcessJoints.clear();
 
-	interiorPoint = Point3d(0,0,0);
+	interiorPoint = Eigen::Vector3d(0,0,0);
 
     //ctxMode = CTX_SELECTION;
 
@@ -244,13 +244,13 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
                                       ((joint*)skt->joints[j])->nodeId);
 
 				   double alfa,beta,gamma;
-				   ((joint*)skt->joints[j])->qrot.ToEulerAngles(alfa,beta,gamma);
+				   /* TOFIX ((joint*)skt->joints[j])->qrot.ToEulerAngles(alfa,beta,gamma);
 				   emit jointTransformationValues(((joint*)skt->joints[j])->pos.X(),
 												  ((joint*)skt->joints[j])->pos.Y(),
 												  ((joint*)skt->joints[j])->pos.Z(),
 												  Rad2Deg(alfa),
 												  Rad2Deg(beta),
-												  Rad2Deg(gamma));
+												  Rad2Deg(gamma)); */
 
                 }
             }
@@ -321,7 +321,7 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
  // Lee una lista de puntos.
 
  bool AdriViewer::readNodes(vector< string >& nodeNames,
-                          vector< Point3d >& nodePoints,
+                          vector< Eigen::Vector3d >& nodePoints,
                           QString sFile)
  {
      nodePoints.clear();
@@ -348,7 +348,7 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
 
          nodeNames[element] = lstr[0].toStdString();
 
-         Point3d pt;
+         Eigen::Vector3d pt;
          for(int i = 0; i< 3; i++)
              pt[i] = lstr[i+1].toDouble();
 
@@ -364,7 +364,7 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
 
 
  // Lee una lista de puntos.
- bool AdriViewer::readPoints(vector< Point3d >& points,
+ bool AdriViewer::readPoints(vector< Eigen::Vector3d >& points,
                            QString sFile)
  {
      points.clear();
@@ -384,7 +384,7 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
          QStringList lstr = str.split(" ");
          assert(lstr.size() == 3);
 
-         Point3d pt;
+         Eigen::Vector3d pt;
          for(int i = 0; i< lstr.size(); i++)
              pt[i] = lstr[i].toDouble();
 
@@ -593,30 +593,30 @@ void AdriViewer::readSkeleton(string fileName)
      // Recomponemos la bounding box de la escena
      for(unsigned int i = 0; i< escena->models.size(); i++)
      {
-         Point3d minAuxPt, maxAuxPt;
+         Eigen::Vector3d minAuxPt, maxAuxPt;
          escena->models[i]->getBoundingBox(minAuxPt, maxAuxPt);
 
 
          if(!init_)
          {
-             minX = minAuxPt.X();
-             minY = minAuxPt.Y();
-             minZ = minAuxPt.Z();
+             minX = minAuxPt.x();
+             minY = minAuxPt.y();
+             minZ = minAuxPt.z();
 
-             maxX = maxAuxPt.X();
-             maxY = maxAuxPt.Y();
-             maxZ = maxAuxPt.Z();
+             maxX = maxAuxPt.x();
+             maxY = maxAuxPt.y();
+             maxZ = maxAuxPt.z();
              init_  = true;
          }
          else
          {
-             minX = min(minAuxPt.X(), minX);
-             minY = min(minAuxPt.Y(), minY);
-             minZ = min(minAuxPt.Y(), minY);
+             minX = min(minAuxPt.x(), minX);
+             minY = min(minAuxPt.y(), minY);
+             minZ = min(minAuxPt.y(), minY);
 
-             maxX = max(maxAuxPt.X(), maxX);
-             maxY = max(maxAuxPt.Y(), maxY);
-             maxZ = max(maxAuxPt.Z(), maxZ);
+             maxX = max(maxAuxPt.x(), maxX);
+             maxY = max(maxAuxPt.y(), maxY);
+             maxZ = max(maxAuxPt.z(), maxZ);
          }
      }
 
@@ -625,29 +625,29 @@ void AdriViewer::readSkeleton(string fileName)
          // TODO
          // Queda mirar esto... lo que tengo previsto es pedir al esqueleto... como con el modelo.
 
-         Point3d minAuxPt, maxAuxPt;
+         Eigen::Vector3d minAuxPt, maxAuxPt;
          escena->skeletons[i]->getBoundingBox(minAuxPt, maxAuxPt);
 
          if(!init_)
          {
-             minX = minAuxPt.X();
-             minY = minAuxPt.Y();
-             minZ = minAuxPt.Z();
+             minX = minAuxPt.x();
+             minY = minAuxPt.y();
+             minZ = minAuxPt.z();
 
-             maxX = maxAuxPt.X();
-             maxY = maxAuxPt.Y();
-             maxZ = maxAuxPt.Z();
+             maxX = maxAuxPt.x();
+             maxY = maxAuxPt.y();
+             maxZ = maxAuxPt.z();
              init_ = true;
          }
          else
          {
-             minX = min(minAuxPt.X(), minX);
-             minY = min(minAuxPt.Y(), minY);
-             minZ = min(minAuxPt.Y(), minY);
+             minX = min(minAuxPt.x(), minX);
+             minY = min(minAuxPt.y(), minY);
+             minZ = min(minAuxPt.y(), minY);
 
-             maxX = max(maxAuxPt.X(), maxX);
-             maxY = max(maxAuxPt.Y(), maxY);
-             maxZ = max(maxAuxPt.Z(), maxZ);
+             maxX = max(maxAuxPt.x(), maxX);
+             maxY = max(maxAuxPt.y(), maxY);
+             maxZ = max(maxAuxPt.z(), maxZ);
          }
      }
 
@@ -786,7 +786,7 @@ void AdriViewer::readSkeleton(string fileName)
 
 	 // SKINNING I SOLVERS
 	 /*if (escena->skeletons.size() > 0 && aniManager.simulationEnabled) {
-		vector<Point3d> rots = escena->solverManager->computeSolvers(frame, this->animationPeriod(), escena->skeletons);
+		vector<Eigen::Vector3d> rots = escena->solverManager->computeSolvers(frame, this->animationPeriod(), escena->skeletons);
 		for (int i = 0; i < escena->skeletons[0]->joints.size(); ++i)
 			escena->skeletons[0]->joints[i]->addRotation(rots[i].X(), rots[i].Y(), rots[i].Z());
 		escena->skeletons[0]->joints[0]->computeWorldPos();
@@ -1419,7 +1419,7 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
            MyMesh::VertexIterator vi;
            for(vi = m->vert.begin(); vi!=m->vert.end(); ++vi ) {
                m->shading->colors[count].resize(3);
-               Point3d pt = vi->P();
+               Eigen::Vector3d pt = vi->P();
 
                Point3i idx = grRend->grid->cellId(pt);
 

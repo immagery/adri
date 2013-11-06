@@ -1,5 +1,92 @@
 #include "util.h"
 
+void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
+{
+	// extract the rest of turns
+	double a = angle;
+	if(angle >= 0)
+		a = angle - (floor(angle/360.0)*360);
+	else
+		a = angle - (ceil(angle/360.0)*360);
+
+	if(a == 0)
+	{
+		q = Eigen::Quaterniond().Identity();
+		return;
+	}
+
+	// This switch changes the case axis
+	Eigen::Vector3d v, Axis2, Axis3;
+	switch(axis)
+	{
+	case 2: // over X
+		Axis2 << 0,1,0;
+		Axis3 << 0,0,1;
+	break;
+	case 1: // over Y
+		Axis2 << 0,0,1;
+		Axis3 << 1,0,0;
+	break;
+	case 0: // over Z
+		Axis2 << 1,0,0;
+		Axis3 << 0,1,0;
+	break;
+	}
+
+	v = Axis2*cos(Deg2Rad(a))+Axis3*sin(Deg2Rad(a));
+
+	if(a >= 0)
+	{
+		if(a == 180)
+		{
+			q = Eigen::Quaterniond().setFromTwoVectors(Axis2, Axis3) * 
+				Eigen::Quaterniond().setFromTwoVectors(Axis3, -Axis2);
+		}
+		else if(a < 180)
+		{
+			q = Eigen::Quaterniond().setFromTwoVectors(Axis2, v);
+		}
+		else if(a > 180)
+		{
+			q = Eigen::Quaterniond().setFromTwoVectors(Axis2, Axis3) * 
+				Eigen::Quaterniond().setFromTwoVectors(Axis3, -Axis2) *
+				Eigen::Quaterniond().setFromTwoVectors(-Axis2, v);
+		}
+	}
+	else
+	{
+		if(a == -180)
+		{
+			q = Eigen::Quaterniond().setFromTwoVectors(Axis2, -Axis3) * 
+				Eigen::Quaterniond().setFromTwoVectors(-Axis3, -Axis2);
+		}
+		else if(a > -180)
+		{
+			q = Eigen::Quaterniond().setFromTwoVectors(Axis2, v);
+		}
+		else if(a > -360)
+		{
+			q = Eigen::Quaterniond().setFromTwoVectors(Axis2, -Axis3) * 
+				Eigen::Quaterniond().setFromTwoVectors(-Axis3, -Axis2) *
+				Eigen::Quaterniond().setFromTwoVectors(-Axis2, v);
+		}
+	}
+	
+}
+
+Eigen::Quaternion<double> fromEulerAngles(double alpha, double beta, double gamma) {
+	Eigen::Quaterniond qX;
+	Eigen::Quaterniond qY;
+	Eigen::Quaterniond qZ;
+
+	getAxisRotationQuaternion(qX, 0, alpha);
+	getAxisRotationQuaternion(qY, 1, beta);
+	getAxisRotationQuaternion(qZ, 2, gamma);
+
+	Eigen::Quaterniond q =  qZ * qY * qX;
+	return q;
+}
+
 // devuelve el signo del valor de entrada.
 double sign(double v)
 {
@@ -9,7 +96,7 @@ double sign(double v)
         return -1;
 }
 
-double det(vcg::Point3d u1, vcg::Point3d u2, vcg::Point3d u3)
+double det(Eigen::Vector3d u1, Eigen::Vector3d u2, Eigen::Vector3d u3)
 {
     return u1[0]*u2[1]*u3[2] + u2[0]*u1[2]*u3[1] + u3[0]*u1[1]*u2[2]
             - u1[2]*u2[1]*u3[0] - u2[0]*u1[1]*u3[2] - u3[1]*u1[0]*u2[2] ;
@@ -162,11 +249,4 @@ double Deg2Rad(double deg)
 double Rad2Deg(double rad)
 {
 	return (rad*360)/(M_PI*2);
-}
-
-vcg::Quaternion<double> rotationBetweenTwoVectors(vcg::Point3d v1, vcg::Point3d v2) {
-	vcg::Quaternion<double> q;
-	q.FromAxis(acos(v1.dot(v2) / (v1.Norm() * v2.Norm())), v1^v2);
-	q.Normalize();
-	return q;
 }

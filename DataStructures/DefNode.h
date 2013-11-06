@@ -2,6 +2,8 @@
 #define DEFNODE_H
 
 #include "DataStructures.h"
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 #include "node.h"
 
 #include <vector>
@@ -13,7 +15,6 @@
 #define ADAPTATIVE_CUTTING_VALUE 1
 
 using namespace std;
-using namespace vcg;
 
 /*
 	-	DEFNODE -

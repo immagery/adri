@@ -215,9 +215,9 @@ void drawBone(double l, double r)
 
 }
 
-void drawBoneStick(float radius, Point3d& pos)
+void drawBoneStick(float radius, Eigen::Vector3d& pos)
 {
-	drawLine(0,0,0, pos.X(), pos.Y(), pos.Z());
+	drawLine(0,0,0, pos.x(), pos.y(), pos.z());
 	//drawLine(1,0,0, pos.X(), pos.Y(), pos.Z());
 	//drawLine(1,0,0, pos.X(), pos.Y(), pos.Z());
 }
@@ -403,10 +403,10 @@ void JointRender::computeWorldPosRec(joint* jt, joint* father)
 	Eigen::Matrix3d rotationMatrix;
 	if(!father)
 	{
-		jt->rTranslation = Eigen::Vector3d(jt->pos.X(), jt->pos.Y(), jt->pos.Z());
+		jt->rTranslation = jt->pos;
 		
-		Eigen::Quaterniond or(jt->qOrient.X(), jt->qOrient.Y(), jt->qOrient.Z(), jt->qOrient.W());
-		Eigen::Quaterniond rot(jt->qrot.X(), jt->qrot.Y(), jt->qrot.Z(), jt->qrot.W());
+		Eigen::Quaterniond or = jt->qOrient;
+		Eigen::Quaterniond rot = jt->qrot;
 		
 		jt->rRotation = or*rot;
 
@@ -415,10 +415,10 @@ void JointRender::computeWorldPosRec(joint* jt, joint* father)
 	else
 	{
 		jt->rTranslation = father->rTranslation + 
-						   father->rRotation._transformVector(Eigen::Vector3d(jt->pos.X(), jt->pos.Y(), jt->pos.Z()));
+						   father->rRotation._transformVector(jt->pos);
 		
-		Eigen::Quaterniond or(jt->qOrient.X(), jt->qOrient.Y(), jt->qOrient.Z(), jt->qOrient.W());
-		Eigen::Quaterniond rot(jt->qrot.X(), jt->qrot.Y(), jt->qrot.Z(), jt->qrot.W());
+		Eigen::Quaterniond or = jt->qOrient;
+		Eigen::Quaterniond rot = jt->qrot;
 		
 		jt->rRotation = father->rRotation * or * rot;
 

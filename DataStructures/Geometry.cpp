@@ -37,8 +37,10 @@ void Geometry::drawFunc()
 
 void Geometry::freezeTransformations()
 {
-	for(unsigned int vi = 0; vi < nodes.size(); vi++ )
-		nodes[vi]->position = tMatrix*nodes[vi]->position;
+	for(unsigned int vi = 0; vi < nodes.size(); vi++ ) {
+		Eigen::Vector4d prod = tMatrix*Eigen::Vector4d(nodes[vi]->position.x(), nodes[vi]->position.y(), nodes[vi]->position.z(), 1);
+		nodes[vi]->position = Eigen::Vector3d(prod.x(), prod.y(), prod.z());
+	}
 
     loadIdentity();
 }

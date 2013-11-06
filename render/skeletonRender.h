@@ -11,6 +11,7 @@
 #define DEFAULT_SIZE 0.1
 
 using namespace std;
+using namespace vcg;
 
 class JointRender : public shadingNode
 {    

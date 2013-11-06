@@ -321,7 +321,7 @@ public:
     ////  FUNCTIONS ///
 
     // Marca las celdas con los diferentes tipos segun la geometria de entrada.
-    int typeCells(MyMesh& mesh);
+    //int typeCells(MyMesh& mesh);
 
 	// Marca las celdas con los diferentes tipos segun la geometria de entrada.
 	// Con la nueva estructura de grafo
@@ -347,7 +347,7 @@ public:
 	void cleanZeroInfluences();
 
     // Marca las celdas con los diferentes tipos según la geometría de entrada.
-    int typeCells(MyFace& face);
+    //int typeCells(MyFace& face);
 
     // Devuelve la direccion de la celda a la que pertenece el punto.
     Eigen::Vector3i cellId(Eigen::Vector3d pt);

@@ -1701,6 +1701,7 @@ int grid3d::typeCells(Modelo* mesh)
     return TypedCells;
 }
 
+/*
 int grid3d::typeCells(MyMesh& mesh)
 {
     // Comprobar que la caja contenedora de la maya está contenida dentro del grid.
@@ -1720,7 +1721,7 @@ int grid3d::typeCells(MyMesh& mesh)
     fillInside();
 
     return TypedCells;
-}
+}*/
 
 Eigen::Vector3i grid3d::cellId(Eigen::Vector3d pt)
 {
@@ -1855,7 +1856,8 @@ int grid3d::typeCells(Modelo* m, int triIdx)
     Eigen::Vector3d v3Dir = v3/v3Norm;
     Eigen::Vector3d normalDir = normal/normalNorm;
 
-    Eigen::Vector3d edgeCenter = v1Dir*(v1Dir*v2) + points[largeIdx];
+    // TOCHECK Eigen::Vector3d edgeCenter = v1Dir*(v1Dir*v2) + points[largeIdx];
+	Eigen::Vector3d edgeCenter = v1Dir * (v1Dir.dot(v2)) + points[largeIdx];
     int div1 = (int)ceil((points[largeIdx]-edgeCenter).norm()/processCellSize);
     int div2 = (int)ceil((points[(largeIdx+1)%3]-edgeCenter).norm()/processCellSize);
 

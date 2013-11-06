@@ -400,7 +400,7 @@ void AdriMainWindow::changeInteriorPointPosition()
 	ui->axisY_edit->setText(QString("%1").arg(valueAuxY));
 	ui->axisZ_edit->setText(QString("%1").arg(valueAuxZ));
 
-	ui->glCustomWidget->interiorPoint = Point3d(valueAuxX,valueAuxY,valueAuxZ);
+	ui->glCustomWidget->interiorPoint = Eigen::Vector3d(valueAuxX,valueAuxY,valueAuxZ);
 	ui->glCustomWidget->setPlanePosition(valueAuxX,valueAuxY,valueAuxZ);
 }
 
@@ -800,7 +800,7 @@ void AdriMainWindow::changeTransformTranslateAmountX(int)
 	// Aplica la traslacion
 	ui->glCustomWidget->particles->xvalue = ui->translationAmountX->value();
     if (selectedObject != NULL) {
-        selectedObject->pos.X() = ui->translationAmountX->value();
+        selectedObject->pos.x() = ui->translationAmountX->value();
 		selectedObject->dirtyFlag = true;
 	}
 
@@ -820,7 +820,7 @@ void AdriMainWindow::changeTransformTranslateAmountY(int)
 	// Aplica la traslacion
 	ui->glCustomWidget->particles->yvalue = ui->translationAmountY->value();
     if (selectedObject != NULL) {
-		selectedObject->pos.Y() = ui->translationAmountY->value();
+		selectedObject->pos.y() = ui->translationAmountY->value();
 		selectedObject->dirtyFlag = true;
 	}
 
@@ -838,7 +838,7 @@ void AdriMainWindow::changeTransformTranslateAmountZ(int) {
 	// Aplica la traslacion
 	ui->glCustomWidget->particles->zvalue = ui->translationAmountZ->value();
     if (selectedObject != NULL) {
-        selectedObject->pos.Z() = ui->translationAmountZ->value();
+        selectedObject->pos.z() = ui->translationAmountZ->value();
 		selectedObject->dirtyFlag = true;
 	}
 
