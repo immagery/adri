@@ -18,7 +18,7 @@ public:
     void computeRestPositions(const vector< skeleton* >& skeletons);
 	void computeDeformations(const vector< skeleton* >& skeletons);
 	void computeDeformationsWithSW(const vector< skeleton* >& skeletons);
-    Point3d deformVertex ();
+    Eigen::Vector3d deformVertex ();
 
 	vector<Geometry*> originalModels;
 	vector<Geometry*> deformedModels;

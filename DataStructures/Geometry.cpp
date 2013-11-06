@@ -1,13 +1,6 @@
 #include "Geometry.h"
 #include "..\render\geometryRender.h"
 
-#include <vcg/complex/allocate.h>
-#include <vcg/complex/algorithms/update/normal.h>
-#include <vcg/complex/algorithms/update/bounding.h>
-
-#include <wrap/io_trimesh/import.h>
-#include <wrap/io_trimesh/export.h>
-//#include "wrap/gl/trimesh.h"
 
 Geometry::Geometry() : object()
 {
@@ -37,8 +30,10 @@ void Geometry::drawFunc()
 
 void Geometry::freezeTransformations()
 {
-	for(unsigned int vi = 0; vi < nodes.size(); vi++ )
-		nodes[vi]->position = tMatrix*nodes[vi]->position;
+	for(unsigned int vi = 0; vi < nodes.size(); vi++ ) {
+		Eigen::Vector4d prod = tMatrix*Eigen::Vector4d(nodes[vi]->position.x(), nodes[vi]->position.y(), nodes[vi]->position.z(), 1);
+		nodes[vi]->position = Eigen::Vector3d(prod.x(), prod.y(), prod.z());
+	}
 
     loadIdentity();
 }
@@ -146,11 +141,11 @@ void Geometry::loadModel(string fileName, string name, string ext, string path)
 
 
 // Return a bool if there is a bounding box computable
-bool Geometry::getBoundingBox(Point3d& minAuxPt,Point3d& maxAuxPt)
+bool Geometry::getBoundingBox(Eigen::Vector3d& minAuxPt,Eigen::Vector3d& maxAuxPt)
 {
 	if(nodes.size() < 0)
 	{
-		minBBox = maxBBox = minAuxPt = maxAuxPt = Point3d(0,0,0);
+		minBBox = maxBBox = minAuxPt = maxAuxPt = Eigen::Vector3d(0,0,0);
 		return false;
 	}
 
@@ -168,8 +163,8 @@ bool Geometry::getBoundingBox(Point3d& minAuxPt,Point3d& maxAuxPt)
 		}
 	}
 
-    minBBox = minAuxPt = Point3d(minValue[0], minValue[1], minValue[2]);
-    maxBBox = maxAuxPt = Point3d(maxValue[0], maxValue[1], maxValue[2]);
+    minBBox = minAuxPt = Eigen::Vector3d(minValue[0], minValue[1], minValue[2]);
+    maxBBox = maxAuxPt = Eigen::Vector3d(maxValue[0], maxValue[1], maxValue[2]);
     return true;
 }
 
@@ -179,9 +174,9 @@ void Geometry::computeFaceNormals()
 	faceNormals.resize(trianglesSize);
 	for(unsigned int i = 0; i < triangles.size(); i++)
 	{
-		Point3d v1 = triangles[i]->verts[1]->position - triangles[i]->verts[0]->position;
-		Point3d v2 = triangles[i]->verts[2]->position - triangles[i]->verts[0]->position;
-		faceNormals[i] = (v1.normalized()^v2.normalized()).normalized();		
+		Eigen::Vector3d v1 = triangles[i]->verts[1]->position - triangles[i]->verts[0]->position;
+		Eigen::Vector3d v2 = triangles[i]->verts[2]->position - triangles[i]->verts[0]->position;
+		faceNormals[i] = (v1.normalized().cross(v2.normalized())).normalized();		
 	}
 }
 
@@ -195,7 +190,7 @@ void Geometry::computeVertNormals()
 	vertTriCounter.resize(nodes.size(),0);
 
 	for(unsigned int i = 0; i < nodes.size();i++)
-		vertNormals[i] = Point3d(0,0,0);
+		vertNormals[i] = Eigen::Vector3d(0,0,0);
 
 	for(unsigned int i = 0; i < triangles.size(); i++)
 	{
@@ -218,11 +213,11 @@ void Geometry::computeNormals()
 	computeVertNormals();
 }
 
-Point3d Geometry::getSelCenter()
+Eigen::Vector3d Geometry::getSelCenter()
 {
     if(shading->subObjectmode)
     {
-        Point3d center;
+        Eigen::Vector3d center;
         for(unsigned int i = 0; i>shading->selectedIds.size(); i++)
         {
 			assert(false);

@@ -1,5 +1,6 @@
 #include "DataStructures.h"
 
+/*
 void initModelForCoordinates(MyMesh& mesh)
 {
     // Anadimos la posibilidad de almacenar las coordenadas en cada vertice de la malla
@@ -115,3 +116,4 @@ void gpUpdateNormals(MyMesh& mesh, bool vertexAlso) {
     }
 }
 
+*/

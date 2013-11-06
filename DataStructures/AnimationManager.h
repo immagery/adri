@@ -9,7 +9,6 @@
 class AnimationManager
 {
 public:
-
     bool animationEnabled;
 	bool simulationEnabled;
     map<int, Animation> animations;		// maps from joint ID to animation
@@ -19,9 +18,9 @@ public:
     bool objectHasAnimation (int id);
     void addAnimation (int id);
     void addKeyFrame (int id, int frame, int tx, int ty, int tz, int rx, int ry, int rz, int sx, int sy, int sz);
-    Point3d getPosition (int id, int frame);
-    Point3d getRotation (int id, int frame);
-    Point3d getScaling (int id, int frame);
+    Eigen::Vector3d getPosition (int id, int frame);
+    Eigen::Vector3d getRotation (int id, int frame);
+    Eigen::Vector3d getScaling (int id, int frame);
 
 	void saveAnimation(string path, scene* escena);
 	void loadAnimations(string path, scene* escena);
@@ -30,7 +29,7 @@ public:
 		set<int> frames;
 		vector<int> kframes;
 		for (map<int, Animation>::iterator it = animations.begin(); it != animations.end(); ++it) {
-			for (map<int, Transform>::iterator itt = it->second.transforms.begin(); itt != it->second.transforms.end(); ++itt) {
+			for (map<int, MyTransform>::iterator itt = it->second.transforms.begin(); itt != it->second.transforms.end(); ++itt) {
 				frames.insert(itt->first);
 			}
 		}

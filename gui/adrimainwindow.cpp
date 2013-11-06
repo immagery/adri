@@ -20,6 +20,7 @@
 #include "AdriViewer.h"
 
 using namespace std;
+using namespace Eigen;
 
 void AdriMainWindow::connectSignals() {
 	// conexiones
@@ -399,7 +400,7 @@ void AdriMainWindow::changeInteriorPointPosition()
 	ui->axisY_edit->setText(QString("%1").arg(valueAuxY));
 	ui->axisZ_edit->setText(QString("%1").arg(valueAuxZ));
 
-	ui->glCustomWidget->interiorPoint = Point3d(valueAuxX,valueAuxY,valueAuxZ);
+	ui->glCustomWidget->interiorPoint = Eigen::Vector3d(valueAuxX,valueAuxY,valueAuxZ);
 	ui->glCustomWidget->setPlanePosition(valueAuxX,valueAuxY,valueAuxZ);
 }
 
@@ -803,7 +804,7 @@ void AdriMainWindow::changeTransformTranslateAmountX(int)
 	// Aplica la traslacion
 	ui->glCustomWidget->particles->xvalue = ui->translationAmountX->value();
     if (selectedObject != NULL) {
-        selectedObject->pos.X() = ui->translationAmountX->value();
+        selectedObject->pos.x() = ui->translationAmountX->value();
 		selectedObject->dirtyFlag = true;
 
 		for(int i = 0; i< ui->glCustomWidget->escena->skeletons.size(); i++)
@@ -826,7 +827,7 @@ void AdriMainWindow::changeTransformTranslateAmountY(int)
 	// Aplica la traslacion
 	ui->glCustomWidget->particles->yvalue = ui->translationAmountY->value();
     if (selectedObject != NULL) {
-		selectedObject->pos.Y() = ui->translationAmountY->value();
+		selectedObject->pos.y() = ui->translationAmountY->value();
 		selectedObject->dirtyFlag = true;
 
 		for(int i = 0; i< ui->glCustomWidget->escena->skeletons.size(); i++)
@@ -847,7 +848,7 @@ void AdriMainWindow::changeTransformTranslateAmountZ(int) {
 	// Aplica la traslacion
 	ui->glCustomWidget->particles->zvalue = ui->translationAmountZ->value();
     if (selectedObject != NULL) {
-        selectedObject->pos.Z() = ui->translationAmountZ->value();
+        selectedObject->pos.z() = ui->translationAmountZ->value();
 		selectedObject->dirtyFlag = true;
 
 		for(int i = 0; i< ui->glCustomWidget->escena->skeletons.size(); i++)
@@ -866,17 +867,13 @@ void AdriMainWindow::changeTransformRotateAmountX(int x)
         selectedObject = ui->glCustomWidget->selMgr.selection.back();
 
 	if (selectedObject != NULL) {
-		Quaternion<double> qaux;
-		//qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()-rotationX),0,0);
-		rotationX =  Deg2Rad((float)ui->dialX->value()/10.0);
-		
+		rotationX =  Deg2Rad((float)ui->dialX->value()/10.0);	
 		//qaux.FromEulerAngles(rotationX, rotationY, rotationZ);
 
 		//qaux.FromEulerAngles(Deg2Rad(ui->rotationAmountX->value()),Deg2Rad(ui->rotationAmountY->value()),Deg2Rad(ui->rotationAmountZ->value()));
 		//selectedObject->qrot = qaux;
 		
 		selectedObject->setRotation(rotationX, rotationY, rotationZ);
-
 		selectedObject->dirtyFlag = true;
 
 		for(int i = 0; i< ui->glCustomWidget->escena->skeletons.size(); i++)
@@ -898,7 +895,7 @@ void AdriMainWindow::changeTransformRotateAmountY(int y)
 
     if (selectedObject != NULL)
 	{
-		Quaternion<double> qaux;
+		Eigen::Quaternion<double> qaux;
 
 		// guardamos el nuevo valor
 		rotationY =  Deg2Rad((float)ui->dialY->value()/10.0);
@@ -907,6 +904,10 @@ void AdriMainWindow::changeTransformRotateAmountY(int y)
 		// Lo aplicamos como incremento
 		//selectedObject->qrot = qaux;
 		selectedObject->setRotation(rotationX, rotationY, rotationZ);
+		// TOFIX qaux.FromEulerAngles(rotationX, rotationY, rotationZ);
+
+		// Lo aplicamos como incremento
+		//selectedObject->qrot = qaux;
 		selectedObject->dirtyFlag = true;
 
 		for(int i = 0; i< ui->glCustomWidget->escena->skeletons.size(); i++)
@@ -929,7 +930,7 @@ void AdriMainWindow::changeTransformRotateAmountZ(int z)
 	if (selectedObject != NULL)
 	{
 
-		Quaternion<double> qaux;
+		Eigen::Quaternion<double> qaux;
 
 		rotationZ =  Deg2Rad((float)ui->dialZ->value()/10.0);
 		//qaux.FromEulerAngles(rotationX, rotationY, rotationZ);

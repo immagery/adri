@@ -7,7 +7,7 @@
 void saveWeightsToMaya(Geometry* mesh,
                        vector< vector<float> >& meshWeights,
                        vector<string>& names,
-                       vector<Point3d>& points,
+                       vector<Eigen::Vector3d>& points,
                        string sFile);
 
 void saveWeightsToMayaByName(Geometry* mesh,

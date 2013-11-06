@@ -4,8 +4,9 @@
 #include "Object.h"
 #include "DefNode.h"
 #include <Eigen/Dense>
+#include <Eigen/Core>
 
-#include <vcg\math\quaternion.h>
+//#include <vcg\math\quaternion.h>
 #include <map>
 
 class DefNode;
@@ -20,7 +21,7 @@ class joint : public object
         vector< joint* > childs;
         vector< DefNode* > nodes;
 
-		vcg::Quaternion<double> qOrient;
+		Eigen::Quaternion<double> qOrient;
 
 		int deformerId;
 
@@ -43,7 +44,7 @@ class joint : public object
 		float smoothness;
 
         // For precomputation
-        Point3d worldPosition;
+        Eigen::Vector3d worldPosition;
 
 		bool enableWeightsComputation;
 
@@ -58,8 +59,8 @@ class joint : public object
 		void initDefaults();
 
         virtual void drawFunc();
-        virtual bool getBoundingBox(Point3d& minAuxPt,
-                                    Point3d& maxAuxPt);
+        virtual bool getBoundingBox(Eigen::Vector3d& minAuxPt,
+                                    Eigen::Vector3d& maxAuxPt);
 
         virtual void select(bool bToogle, int id);
 
@@ -72,9 +73,9 @@ class joint : public object
                                  double  ojZ,
 								 bool radians = false);
 
-        void setWorldPosition(Point3d pos);
-        Point3d getJointOrientation();
-        Point3d getWorldPosition();
+        void setWorldPosition(Eigen::Vector3d pos);
+        Eigen::Vector3d getJointOrientation();
+        Eigen::Vector3d getWorldPosition();
 
 		// Hierarchy relations.
 		joint* getFather();
@@ -107,7 +108,7 @@ class skeleton : public object
 	float minSegmentLength;
 
     virtual void drawFunc();
-    virtual bool getBoundingBox(Point3d& minAuxPt,Point3d& maxAuxPt);
+    virtual bool getBoundingBox(Eigen::Vector3d& minAuxPt,Eigen::Vector3d& maxAuxPt);
     virtual void select(bool bToogle, int id);
 
     virtual bool update();
@@ -143,7 +144,7 @@ int proposeNodes(vector<skeleton*>& skts, vector< DefNode >& nodePoints);
 
 void addNodes(joint* jt, vector< DefNode >& nodePoints, float subdivisionRatio);
 
-int subdivideBone( joint* parent, joint* child,/* Point3d origen, Point3d fin,*/
+int subdivideBone( joint* parent, joint* child,/* Eigen::Vector3d origen, Eigen::Vector3d fin,*/
 				  vector< DefNode >& nodePoints,
 				  float subdivisionRatio);
 

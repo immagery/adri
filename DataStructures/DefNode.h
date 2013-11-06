@@ -2,6 +2,8 @@
 #define DEFNODE_H
 
 #include "DataStructures.h"
+#include <Eigen/Core>
+#include <Eigen/Geometry>
 #include "node.h"
 
 #include <vector>
@@ -13,7 +15,6 @@
 #define ADAPTATIVE_CUTTING_VALUE 1
 
 using namespace std;
-using namespace vcg;
 
 /*
 	-	DEFNODE -
@@ -36,7 +37,7 @@ public:
 		ratio = -1;
 		expansion = 1;
 
-		pos = Point3d(0,0,0);
+		pos = Eigen::Vector3d(0,0,0);
 		precomputedDistances = 0;
 
 		// This flag enables weight computation.
@@ -64,7 +65,7 @@ public:
 		boneId = id;
 	}
 
-	DefNode(Point3d newPos, int id) : node() 
+	DefNode(Eigen::Vector3d newPos, int id) : node() 
 	{
 		LoadDefaultValues();
 
@@ -106,7 +107,7 @@ public:
 	double precomputedDistances;
 
 	// For faster computation
-	Point3d pos;
+	Eigen::Vector3d pos;
 
 	// This flag enables weight computation.
 	bool enableWeightsComputation;

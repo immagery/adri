@@ -18,10 +18,10 @@ void ReadEmbedding(std::string fileName, vector< vector<double> >& V, bool ascii
   >  eigenVectorsEmbedding -- embedding calculated with .... function
   >  modelo                -- model that constains the points.
 */
-void mvc_IBD(vector<vcg::Point3d>& points,
+/*void mvc_IBD(vector<Eigen::Vector3d>& points,
              vector< vector<double> >& embeddedPoints,
              vector< vector<double> >& eigenVectorsEmbedding,
-             MyMesh& modelo);
+             MyMesh& modelo);*/
 
 /*   ---- INTERIOR DISTANCE COMPUTATION ---
   Get the distance between two points embedded

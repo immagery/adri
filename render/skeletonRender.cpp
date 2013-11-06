@@ -215,9 +215,9 @@ void drawBone(double l, double r)
 
 }
 
-void drawBoneStick(float radius, Point3d& pos)
+void drawBoneStick(float radius, Eigen::Vector3d& pos)
 {
-	drawLine(0,0,0, pos.X(), pos.Y(), pos.Z());
+	drawLine(0,0,0, pos.x(), pos.y(), pos.z());
 	//drawLine(1,0,0, pos.X(), pos.Y(), pos.Z());
 	//drawLine(1,0,0, pos.X(), pos.Y(), pos.Z());
 }
@@ -376,19 +376,19 @@ void JointRender::computeRestPosRec(joint* jt, joint* father)
 
     //glTranslated(jt->pos.X(),jt->pos.Y(),jt->pos.Z());
 
-	double orientAlpha, orientBeta, orientGamma;
-	jt->qOrient.ToEulerAngles(orientAlpha, orientBeta, orientGamma);
+	//double orientAlpha, orientBeta, orientGamma;
+	//jt->qOrient.ToEulerAngles(orientAlpha, orientBeta, orientGamma);
 
-	Matrix33d orientMatrix;
-	Matrix33d rotateMatrix;
-	jt->qOrient.ToMatrix(orientMatrix);
-	jt->qrot.ToMatrix(rotateMatrix);
-	Matrix33d oriRot =  (rotateMatrix * orientMatrix);
+	Eigen::Matrix3d orientMatrix;
+	Eigen::Matrix3d rotateMatrix;
+	//jt->qOrient.ToMatrix(orientMatrix);
+	//jt->qrot.ToMatrix(rotateMatrix);
+	Eigen::Matrix3d oriRot =  (rotateMatrix * orientMatrix);
 
 	Eigen::Matrix4d transformMatrix;
-	transformMatrix << oriRot[0][0] , oriRot[0][1] , oriRot[0][2], jt->pos.X(),
-						oriRot[1][0] , oriRot[1][1] , oriRot[1][2], jt->pos.Y(),
-						oriRot[2][0] , oriRot[2][1] , oriRot[2][2], jt->pos.Z(),
+	transformMatrix << oriRot(0,0) , oriRot(0,1) , oriRot(0,2), jt->pos.x(),
+						oriRot(1,0) , oriRot(1,1) , oriRot(1,2), jt->pos.y(),
+						oriRot(2,0) , oriRot(2,1) , oriRot(2,2), jt->pos.z(),
 						0,				0,				0,			1;
 
 
@@ -400,8 +400,8 @@ void JointRender::computeRestPosRec(joint* jt, joint* father)
     //glRotatef((GLfloat)jt->orientJoint.Y(),0,1,0);
     //glRotatef((GLfloat)jt->orientJoint.X(),1,0,0);
 
-	double alpha, beta, gamma;
-	jt->qrot.ToEulerAngles(alpha, beta, gamma);
+	//double alpha, beta, gamma;
+	//jt->qrot.ToEulerAngles(alpha, beta, gamma);
 
     //glRotatef((GLfloat)Rad2Deg(gamma),0,0,1);
     //glRotatef((GLfloat)Rad2Deg(beta),0,1,0);
@@ -423,7 +423,7 @@ void JointRender::computeRestPosRec(joint* jt, joint* father)
 
     GLdouble modelview[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-    jt->worldPosition = Point3d(modelview[12],modelview[13],modelview[14]);
+    jt->worldPosition = Eigen::Vector3d(modelview[12],modelview[13],modelview[14]);
 
 	Eigen::MatrixXf m(4,4);
 	m << modelview[0], modelview[1], modelview[2], modelview[3],
@@ -454,10 +454,10 @@ void JointRender::computeWorldPosRec(joint* jt, joint* father)
 	Eigen::Matrix3d rotationMatrix;
 	if(!father)
 	{
-		jt->translation = Eigen::Vector3d(jt->pos.X(), jt->pos.Y(), jt->pos.Z());
+		jt->translation = jt->pos;
 		
-		Eigen::Quaterniond or(jt->qOrient[0], jt->qOrient[1], jt->qOrient[2], jt->qOrient[3]);
-		Eigen::Quaterniond rot(jt->qrot[0], jt->qrot[1], jt->qrot[2], jt->qrot[3]);
+		Eigen::Quaterniond or = jt->qOrient;
+		Eigen::Quaterniond rot = jt->qrot;
 		
 		jt->rotation =  rot*or;
 
@@ -466,10 +466,10 @@ void JointRender::computeWorldPosRec(joint* jt, joint* father)
 	else
 	{
 		jt->translation = father->translation + 
-						   father->rotation._transformVector(Eigen::Vector3d(jt->pos.X(), jt->pos.Y(), jt->pos.Z()));
+						   father->rotation._transformVector(jt->pos);
 		
-		Eigen::Quaterniond or(jt->qOrient[0], jt->qOrient[1], jt->qOrient[2], jt->qOrient[3]);
-		Eigen::Quaterniond rot(jt->qrot[0], jt->qrot[1], jt->qrot[2], jt->qrot[3]);
+		Eigen::Quaterniond or = jt->qOrient;
+		Eigen::Quaterniond rot = jt->qrot;
 		
 		jt->rotation =  father->rotation * rot * or;
 
@@ -489,7 +489,7 @@ void JointRender::computeWorldPosRec(joint* jt, joint* father)
 	transformMatrix2.transposeInPlace();
 	jt->world = transformMatrix2;
 
-	jt->worldPosition = Point3d(jt->translation[0],jt->translation[1],jt->translation[2]);
+	jt->worldPosition = jt->translation;
 	jt->W = transformMatrix2.transpose();
 	
 
@@ -510,16 +510,16 @@ void JointRender::computeWorldPosRec(joint* jt, joint* father)
 	if (father != NULL) {
 		fatherTranslation = father->translation;
 		fatherRotation = father->rotation;
-		fatherWP = Eigen::Vector3d(father->getWorldPosition().X(), father->getWorldPosition().Y(), father->getWorldPosition().Z());
+		fatherWP = father->getWorldPosition();
 	}
 
-	Eigen::Quaternion<double> q(jt->qrot.X(), jt->qrot.Y(), jt->qrot.Z(), jt->qrot.W());
-	Eigen::Quaternion<double> qor(jt->qOrient.X(), jt->qOrient.Y(), jt->qOrient.Z(), jt->qOrient.W());
+	Eigen::Quaternion<double> q = jt->qrot;
+	Eigen::Quaternion<double> qor = jt->qOrient;
 	printf("Local rotation: %f %f %f %f\n", q.w(), q.x(), q.y(), q.z());
 	printf("Local orient: %f %f %f %f\n", qor.w(), qor.x(), qor.y(), qor.z());
 	q = q * qor;
 	printf("Local rot*orient: %f %f %f %f\n", q.w(), q.x(), q.y(), q.z());
-	Eigen::Vector3d p (jt->pos.X(), jt->pos.Y(), jt->pos.Z());
+	Eigen::Vector3d p = jt->pos;
 
 	if (father == NULL) {
 		jt->translation = q.inverse()._transformVector(p);
@@ -549,16 +549,16 @@ void JointRender::computeWorldPosRec(joint* jt, joint* father)
 	//double orientAlpha, orientBeta, orientGamma;
 	//jt->qOrient.ToEulerAngles(orientAlpha, orientBeta, orientGamma);
 
-	Matrix33d orientMatrix;
-	Matrix33d rotateMatrix;
-	jt->qOrient.ToMatrix(orientMatrix);
-	jt->qrot.ToMatrix(rotateMatrix);
-	Matrix33d oriRot =  (rotateMatrix * orientMatrix);
+	Eigen::Matrix3d orientMatrix;
+	Eigen::Matrix3d rotateMatrix;
+	//jt->qOrient.ToMatrix(orientMatrix);
+	//jt->qrot.ToMatrix(rotateMatrix);
+	Eigen::Matrix3d oriRot =  (rotateMatrix * orientMatrix);
 
 	Eigen::Matrix4f transformMatrix;
-	transformMatrix << oriRot[0][0] , oriRot[0][1] , oriRot[0][2], jt->pos.X(),
-						oriRot[1][0] , oriRot[1][1] , oriRot[1][2], jt->pos.Y(),
-						oriRot[2][0] , oriRot[2][1] , oriRot[2][2], jt->pos.Z(),
+	transformMatrix << oriRot(0,0) , oriRot(0,1) , oriRot(0,2), jt->pos.x(),
+						oriRot(1,0) , oriRot(1,1) , oriRot(1,2), jt->pos.y(),
+						oriRot(2,0) , oriRot(2,1) , oriRot(2,2), jt->pos.z(),
 						0,				0,				0,			1;
 
 	//double alpha, beta, gamma;
@@ -578,7 +578,7 @@ void JointRender::computeWorldPosRec(joint* jt, joint* father)
 
     GLdouble modelview[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     glGetDoublev( GL_MODELVIEW_MATRIX, modelview );
-    jt->worldPosition = Point3d(modelview[12],modelview[13],modelview[14]);
+    jt->worldPosition = Eigen::Vector3d(modelview[12],modelview[13],modelview[14]);
 
 
 	printf("World position 1: %f %f %f\n", modelview[12], modelview[13], modelview[14]);

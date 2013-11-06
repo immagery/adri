@@ -11,7 +11,7 @@
 class Modelo;
 class skeleton;
 
-void drawPointLocator(Point3d pt, float size, bool spot);
+void drawPointLocator(Eigen::Vector3d pt, float size, bool spot);
 
 class gridRenderer : public shadingNode
 {
@@ -147,8 +147,8 @@ public:
     bool Initialized;
 
     vector<bool> segmentationIndicesToShow; // Segmentation labels to show
-    vector< vector<Point3f> > sliceValuesXZ; // Cached values for coloring plane XZ
-    vector< vector<Point3f> > sliceValuesXY; // Cached values for coloring plane XZ
+    vector< vector<Eigen::Vector3f> > sliceValuesXZ; // Cached values for coloring plane XZ
+    vector< vector<Eigen::Vector3f> > sliceValuesXY; // Cached values for coloring plane XZ
 
     int desiredVertex; // Vertex for showing weights
 

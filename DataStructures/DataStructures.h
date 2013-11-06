@@ -3,8 +3,9 @@
 
 #define DIR_MODELS_FOR_TEST "C:/Users/chus/Documents/dev/Data/models/"
 
-#include <vcg/complex/complex.h>
-#include<vcg/complex/append.h>
+/*#include <vcg/complex/complex.h>
+#include <vcg/complex/append.h>
+#include <vcg/complex/append.h>
 
 class MyVertex;
 class MyFace;
@@ -17,6 +18,6 @@ class MyMesh   : public vcg::tri::TriMesh< std::vector<MyVertex>, std::vector<My
 
 void initModelForCoordinates(MyMesh& mesh);
 void gpUpdateNormals(MyMesh& mesh, bool vertexAlso = false);
-void buildCube(MyMesh& mesh, vcg::Point3d center, double radius);
+void buildCube(MyMesh& mesh, Eigen::Vector3d center, double radius);*/
 
 #endif // DATASTRUCTURES_H

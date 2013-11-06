@@ -25,11 +25,11 @@ bool shadingNode::update(object* obj)
         glPopMatrix();
         */
 		
-		obj->qrot.ToMatrix(obj->tMatrix);
-		obj->tMatrix[0][3] = obj->pos.X();
-		obj->tMatrix[1][3] = obj->pos.Y();
-		obj->tMatrix[2][3] = obj->pos.Z();
-		obj->tMatrix[3][3] = 1.0;
+		Eigen::Matrix3d rot = obj->qrot.toRotationMatrix();
+		obj->tMatrix << rot(0,0), rot(0,1), rot(0,2), obj->pos.x(),
+						rot(1,0), rot(1,1), rot(1,2), obj->pos.y(),
+						rot(2,0), rot(2,1), rot(2,2), obj->pos.z(),
+						0		, 0		  , 0		, 1;
 
 		obj->dirtyFlag = false;
     }
@@ -50,7 +50,7 @@ void shadingNode::beforeDraw(object* obj)
 	{
 		for(int j = 0; j< 4; j++)
 		{
-			mat[i*4+j] = obj->tMatrix[i][j];
+			mat[i*4+j] = obj->tMatrix(i,j);
 		}
 	}
 

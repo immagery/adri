@@ -10,7 +10,6 @@
 #include <fstream>
 
 using namespace std;
-using namespace vcg;
 
 int findWeight(vector<weight>& weights, int label)
 {
@@ -33,7 +32,7 @@ cellData::cellData()
 
     embedding.clear();
     vertexContainer = false;
-    pos = Point3i(-1,-1,-1);
+    pos = Eigen::Vector3i(-1,-1,-1);
     itPass =-1;
 
 	confidenceLevel = 0;
@@ -53,7 +52,7 @@ cellData::cellData()
 	assigned = false;
 	validated = false;
 
-	color = Point3f(0,0,0);
+	color = Eigen::Vector3f(0,0,0);
 }
 
 cellData::cellData(int weightsSize)
@@ -66,7 +65,7 @@ cellData::cellData(int weightsSize)
     vertexContainer = false;
 
     auxInfluences.clear();
-    pos = Point3i(-1,-1,-1);
+    pos = Eigen::Vector3i(-1,-1,-1);
     itPass =-1;
     ownerLabel = -1;
 	confidenceLevel = 0;
@@ -75,7 +74,7 @@ cellData::cellData(int weightsSize)
 	assigned = false;
 	validated = false;
 
-	color = Point3f(0,0,0);
+	color = Eigen::Vector3f(0,0,0);
 }
 
 // Clear no del todo, no quitamos el labeling de la voxelizacion
@@ -89,7 +88,7 @@ void cellData::clear()
 
 	confidenceLevel = 0;
 
-    pos = Point3i(-1,-1,-1);
+    pos = Eigen::Vector3i(-1,-1,-1);
     itPass =-1;
 
     // Flags for better computation
@@ -97,8 +96,8 @@ void cellData::clear()
 
 	// TO DEBUG
 	//vertexContainer;
-	//Point3f color;
-	color = Point3f(0,0,0);
+	//Eigen::Vector3f color;
+	color = Eigen::Vector3f(0,0,0);
 
 	// No tocaria
     //vector<double> embedding;
@@ -262,7 +261,7 @@ cell3d::~cell3d()
 void grid3d::initBasicData()
 {
 	cells.clear();
-	dimensions = Point3i(0,0,0);
+	dimensions = Eigen::Vector3i(0,0,0);
 	cellSize = 0;
 	weightSize = 0;
 	totalCellsCounts = 0;
@@ -293,23 +292,23 @@ grid3d::grid3d()
     initBasicData();
 }
 
-void grid3d::initwithNoData(Box3d bounding_, Point3i divisions)
+void grid3d::initwithNoData(MyBox3 bounding_, Eigen::Vector3i divisions)
 {
 	initBasicData();
 
     // comprobamos que las dimensiones tengan sentido
-    assert(divisions.X() != 0 || divisions.Y() != 0 || divisions.Z() != 0);
+    assert(divisions.x() != 0 || divisions.y() != 0 || divisions.z() != 0);
 
     bool withData = false;
     // reservamos el espacio necesario para hacer los cálculos
-    cells.resize(divisions.X());
-    for(int i = 0; i< divisions.X(); i++)
+    cells.resize(divisions.x());
+    for(int i = 0; i< divisions.x(); i++)
     {
-        cells[i].resize(divisions.Y());
-        for(int j = 0; j< divisions.Y(); j++)
+        cells[i].resize(divisions.y());
+        for(int j = 0; j< divisions.y(); j++)
         {
-            cells[i][j].resize(divisions.Z());
-            for(int k = 0; k< divisions.Z(); k++)
+            cells[i][j].resize(divisions.z());
+            for(int k = 0; k< divisions.z(); k++)
             {
                 //cells[i][j][k] = new cell3d(_weightsSize);
                 cells[i][j][k] = new cell3d(withData);
@@ -320,20 +319,20 @@ void grid3d::initwithNoData(Box3d bounding_, Point3i divisions)
     dimensions = divisions;
     bounding = bounding_;
 
-    double cell01 = bounding.DimX()/divisions.X();
-    double cell02 = bounding.DimY()/divisions.Y();
-    double cell03 = bounding.DimZ()/divisions.Z();
+    double cell01 = bounding.DimX()/divisions.x();
+    double cell02 = bounding.DimY()/divisions.y();
+    double cell03 = bounding.DimZ()/divisions.z();
 
     // Comprobamos de las celdas son regulares.
     double error = 0.0000000001;
     assert(fabs(cell01-cell02)<error && fabs(cell03-cell02)<error);
 
-    cellSize = bounding.DimX()/divisions.X();
+    cellSize = bounding.DimX()/divisions.x();
 }
 
-Point3d grid3d::getCenterOfCell(int i, int j, int k)
+Eigen::Vector3d grid3d::getCenterOfCell(int i, int j, int k)
 {
-	return bounding.min + Point3d(((float)i+0.5)*cellSize, ((float)j+0.5)*cellSize,((float)k+0.5)*cellSize);
+	return bounding.min + Eigen::Vector3d(((float)i+0.5)*cellSize, ((float)j+0.5)*cellSize,((float)k+0.5)*cellSize);
 }
 
 void interpolateLinear(vector<weight>& result, vector<weight>& ptminWeights, vector<weight>& ptmaxWeights, float interpolationValue)
@@ -413,16 +412,16 @@ void interpolateBiLinear(vector<weight>& result,
 		interpolateLinear(result, weights1, weights2, interpolationValue2);
 }
 
-bool grid3d::isOut(Point3i& pt)
+bool grid3d::isOut(Eigen::Vector3i& pt)
 {
-	return (pt.X() < 0 || pt.Y() < 0 || pt.Z() < 0 ||
-		    pt.X() >= dimensions.X() || pt.Y() >=  dimensions.Y()  || pt.Z() >=  dimensions.Z());
+	return (pt.x() < 0 || pt.y() < 0 || pt.z() < 0 ||
+		    pt.x() >= dimensions.x() || pt.y() >=  dimensions.y()  || pt.z() >=  dimensions.z());
 
 }
 
-bool grid3d::hasData(Point3i& pt)
+bool grid3d::hasData(Eigen::Vector3i& pt)
 {
-	return cells[pt.X()][pt.Y()][pt.Z()]->data != NULL;
+	return cells[pt.x()][pt.y()][pt.z()]->data != NULL;
 }
 
 void grid3d::copyValues(vector<weight>& weights, vector<weight>& weights_out)
@@ -469,16 +468,16 @@ void interpolateTriLinear(vector<weight>& result,
 						interpolationValue3);
 }
 
-void grid3d::getCoordsFromPointSimple(Point3d& pt, vector<weight>& weights)
+void grid3d::getCoordsFromPointSimple(Eigen::Vector3d& pt, vector<weight>& weights)
 {
 	weights.clear();
 
-	Point3i originCell = cellId(pt);
-	int i = originCell.X();
-	int j = originCell.Y();
-	int k = originCell.Z();
+	Eigen::Vector3i originCell = cellId(pt);
+	int i = originCell.x();
+	int j = originCell.y();
+	int k = originCell.z();
 
-	if(i < 0 || j < 0 || k < 0 || i >= dimensions.X() || j >= dimensions.Y() || k >= dimensions.Z()) return;
+	if(i < 0 || j < 0 || k < 0 || i >= dimensions.x() || j >= dimensions.y() || k >= dimensions.z()) return;
 
 	if(cells[i][j][k]->getType() != EXTERIOR)
 	{
@@ -490,16 +489,16 @@ void grid3d::getCoordsFromPointSimple(Point3d& pt, vector<weight>& weights)
 	}
 }
 
-void grid3d::getCoordsFromPoint(Point3d& pt, vector<weight>& weights)
+void grid3d::getCoordsFromPoint(Eigen::Vector3d& pt, vector<weight>& weights)
 {
 	weights.clear();
 
-	Point3i originCell = cellId(pt);
-	int i = originCell.X();
-	int j = originCell.Y();
-	int k = originCell.Z();
+	Eigen::Vector3i originCell = cellId(pt);
+	int i = originCell.x();
+	int j = originCell.y();
+	int k = originCell.z();
 
-	if(i < 0 || j < 0 || k < 0 || i >= dimensions.X() || j >= dimensions.Y() || k >= dimensions.Z()) return;
+	if(i < 0 || j < 0 || k < 0 || i >= dimensions.x() || j >= dimensions.y() || k >= dimensions.z()) return;
 
 	if(cells[i][j][k]->getType() != EXTERIOR)
 	{
@@ -508,12 +507,12 @@ void grid3d::getCoordsFromPoint(Point3d& pt, vector<weight>& weights)
 			//copyValues(cells[i][j][k]->data->influences, weights);
 			//return;
 
-			Point3d c = getCenterOfCell(i,j,k);
+			Eigen::Vector3d c = getCenterOfCell(i,j,k);
 			// Obtenemos el cuadrante en que cae el punto.
-			Point3d dpt = pt - c;
+			Eigen::Vector3d dpt = pt - c;
 
-			Point3d ptmin, ptmax;
-			Point3i ptminIdx, ptmaxIdx;
+			Eigen::Vector3d ptmin, ptmax;
+			Eigen::Vector3i ptminIdx, ptmaxIdx;
 			for(int comp = 0; comp < 3; comp++)
 			{
 				if(dpt[comp]>=0)
@@ -596,21 +595,21 @@ void grid3d::getCoordsFromPoint(Point3d& pt, vector<weight>& weights)
 			if(coin == 0)
 			{
 				// dentro
-				Point3i CoordPt1, CoordPt2;
+				Eigen::Vector3i CoordPt1, CoordPt2;
 				int interpCoord1 = -1;
 				int interpCoord2 = -1;
 
-				vector<Point3i> facePoints1(4); // Cara 1
-				facePoints1[0] = Point3i(ptminIdx[0], ptminIdx[1], ptminIdx[2]);
-				facePoints1[1] = Point3i(ptmaxIdx[0], ptminIdx[1], ptminIdx[2]);
-				facePoints1[2] = Point3i(ptmaxIdx[0], ptmaxIdx[1], ptminIdx[2]);
-				facePoints1[3] = Point3i(ptminIdx[0], ptmaxIdx[1], ptminIdx[2]);
+				vector<Eigen::Vector3i> facePoints1(4); // Cara 1
+				facePoints1[0] = Eigen::Vector3i(ptminIdx[0], ptminIdx[1], ptminIdx[2]);
+				facePoints1[1] = Eigen::Vector3i(ptmaxIdx[0], ptminIdx[1], ptminIdx[2]);
+				facePoints1[2] = Eigen::Vector3i(ptmaxIdx[0], ptmaxIdx[1], ptminIdx[2]);
+				facePoints1[3] = Eigen::Vector3i(ptminIdx[0], ptmaxIdx[1], ptminIdx[2]);
 
-				vector<Point3i> facePoints2(4); // Cara 2
-				facePoints2[0] = Point3i(ptminIdx[0], ptminIdx[1], ptmaxIdx[2]);
-				facePoints2[1] = Point3i(ptmaxIdx[0], ptminIdx[1], ptmaxIdx[2]);
-				facePoints2[2] = Point3i(ptmaxIdx[0], ptmaxIdx[1], ptmaxIdx[2]);
-				facePoints2[3] = Point3i(ptminIdx[0], ptmaxIdx[1], ptmaxIdx[2]);
+				vector<Eigen::Vector3i> facePoints2(4); // Cara 2
+				facePoints2[0] = Eigen::Vector3i(ptminIdx[0], ptminIdx[1], ptmaxIdx[2]);
+				facePoints2[1] = Eigen::Vector3i(ptmaxIdx[0], ptminIdx[1], ptmaxIdx[2]);
+				facePoints2[2] = Eigen::Vector3i(ptmaxIdx[0], ptmaxIdx[1], ptmaxIdx[2]);
+				facePoints2[3] = Eigen::Vector3i(ptminIdx[0], ptmaxIdx[1], ptmaxIdx[2]);
 				
 				vector<float> interpolationValues(3);
 				
@@ -647,7 +646,7 @@ void grid3d::getCoordsFromPoint(Point3d& pt, vector<weight>& weights)
 			else if(coin == 1)
 			{
 				// cara
-				Point3i CoordPt1, CoordPt2;
+				Eigen::Vector3i CoordPt1, CoordPt2;
 				int interpCoord1 = -1;
 				int interpCoord2 = -1;
 
@@ -679,7 +678,7 @@ void grid3d::getCoordsFromPoint(Point3d& pt, vector<weight>& weights)
 					}
 				}
 
-				vector<Point3i> facePoints(4);
+				vector<Eigen::Vector3i> facePoints(4);
 				facePoints[0] = CoordPt1;
 				facePoints[1] = CoordPt1;
 				facePoints[2] = CoordPt2;
@@ -702,8 +701,8 @@ void grid3d::getCoordsFromPoint(Point3d& pt, vector<weight>& weights)
 			else if(coin == 2)
 			{
 				// arista
-				Point3i CoordPt1;
-				Point3i CoordPt2;
+				Eigen::Vector3i CoordPt1;
+				Eigen::Vector3i CoordPt2;
 				int interpCoord = -1;
 				for(int comp = 0; comp< 3; comp++)
 				{
@@ -736,7 +735,7 @@ void grid3d::getCoordsFromPoint(Point3d& pt, vector<weight>& weights)
 			else if(coin == 3)
 			{
 
-					Point3i CoordPt;
+					Eigen::Vector3i CoordPt;
 					for(int comp = 0; comp< 3; comp++)
 					{
 						if(coincidences[comp])
@@ -774,22 +773,22 @@ void grid3d::getCoordsFromPoint(Point3d& pt, vector<weight>& weights)
 	}
 }
 
-void grid3d::init(Box3d bounding_, Point3i divisions, int _weightsSize)
+void grid3d::init(MyBox3 bounding_, Eigen::Vector3i divisions, int _weightsSize)
 {
 	initBasicData();
 
     // comprobamos que las dimensiones tengan sentido
-    assert(divisions.X() != 0 || divisions.Y() != 0 || divisions.Z() != 0);
+    assert(divisions.x() != 0 || divisions.y() != 0 || divisions.z() != 0);
 
     // reservamos el espacio necesario para hacer los cálculos
-    cells.resize(divisions.X());
-    for(int i = 0; i< divisions.X(); i++)
+    cells.resize(divisions.x());
+    for(int i = 0; i< divisions.x(); i++)
     {
-        cells[i].resize(divisions.Y());
-        for(int j = 0; j< divisions.Y(); j++)
+        cells[i].resize(divisions.y());
+        for(int j = 0; j< divisions.y(); j++)
         {
-            cells[i][j].resize(divisions.Z());
-            for(int k = 0; k< divisions.Z(); k++)
+            cells[i][j].resize(divisions.z());
+            for(int k = 0; k< divisions.z(); k++)
             {
                 //cells[i][j][k] = new cell3d(_weightsSize);
                 cells[i][j][k] = new cell3d(true);
@@ -800,31 +799,31 @@ void grid3d::init(Box3d bounding_, Point3i divisions, int _weightsSize)
     dimensions = divisions;
     bounding = bounding_;
 
-    double cell01 = bounding.DimX()/divisions.X();
-    double cell02 = bounding.DimY()/divisions.Y();
-    double cell03 = bounding.DimZ()/divisions.Z();
+    double cell01 = bounding.DimX()/divisions.x();
+    double cell02 = bounding.DimY()/divisions.y();
+    double cell03 = bounding.DimZ()/divisions.z();
 
     // Comprobamos de las celdas son regulares.
     double error = 0.0000000001;
     assert(fabs(cell01-cell02)<error && fabs(cell03-cell02)<error);
 
-    cellSize = bounding.DimX()/divisions.X();
+    cellSize = bounding.DimX()/divisions.x();
 }
 
-grid3d::grid3d(Box3d bounding_, Point3i divisions, int _weightsSize)
+grid3d::grid3d(MyBox3 bounding_, Eigen::Vector3i divisions, int _weightsSize)
 {
     // comprobamos que las dimensiones tengan sentido
-    assert(divisions.X() != 0 || divisions.Y() != 0 || divisions.Z() != 0);
+    assert(divisions.x() != 0 || divisions.y() != 0 || divisions.z() != 0);
 
     // reservamos el espacio necesario para hacer los cálculos
-    cells.resize(divisions.X());
-    for(int i = 0; i< divisions.X(); i++)
+    cells.resize(divisions.x());
+    for(int i = 0; i< divisions.x(); i++)
     {
-        cells[i].resize(divisions.Y());
-        for(int j = 0; j< divisions.Y(); j++)
+        cells[i].resize(divisions.y());
+        for(int j = 0; j< divisions.y(); j++)
         {
-            cells[i][j].resize(divisions.Z());
-            for(int k = 0; k< divisions.Z(); k++)
+            cells[i][j].resize(divisions.z());
+            for(int k = 0; k< divisions.z(); k++)
             {
                 //cells[i][j][k] = new cell3d(_weightsSize);
                 cells[i][j][k] = new cell3d();
@@ -851,14 +850,14 @@ grid3d::grid3d(Box3d bounding_, Point3i divisions, int _weightsSize)
     dimensions = divisions;
     bounding = bounding_;
 
-    double cell01 = bounding.DimX()/divisions.X();
-    double cell02 = bounding.DimY()/divisions.Y();
-    double cell03 = bounding.DimZ()/divisions.Z();
+    double cell01 = bounding.DimX()/divisions.x();
+    double cell02 = bounding.DimY()/divisions.y();
+    double cell03 = bounding.DimZ()/divisions.z();
 
     // Comprobamos de las celdas son regulares.
     assert(cell01 == cell02 && cell02 == cell03);
 
-    cellSize = bounding.DimX()/divisions.X();
+    cellSize = bounding.DimX()/divisions.x();
 }
 
 void grid3d::updateStatistics()
@@ -915,7 +914,7 @@ void grid3d::clear()
     }
     cells.clear();
 
-    dimensions = Point3i(0,0,0);
+    dimensions = Eigen::Vector3i(0,0,0);
     bounding.SetNull();
     weightSize = 0;
     cellSize = 0;
@@ -923,37 +922,37 @@ void grid3d::clear()
 
 int grid3d::fillFromCorners()
 {
-    vector<Point3i> listForProcess;
+    vector<Eigen::Vector3i> listForProcess;
 
     int cellsCount = 0;
 
     // Encolamos los 8 extremos.
-    listForProcess.push_back(Point3i(0,0,0));
-    listForProcess.push_back(Point3i(0,dimensions.Y()-1,0));
-    listForProcess.push_back(Point3i(0,0,dimensions.Z()-1));
-    listForProcess.push_back(Point3i(0,dimensions.Y()-1,dimensions.Z()-1));
-    listForProcess.push_back(Point3i(dimensions.X()-1,0,0));
-    listForProcess.push_back(Point3i(dimensions.X()-1,dimensions.Y()-1,0));
-    listForProcess.push_back(Point3i(dimensions.X()-1,0,dimensions.Z()-1));
-    listForProcess.push_back(Point3i(dimensions.X()-1,dimensions.Y()-1,dimensions.Z()-1));
+    listForProcess.push_back(Eigen::Vector3i(0,0,0));
+    listForProcess.push_back(Eigen::Vector3i(0,dimensions.y()-1,0));
+    listForProcess.push_back(Eigen::Vector3i(0,0,dimensions.z()-1));
+    listForProcess.push_back(Eigen::Vector3i(0,dimensions.y()-1,dimensions.z()-1));
+    listForProcess.push_back(Eigen::Vector3i(dimensions.x()-1,0,0));
+    listForProcess.push_back(Eigen::Vector3i(dimensions.x()-1,dimensions.y()-1,0));
+    listForProcess.push_back(Eigen::Vector3i(dimensions.x()-1,0,dimensions.z()-1));
+    listForProcess.push_back(Eigen::Vector3i(dimensions.x()-1,dimensions.y()-1,dimensions.z()-1));
 
     // Los posibles vecinos de expansion
-    vector<Point3i> neighbours;
-    neighbours.push_back(Point3i(0,0,-1));
-    neighbours.push_back(Point3i(0,0,1));
-    neighbours.push_back(Point3i(0,-1,0));
-    neighbours.push_back(Point3i(0,1,0));
-    neighbours.push_back(Point3i(-1,0,0));
-    neighbours.push_back(Point3i(1,0,0));
+    vector<Eigen::Vector3i> neighbours;
+    neighbours.push_back(Eigen::Vector3i(0,0,-1));
+    neighbours.push_back(Eigen::Vector3i(0,0,1));
+    neighbours.push_back(Eigen::Vector3i(0,-1,0));
+    neighbours.push_back(Eigen::Vector3i(0,1,0));
+    neighbours.push_back(Eigen::Vector3i(-1,0,0));
+    neighbours.push_back(Eigen::Vector3i(1,0,0));
 
     // Hasta que se vacie la cola recorremos los cubos vecinos.
     while(!listForProcess.empty())
     {
-        Point3i pos = listForProcess.back(); listForProcess.pop_back();
+        Eigen::Vector3i pos = listForProcess.back(); listForProcess.pop_back();
 
-        if(cells[pos.X()][pos.Y()][pos.Z()]->getType() == UNTYPED)
+        if(cells[pos.x()][pos.y()][pos.z()]->getType() == UNTYPED)
         {
-            cells[pos.X()][pos.Y()][pos.Z()]->setType(EXTERIOR);
+            cells[pos.x()][pos.y()][pos.z()]->setType(EXTERIOR);
             cellsCount++;
         }
         else
@@ -961,15 +960,15 @@ int grid3d::fillFromCorners()
 
         for(unsigned int l = 0; l< neighbours.size(); l++)
         {
-            int i = neighbours[l].X();
-            int j = neighbours[l].Y();
-            int k = neighbours[l].Z();
+            int i = neighbours[l].x();
+            int j = neighbours[l].y();
+            int k = neighbours[l].z();
 
-            if(pos.X() + i >= 0 && pos.Y() + j >= 0 && pos.Z() + k >= 0 &&
-               pos.X() + i < dimensions.X() && pos.Y() + j < dimensions.Y() && pos.Z() + k  < dimensions.Z())
+            if(pos.x() + i >= 0 && pos.y() + j >= 0 && pos.z() + k >= 0 &&
+               pos.x() + i < dimensions.x() && pos.y() + j < dimensions.y() && pos.z() + k  < dimensions.z())
             {
-                if(cells[pos.X() + i][pos.Y() + j][pos.Z() + k]->getType() == UNTYPED)
-                    listForProcess.push_back(Point3i(pos.X() + i,pos.Y() + j,pos.Z() + k));
+                if(cells[pos.x() + i][pos.y() + j][pos.z() + k]->getType() == UNTYPED)
+                    listForProcess.push_back(Eigen::Vector3i(pos.x() + i,pos.y() + j,pos.z() + k));
             }
         }
     }
@@ -980,11 +979,11 @@ int grid3d::fillFromCorners()
 int grid3d::fillInside()
 {
     int cellsCount = 0;
-    for(int i = 0; i< dimensions.X(); i++)
+    for(int i = 0; i< dimensions.x(); i++)
     {
-        for(int j = 0; j< dimensions.Y(); j++)
+        for(int j = 0; j< dimensions.y(); j++)
         {
-            for(int k = 0; k< dimensions.Z(); k++)
+            for(int k = 0; k< dimensions.z(); k++)
             {
                 if(cells[i][j][k]->getType() == UNTYPED)
                 {
@@ -1004,11 +1003,11 @@ int grid3d::fillInside()
 
 void grid3d::cleanZeroInfluences()
 {
-	for(int i = 0; i< dimensions.X(); i++)
+	for(int i = 0; i< dimensions.x(); i++)
 	{
-		for(int j = 0; j< dimensions.Y(); j++)
+		for(int j = 0; j< dimensions.y(); j++)
 		{
-			for(int k = 0; k< dimensions.Z(); k++)
+			for(int k = 0; k< dimensions.z(); k++)
 			{
 				if(cells[i][j][k]->getType() != BOUNDARY) continue;
 
@@ -1037,11 +1036,11 @@ void grid3d::cleanZeroInfluences()
 // y los vectores de influencias auxiliares.
 void grid3d::normalizeWeightsByDomain()
 {
-	for(int i = 0; i< dimensions.X(); i++)
+	for(int i = 0; i< dimensions.x(); i++)
     {
-        for(int j = 0; j< dimensions.Y(); j++)
+        for(int j = 0; j< dimensions.y(); j++)
         {
-            for(int k = 0; k< dimensions.Z(); k++)
+            for(int k = 0; k< dimensions.z(); k++)
             {
 				if(cells[i][j][k]->getType() != BOUNDARY) 
 					continue;
@@ -1144,11 +1143,11 @@ void grid3d::normalizeWeightsOptimized()
 	int counterTotalCells = 0;
 	int counterZeroCells = 0;
 	float maxValue = -9999, minValue = 9999;
-	for(int i = 0; i< dimensions.X(); i++)
+	for(int i = 0; i< dimensions.x(); i++)
 	{
-		for(int j = 0; j< dimensions.Y(); j++)
+		for(int j = 0; j< dimensions.y(); j++)
 		{
-			for(int k = 0; k< dimensions.Z(); k++)
+			for(int k = 0; k< dimensions.z(); k++)
 			{
 				if(cells[i][j][k]->getType() != EXTERIOR)
 				{
@@ -1201,11 +1200,11 @@ void grid3d::normalizeWeights()
     if(DEBUG)
     {
         float maxValue = -9999, minValue = 9999;
-        for(int i = 0; i< dimensions.X(); i++)
+        for(int i = 0; i< dimensions.x(); i++)
         {
-            for(int j = 0; j< dimensions.Y(); j++)
+            for(int j = 0; j< dimensions.y(); j++)
             {
-                for(int k = 0; k< dimensions.Z(); k++)
+                for(int k = 0; k< dimensions.z(); k++)
                 {
                     if(cells[i][j][k]->getType() == INTERIOR)
                     {
@@ -1225,11 +1224,11 @@ void grid3d::normalizeWeights()
         printf("MinValue: %f; MaxValue: %f\n", minValue, maxValue); fflush(0);
     }
 
-    for(int i = 0; i< dimensions.X(); i++)
+    for(int i = 0; i< dimensions.x(); i++)
     {
-        for(int j = 0; j< dimensions.Y(); j++)
+        for(int j = 0; j< dimensions.y(); j++)
         {
-            for(int k = 0; k< dimensions.Z(); k++)
+            for(int k = 0; k< dimensions.z(); k++)
             {
                 if(cells[i][j][k]->getType() == INTERIOR)
                 {
@@ -1257,11 +1256,11 @@ void grid3d::normalizeWeights()
     if(DEBUG)
     {
         float maxValue = -9999, minValue = 9999;
-        for(int i = 0; i< dimensions.X(); i++)
+        for(int i = 0; i< dimensions.x(); i++)
         {
-            for(int j = 0; j< dimensions.Y(); j++)
+            for(int j = 0; j< dimensions.y(); j++)
             {
-                for(int k = 0; k< dimensions.Z(); k++)
+                for(int k = 0; k< dimensions.z(); k++)
                 {
                     if(cells[i][j][k]->getType() == INTERIOR)
                     {
@@ -1287,27 +1286,27 @@ void grid3d::expandWeightsOptimized(Modelo* m)
 {
     // Inicializamos los posibles vecinos en un array para
     // Simplificar el codigo -> 6-conectado
-    vector<Point3i> positions;
+    vector<Eigen::Vector3i> positions;
     positions.resize(6);
-    positions[0] = Point3i(1,0,0);
-    positions[1] = Point3i(-1,0,0);
-    positions[2] = Point3i(0,1,0);
-    positions[3] = Point3i(0,-1,0);
-    positions[4] = Point3i(0,0,1);
-    positions[5] = Point3i(0,0,-1);
+    positions[0] = Eigen::Vector3i(1,0,0);
+    positions[1] = Eigen::Vector3i(-1,0,0);
+    positions[2] = Eigen::Vector3i(0,1,0);
+    positions[3] = Eigen::Vector3i(0,-1,0);
+    positions[4] = Eigen::Vector3i(0,0,1);
+    positions[5] = Eigen::Vector3i(0,0,-1);
 
     float iterationVariation = 9999;
     int iterations = 0;
 
-    for(int i = 0; i< dimensions.X(); i++)
+    for(int i = 0; i< dimensions.x(); i++)
     {
-        for(int j = 0; j< dimensions.Y(); j++)
+        for(int j = 0; j< dimensions.y(); j++)
         {
-            for(int k = 0; k< dimensions.Z(); k++)
+            for(int k = 0; k< dimensions.z(); k++)
             {
                 if(cells[i][j][k]->getType() != EXTERIOR )
                 {
-                    cells[i][j][k]->data->pos = Point3i(i,j,k);
+                    cells[i][j][k]->data->pos = Eigen::Vector3i(i,j,k);
                     cells[i][j][k]->changed = false;
 					cells[i][j][k]->data->validated = false;
 					cells[i][j][k]->data->tempOwnerWeight = 0.0;
@@ -1337,10 +1336,10 @@ void grid3d::expandWeightsOptimized(Modelo* m)
 
 		// Inicializamos
 		//cell3d* currentCell = processCells[cellId(m->nodes[weightIdx]->position)];
-		Point3i originCell = cellId(m->nodes[weightIdx]->position);
-        int i = originCell.X();
-        int j = originCell.Y();
-        int k = originCell.Z();
+		Eigen::Vector3i originCell = cellId(m->nodes[weightIdx]->position);
+        int i = originCell.x();
+        int j = originCell.y();
+        int k = originCell.z();
 
         assert(cells[i][j][k]->getType() != EXTERIOR);
 
@@ -1353,14 +1352,14 @@ void grid3d::expandWeightsOptimized(Modelo* m)
 		// Anadimos los vecinos con peso 0
         for(unsigned int p = 0; p < positions.size(); p++)
         {
-            int newI = i+positions[p].X();
-            int newJ = j+positions[p].Y();
-            int newK = k+positions[p].Z();
+            int newI = i+positions[p].x();
+            int newJ = j+positions[p].y();
+            int newK = k+positions[p].z();
 
             // Comprobamos que no se salga del grid.
-            if(newI <0 || newI >= dimensions.X()) continue;
-            if(newJ <0 || newJ >= dimensions.Y()) continue;
-            if(newK <0 || newK >= dimensions.Z()) continue;
+            if(newI <0 || newI >= dimensions.x()) continue;
+            if(newJ <0 || newJ >= dimensions.y()) continue;
+            if(newK <0 || newK >= dimensions.z()) continue;
 
             if(cells[newI][newJ][newK]->getType() == EXTERIOR) continue;
 
@@ -1384,23 +1383,23 @@ void grid3d::expandWeightsOptimized(Modelo* m)
 			for(unsigned int cellCount = 0; cellCount< stepProcessCells.size(); cellCount++)
 			{
 				cell3d* currentCell = stepProcessCells[cellCount];
-				int nexti = currentCell->data->pos.X();
-				int nextj = currentCell->data->pos.Y();
-				int nextk = currentCell->data->pos.Z();
+				int nexti = currentCell->data->pos.x();
+				int nextj = currentCell->data->pos.y();
+				int nextk = currentCell->data->pos.z();
 
 				float tempValue = 0;
 				float inPos = 0;
 
 				for(unsigned int p = 0; p < positions.size(); p++)
 				{
-					int newI = nexti+positions[p].X();
-					int newJ = nextj+positions[p].Y();
-					int newK = nextk+positions[p].Z();
+					int newI = nexti+positions[p].x();
+					int newJ = nextj+positions[p].y();
+					int newK = nextk+positions[p].z();
 
 					// Comprobamos que no se salga del grid.
-					if(newI <0 || newI >= dimensions.X()) continue;
-					if(newJ <0 || newJ >= dimensions.Y()) continue;
-					if(newK <0 || newK >= dimensions.Z()) continue;
+					if(newI <0 || newI >= dimensions.x()) continue;
+					if(newJ <0 || newJ >= dimensions.y()) continue;
+					if(newK <0 || newK >= dimensions.z()) continue;
 
 					if(cells[newI][newJ][newK]->getType() == EXTERIOR) continue;
 
@@ -1432,9 +1431,9 @@ void grid3d::expandWeightsOptimized(Modelo* m)
 			for(unsigned int cellCount = 0; cellCount< stepProcessCells.size(); cellCount++)
 			{
 				cell3d* currentCell = stepProcessCells[cellCount];
-				int nexti = currentCell->data->pos.X();
-				int nextj = currentCell->data->pos.Y();
-				int nextk = currentCell->data->pos.Z();
+				int nexti = currentCell->data->pos.x();
+				int nextj = currentCell->data->pos.y();
+				int nextk = currentCell->data->pos.z();
 
 				float owner001 = cells[nexti][nextj][nextk]->data->ownerWeight;
 				float owner002 = cells[nexti][nextj][nextk]->data->tempOwnerWeight;
@@ -1445,9 +1444,9 @@ void grid3d::expandWeightsOptimized(Modelo* m)
 			for(unsigned int cellCount = 0; cellCount< cellsToAdd.size(); cellCount++)
 			{
 				cell3d* currentCell = cellsToAdd[cellCount];
-				int nexti = currentCell->data->pos.X();
-				int nextj = currentCell->data->pos.Y();
-				int nextk = currentCell->data->pos.Z();
+				int nexti = currentCell->data->pos.x();
+				int nextj = currentCell->data->pos.y();
+				int nextk = currentCell->data->pos.z();
 
 				// No deberia ser necesario... pero lo hacemos.
 				//cells[nexti][nextj][nextk]->data->ownerWeight = cells[nexti][nextj][nextk]->data->tempOwnerWeight;
@@ -1474,9 +1473,9 @@ void grid3d::expandWeightsOptimized(Modelo* m)
 		for(unsigned int cellCount = 0; cellCount< stepProcessCells.size(); cellCount++)
 		{
 			cell3d* currentCell = stepProcessCells[cellCount];
-			int nexti = currentCell->data->pos.X();
-			int nextj = currentCell->data->pos.Y();
-			int nextk = currentCell->data->pos.Z();
+			int nexti = currentCell->data->pos.x();
+			int nextj = currentCell->data->pos.y();
+			int nextk = currentCell->data->pos.z();
 
 			if(cells[nexti][nextj][nextk]->data->ownerWeight > weightThreshold)
 				cells[nexti][nextj][nextk]->data->influences.push_back(weight(weightIdx,cells[nexti][nextj][nextk]->data->ownerWeight));
@@ -1507,29 +1506,29 @@ void grid3d::expandWeights()
 	/*
     // Inicializamos los posibles vecinos en un array para
     // Simplificar el codigo -> 6-conectado
-    vector<Point3i> positions;
+    vector<Eigen::Vector3i> positions;
     positions.resize(6);
-    positions[0] = Point3i(1,0,0);
-    positions[1] = Point3i(-1,0,0);
-    positions[2] = Point3i(0,1,0);
-    positions[3] = Point3i(0,-1,0);
-    positions[4] = Point3i(0,0,1);
-    positions[5] = Point3i(0,0,-1);
+    positions[0] = Eigen::Vector3i(1,0,0);
+    positions[1] = Eigen::Vector3i(-1,0,0);
+    positions[2] = Eigen::Vector3i(0,1,0);
+    positions[3] = Eigen::Vector3i(0,-1,0);
+    positions[4] = Eigen::Vector3i(0,0,1);
+    positions[5] = Eigen::Vector3i(0,0,-1);
 
     float iterationVariation = 9999;
     int iterations = 0;
 
     vector< cell3d* > processCells;
-    for(int i = 0; i< dimensions.X(); i++)
+    for(int i = 0; i< dimensions.x(); i++)
     {
-        for(int j = 0; j< dimensions.Y(); j++)
+        for(int j = 0; j< dimensions.y(); j++)
         {
-            for(int k = 0; k< dimensions.Z(); k++)
+            for(int k = 0; k< dimensions.z(); k++)
             {
                 if(cells[i][j][k]->getType() != EXTERIOR )
                 {
                     processCells.push_back(cells[i][j][k]);
-                    cells[i][j][k]->data->pos = Point3i(i,j,k);
+                    cells[i][j][k]->data->pos = Eigen::Vector3i(i,j,k);
                     cells[i][j][k]->changed = false;
                 }
             }
@@ -1549,9 +1548,9 @@ void grid3d::expandWeights()
         {
 
             cell3d* currentCell = processCells[cellCount];
-            int i = currentCell->data->pos.X();
-            int j = currentCell->data->pos.Y();
-            int k = currentCell->data->pos.Z();
+            int i = currentCell->data->pos.x();
+            int j = currentCell->data->pos.y();
+            int k = currentCell->data->pos.z();
 
             if(cells[i][j][k]->getType() == INTERIOR || cells[i][j][k]->getType() == BOUNDARY)
             {
@@ -1575,14 +1574,14 @@ void grid3d::expandWeights()
                     // Para cada uno de los vecinos 6-conectado.
                     for(unsigned int p = 0; p < positions.size(); p++)
                     {
-                        int newI = i+positions[p].X();
-                        int newJ = j+positions[p].Y();
-                        int newK = k+positions[p].Z();
+                        int newI = i+positions[p].x();
+                        int newJ = j+positions[p].y();
+                        int newK = k+positions[p].z();
 
                         // Comprobamos que no se salga del grid.
-                        if(newI <0 || newI >= dimensions.X()) continue;
-                        if(newJ <0 || newJ >= dimensions.Y()) continue;
-                        if(newK <0 || newK >= dimensions.Z()) continue;
+                        if(newI <0 || newI >= dimensions.x()) continue;
+                        if(newJ <0 || newJ >= dimensions.y()) continue;
+                        if(newK <0 || newK >= dimensions.z()) continue;
 
                         if(cells[newI][newJ][newK]->getType() == EXTERIOR) continue;
 
@@ -1616,9 +1615,9 @@ void grid3d::expandWeights()
         for(unsigned int cellCount = 0; cellCount< processCells.size(); cellCount++)
         {
             cell3d* currentCell = processCells[cellCount];
-            int i = currentCell->data->pos.X();
-            int j = currentCell->data->pos.Y();
-            int k = currentCell->data->pos.Z();
+            int i = currentCell->data->pos.x();
+            int j = currentCell->data->pos.y();
+            int k = currentCell->data->pos.z();
 
             if(cells[i][j][k]->getType() == INTERIOR || cells[i][j][k]->getType() == BOUNDARY)
             {
@@ -1699,6 +1698,7 @@ int grid3d::typeCells(Modelo* mesh)
     return TypedCells;
 }
 
+/*
 int grid3d::typeCells(MyMesh& mesh)
 {
     // Comprobar que la caja contenedora de la maya está contenida dentro del grid.
@@ -1718,34 +1718,34 @@ int grid3d::typeCells(MyMesh& mesh)
     fillInside();
 
     return TypedCells;
+}*/
+
+Eigen::Vector3i grid3d::cellId(Eigen::Vector3d pt)
+{
+    Eigen::Vector3d aux = pt - bounding.min;
+    int x = (int)floor(aux.x()/cellSize);
+    int y = (int)floor(aux.y()/cellSize);
+    int z = (int)floor(aux.z()/cellSize);
+    return Eigen::Vector3i(x,y,z);
 }
 
-Point3i grid3d::cellId(Point3d pt)
+Eigen::Vector3d grid3d::cellCenter(int i,int j,int k)
 {
-    Point3d aux = pt - bounding.min;
-    int x = (int)floor(aux.X()/cellSize);
-    int y = (int)floor(aux.Y()/cellSize);
-    int z = (int)floor(aux.Z()/cellSize);
-    return Point3i(x,y,z);
-}
-
-Point3d grid3d::cellCenter(int i,int j,int k)
-{
-    Point3d aux = bounding.min;
-    aux += Point3d(cellSize*(i+0.5),cellSize*(j+0.5),cellSize*(k+0.5));
+    Eigen::Vector3d aux = bounding.min;
+    aux += Eigen::Vector3d(cellSize*(i+0.5),cellSize*(j+0.5),cellSize*(k+0.5));
     return aux;
 }
 
 int grid3d::typeCells(Modelo* m, int triIdx)
 {
     // A. Anadimos los vertices.
-    Point3i cell[3];
+    Eigen::Vector3i cell[3];
     //Box3i boundingCells;
 
     int boundaryCells = 0;
 
 	GraphNodePolygon* tri = m->triangles[triIdx];
-	vector<Point3d> points;
+	vector<Eigen::Vector3d> points;
 	points.resize(tri->verts.size());
 	for(int i = 0; i< tri->verts.size(); i++)
 		points[i] = tri->verts[i]->position;
@@ -1758,9 +1758,9 @@ int grid3d::typeCells(Modelo* m, int triIdx)
 		cell[i] = cellId(points[i]); // Obtenemos la celda en la que cae el vértice
         //boundingCells.Add(cell[i]);
 
-		int x = cell[i].X();
-		int y = cell[i].Y();
-		int z = cell[i].Z();
+		int x = cell[i].x();
+		int y = cell[i].y();
+		int z = cell[i].z();
 
         if(cells[x][y][z]->getType() != BOUNDARY)
         {
@@ -1772,7 +1772,7 @@ int grid3d::typeCells(Modelo* m, int triIdx)
 			cells[x][y][z]->data = new cellData();
 
         cells[x][y][z]->data->vertexContainer = true;
-        //cells[cell[i].X()][cell[i].Y()][cell[i].Z()]->weights[face.V(i)->IMark()] = 1.0;
+        //cells[cell[i].x()][cell[i].y()][cell[i].z()]->weights[face.V(i)->IMark()] = 1.0;
     }
 
     // Ahora recorremos celda por celda y vamos pintando el contorno.
@@ -1784,29 +1784,29 @@ int grid3d::typeCells(Modelo* m, int triIdx)
     // ponemos el valor para las arestas tambi�n.
     for(int k = 0; k<tri->verts.size(); k++)
     {
-        Point3d v = ( points[(k+1)%3] - points[k] );
+        Eigen::Vector3d v = ( points[(k+1)%3] - points[k] );
 
         //int idvert1 = face.V(k)->IMark();
         //int idvert2 = face.V((k+1)%3)->IMark();
-        Point3d v1 = points[k];
-        //Point3d v2 = face.V((k+1)%3)->P();
-        //float edgeLength = (v2-v1).Norm();
+        Eigen::Vector3d v1 = points[k];
+        //Eigen::Vector3d v2 = face.V((k+1)%3)->P();
+        //float edgeLength = (v2-v1).norm();
 
-        int divisions = (int)floor(v.Norm()/processCellSize);
-        Point3d vDir = v/v.Norm();
+        int divisions = (int)floor(v.norm()/processCellSize);
+        Eigen::Vector3d vDir = v/v.norm();
         for(int i = 0; i< divisions ; i++)
         {
-            Point3d intPoint = vDir*i*processCellSize + v1;
-            Point3i cell = cellId(intPoint);
+            Eigen::Vector3d intPoint = vDir*i*processCellSize + v1;
+            Eigen::Vector3i cell = cellId(intPoint);
 
-            if(dimensions.X() <= cell.X() || dimensions.Y() <= cell.Y() || dimensions.Z() <= cell.Z() ||
-               0 > cell.X() || 0 > cell.Y() || 0 > cell.Z()      )
+            if(dimensions.x() <= cell.x() || dimensions.y() <= cell.y() || dimensions.z() <= cell.z() ||
+               0 > cell.x() || 0 > cell.y() || 0 > cell.z()      )
             {
-                printf("Tenemos un punto fuera?? (%d, %d, %d)\n", cell.X(), cell.Y(), cell.Z());
+                printf("Tenemos un punto fuera?? (%d, %d, %d)\n", cell.x(), cell.y(), cell.z());
             }
             else
             {
-				cell3d* cellT = cells[cell.X()][cell.Y()][cell.Z()];
+				cell3d* cellT = cells[cell.x()][cell.y()][cell.z()];
 
                 if(cellT->getType() != BOUNDARY)
                 {
@@ -1821,63 +1821,64 @@ int grid3d::typeCells(Modelo* m, int triIdx)
 
     // buscamos la aresta mas larga.
     int largeIdx = 0;
-	Point3d v = (points[(largeIdx+1)%3]-points[largeIdx]);
-    float edgeLong = v.Norm();
+	Eigen::Vector3d v = (points[(largeIdx+1)%3]-points[largeIdx]);
+    float edgeLong = v.norm();
     for(int k = 1; k<3; k++)
     {
         v = (points[(k+1)%3]-points[k]);
-        if(edgeLong < v.Norm())
+        if(edgeLong < v.norm())
         {
             largeIdx = k;
-            edgeLong = v.Norm();
+            edgeLong = v.norm();
         }
     }
 
-    Point3d v1 = Point3d(points[(largeIdx+1)%3] - points[largeIdx]);
-    Point3d v2 = Point3d(points[(largeIdx+2)%3] - points[largeIdx]);
-    Point3d v3 = Point3d(points[(largeIdx+2)%3] - points[(largeIdx+1)%3]);
+    Eigen::Vector3d v1 = Eigen::Vector3d(points[(largeIdx+1)%3] - points[largeIdx]);
+    Eigen::Vector3d v2 = Eigen::Vector3d(points[(largeIdx+2)%3] - points[largeIdx]);
+    Eigen::Vector3d v3 = Eigen::Vector3d(points[(largeIdx+2)%3] - points[(largeIdx+1)%3]);
 
-    Point3d aux = v1^v2;
-    Point3d normal = aux^v1;
+    Eigen::Vector3d aux = v1.cross(v2);
+    Eigen::Vector3d normal = aux.cross(v1);
 
-    float v1Norm = (float)v1.Norm();
-    float v2Norm = (float)v2.Norm();
-    float v3Norm = (float)v3.Norm();
-    float normalNorm = (float)normal.Norm();
+    float v1Norm = (float)v1.norm();
+    float v2Norm = (float)v2.norm();
+    float v3Norm = (float)v3.norm();
+    float normalNorm = (float)normal.norm();
 
-    Point3d v1Dir = v1/v1Norm;
-    Point3d v2Dir = v2/v2Norm;
-    Point3d v3Dir = v3/v3Norm;
-    Point3d normalDir = normal/normalNorm;
+    Eigen::Vector3d v1Dir = v1/v1Norm;
+    Eigen::Vector3d v2Dir = v2/v2Norm;
+    Eigen::Vector3d v3Dir = v3/v3Norm;
+    Eigen::Vector3d normalDir = normal/normalNorm;
 
-    Point3d edgeCenter = v1Dir*(v1Dir*v2) + points[largeIdx];
-    int div1 = (int)ceil((points[largeIdx]-edgeCenter).Norm()/processCellSize);
-    int div2 = (int)ceil((points[(largeIdx+1)%3]-edgeCenter).Norm()/processCellSize);
+    // TOCHECK Eigen::Vector3d edgeCenter = v1Dir*(v1Dir*v2) + points[largeIdx];
+	Eigen::Vector3d edgeCenter = v1Dir * (v1Dir.dot(v2)) + points[largeIdx];
+    int div1 = (int)ceil((points[largeIdx]-edgeCenter).norm()/processCellSize);
+    int div2 = (int)ceil((points[(largeIdx+1)%3]-edgeCenter).norm()/processCellSize);
 
     for(int i = 1; i< div1 ; i++) // Saltamos el 0 porque es el mismo vertice.
     {
-        Point3d minPt = v1Dir*i*processCellSize + points[largeIdx];
-        Point3d maxPt = v2Dir*((float)i/(float)div1)*v2Norm + points[largeIdx]; // Suponemos que al ser triangulo rectangulo mantiene proporciones.
+        Eigen::Vector3d minPt = v1Dir*i*processCellSize + points[largeIdx];
+        Eigen::Vector3d maxPt = v2Dir*((float)i/(float)div1)*v2Norm + points[largeIdx]; // Suponemos que al ser triangulo rectangulo mantiene proporciones.
 
-        Point3d line = maxPt-minPt;
-        int Ydivs = (int)floor(line.Norm()/processCellSize);
+        Eigen::Vector3d line = maxPt-minPt;
+        int Ydivs = (int)floor(line.norm()/processCellSize);
 
         for(int j = 1; j< Ydivs ; j++) // Saltamos el 0 porque es el mismo vértice.
         {
-            Point3d intPoint = normalDir*j*processCellSize + minPt;
-            Point3i cell = cellId(intPoint);
+            Eigen::Vector3d intPoint = normalDir*j*processCellSize + minPt;
+            Eigen::Vector3i cell = cellId(intPoint);
 
-            if(dimensions.X() <= cell.X() || dimensions.Y() <= cell.Y() || dimensions.Z() <= cell.Z() ||
-               0 > cell.X() || 0 > cell.Y() || 0 > cell.Z()      )
+            if(dimensions.x() <= cell.x() || dimensions.y() <= cell.y() || dimensions.z() <= cell.z() ||
+               0 > cell.x() || 0 > cell.y() || 0 > cell.z()      )
             {
-                printf("Tenemos un punto fuera?? (%d, %d, %d)\n", cell.X(), cell.Y(), cell.Z());
+                printf("Tenemos un punto fuera?? (%d, %d, %d)\n", cell.x(), cell.y(), cell.z());
             }
             else
             {
-				if(cells[cell.X()][cell.Y()][cell.Z()]->data == NULL)
-					cells[cell.X()][cell.Y()][cell.Z()]->data = new cellData();
+				if(cells[cell.x()][cell.y()][cell.z()]->data == NULL)
+					cells[cell.x()][cell.y()][cell.z()]->data = new cellData();
 
-                cells[cell.X()][cell.Y()][cell.Z()]->setType(BOUNDARY);
+                cells[cell.x()][cell.y()][cell.z()]->setType(BOUNDARY);
             }
 
             boundaryCells++;
@@ -1887,28 +1888,28 @@ int grid3d::typeCells(Modelo* m, int triIdx)
 
     for(int i = 1; i< div2 ; i++) // Saltamos el 0 porque es el mismo vertice.
     {
-        Point3d minPt = -v1Dir*i*processCellSize + points[(largeIdx+1)%3];
-        Point3d maxPt = v3Dir*((float)i/(float)div2)*v3Norm + points[(largeIdx+1)%3]; // Suponemos que al ser triángulo rectángulo mantiene proporciones.
+        Eigen::Vector3d minPt = -v1Dir*i*processCellSize + points[(largeIdx+1)%3];
+        Eigen::Vector3d maxPt = v3Dir*((float)i/(float)div2)*v3Norm + points[(largeIdx+1)%3]; // Suponemos que al ser triángulo rectángulo mantiene proporciones.
 
-        Point3d line = maxPt-minPt;
-        int Ydivs = (int)floor(line.Norm()/processCellSize);
+        Eigen::Vector3d line = maxPt-minPt;
+        int Ydivs = (int)floor(line.norm()/processCellSize);
 
         for(int j = 1; j< Ydivs ; j++) // Saltamos el 0 porque es el mismo vértice.
         {
-            Point3d intPoint = normalDir*j*processCellSize + minPt;
-            Point3i cell = cellId(intPoint);
+            Eigen::Vector3d intPoint = normalDir*j*processCellSize + minPt;
+            Eigen::Vector3i cell = cellId(intPoint);
 
-            if(dimensions.X() <= cell.X() || dimensions.Y() <= cell.Y() || dimensions.Z() <= cell.Z() ||
-               0 > cell.X() || 0 > cell.Y() || 0 > cell.Z()      )
+            if(dimensions.x() <= cell.x() || dimensions.y() <= cell.y() || dimensions.z() <= cell.z() ||
+               0 > cell.x() || 0 > cell.y() || 0 > cell.z()      )
             {
-                printf("Tenemos un punto fuera?? (%d, %d, %d)\n", cell.X(), cell.Y(), cell.Z());
+                printf("Tenemos un punto fuera?? (%d, %d, %d)\n", cell.x(), cell.y(), cell.z());
             }
             else
 			{
-				if(cells[cell.X()][cell.Y()][cell.Z()]->data == NULL)
-					cells[cell.X()][cell.Y()][cell.Z()]->data = new cellData();
+				if(cells[cell.x()][cell.y()][cell.z()]->data == NULL)
+					cells[cell.x()][cell.y()][cell.z()]->data = new cellData();
 
-                cells[cell.X()][cell.Y()][cell.Z()]->setType(BOUNDARY);
+                cells[cell.x()][cell.y()][cell.z()]->setType(BOUNDARY);
 			}
 
             boundaryCells++;
@@ -1936,7 +1937,7 @@ int grid3d::typeCells(Modelo* m, int triIdx)
                                 if(l == 0 && m == 0 && n == 0) continue;
 
 
-                                if(l+i < 0 || m+j < 0 || n+k < 0 || dimensions.X() <= l+i || dimensions.Y() <= m+j || dimensions.Z() <= n+k )  continue;
+                                if(l+i < 0 || m+j < 0 || n+k < 0 || dimensions.x() <= l+i || dimensions.y() <= m+j || dimensions.z() <= n+k )  continue;
 
                                 if(cells[i][j][k]->tipo == BOUNDARY) continue;
 
@@ -1958,10 +1959,11 @@ int grid3d::typeCells(Modelo* m, int triIdx)
      return boundaryCells;
 }
 
+/*
 int grid3d::typeCells(MyFace& face)
 {
     // A. Anadimos los vertices.
-    Point3i cell[3];
+    Eigen::Vector3i cell[3];
     //Box3i boundingCells;
 
     int boundaryCells = 0;
@@ -1972,17 +1974,17 @@ int grid3d::typeCells(MyFace& face)
         cell[i] = cellId(face.P(i)); // Obtenemos la celda en la que cae el vértice
         //boundingCells.Add(cell[i]);
 
-        if(cells[cell[i].X()][cell[i].Y()][cell[i].Z()]->getType() != BOUNDARY)
+        if(cells[cell[i].x()][cell[i].y()][cell[i].z()]->getType() != BOUNDARY)
         {
-            cells[cell[i].X()][cell[i].Y()][cell[i].Z()]->setType(BOUNDARY);
+            cells[cell[i].x()][cell[i].y()][cell[i].z()]->setType(BOUNDARY);
             boundaryCells++;
         }
 
-		if(cells[cell[i].X()][cell[i].Y()][cell[i].Z()]->data == NULL)
-			cells[cell[i].X()][cell[i].Y()][cell[i].Z()]->data = new cellData();
+		if(cells[cell[i].x()][cell[i].y()][cell[i].z()]->data == NULL)
+			cells[cell[i].x()][cell[i].y()][cell[i].z()]->data = new cellData();
 
-        cells[cell[i].X()][cell[i].Y()][cell[i].Z()]->data->vertexContainer = true;
-        //cells[cell[i].X()][cell[i].Y()][cell[i].Z()]->weights[face.V(i)->IMark()] = 1.0;
+        cells[cell[i].x()][cell[i].y()][cell[i].z()]->data->vertexContainer = true;
+        //cells[cell[i].x()][cell[i].y()][cell[i].z()]->weights[face.V(i)->IMark()] = 1.0;
     }
 
     // Ahora recorremos celda por celda y vamos pintando el contorno.
@@ -1994,29 +1996,29 @@ int grid3d::typeCells(MyFace& face)
     // ponemos el valor para las arestas tambi�n.
     for(int k = 0; k<3; k++)
     {
-        Point3d v = (face.V((k+1)%3)->P()-face.V(k)->P());
+        Eigen::Vector3d v = (face.V((k+1)%3)->P()-face.V(k)->P());
 
         //int idvert1 = face.V(k)->IMark();
         //int idvert2 = face.V((k+1)%3)->IMark();
-        Point3d v1 = face.V(k)->P();
-        //Point3d v2 = face.V((k+1)%3)->P();
-        //float edgeLength = (v2-v1).Norm();
+        Eigen::Vector3d v1 = face.V(k)->P();
+        //Eigen::Vector3d v2 = face.V((k+1)%3)->P();
+        //float edgeLength = (v2-v1).norm();
 
-        int divisions = (int)floor(v.Norm()/processCellSize);
-        Point3d vDir = v/v.Norm();
+        int divisions = (int)floor(v.norm()/processCellSize);
+        Eigen::Vector3d vDir = v/v.norm();
         for(int i = 0; i< divisions ; i++)
         {
-            Point3d intPoint = vDir*i*processCellSize + v1;
-            Point3i cell = cellId(intPoint);
+            Eigen::Vector3d intPoint = vDir*i*processCellSize + v1;
+            Eigen::Vector3i cell = cellId(intPoint);
 
-            if(dimensions.X() <= cell.X() || dimensions.Y() <= cell.Y() || dimensions.Z() <= cell.Z() ||
-               0 > cell.X() || 0 > cell.Y() || 0 > cell.Z()      )
+            if(dimensions.x() <= cell.x() || dimensions.y() <= cell.y() || dimensions.z() <= cell.z() ||
+               0 > cell.x() || 0 > cell.y() || 0 > cell.z()      )
             {
-                printf("Tenemos un punto fuera?? (%d, %d, %d)\n", cell.X(), cell.Y(), cell.Z());
+                printf("Tenemos un punto fuera?? (%d, %d, %d)\n", cell.x(), cell.y(), cell.z());
             }
             else
             {
-				cell3d* cellT = cells[cell.X()][cell.Y()][cell.Z()];
+				cell3d* cellT = cells[cell.x()][cell.y()][cell.z()];
 
                 if(cellT->getType() != BOUNDARY)
                 {
@@ -2030,63 +2032,63 @@ int grid3d::typeCells(MyFace& face)
 
     // buscamos la aresta mas larga.
     int largeIdx = 0;
-    Point3d v = (face.V((largeIdx+1)%3)->P()-face.V(largeIdx)->P());
-    float edgeLong = v.Norm();
+    Eigen::Vector3d v = (face.V((largeIdx+1)%3)->P()-face.V(largeIdx)->P());
+    float edgeLong = v.norm();
     for(int k = 1; k<3; k++)
     {
-        v = Point3d(face.V((k+1)%3)->P()-face.V(k)->P());
-        if(edgeLong < v.Norm())
+        v = Eigen::Vector3d(face.V((k+1)%3)->P()-face.V(k)->P());
+        if(edgeLong < v.norm())
         {
             largeIdx = k;
-            edgeLong = v.Norm();
+            edgeLong = v.norm();
         }
     }
 
-    Point3d v1 = Point3d(face.V((largeIdx+1)%3)->P()-face.V(largeIdx)->P());
-    Point3d v2 = Point3d(face.V((largeIdx+2)%3)->P()-face.V(largeIdx)->P());
-    Point3d v3 = Point3d(face.V((largeIdx+2)%3)->P()-face.V((largeIdx+1)%3)->P());
+    Eigen::Vector3d v1 = Eigen::Vector3d(face.V((largeIdx+1)%3)->P()-face.V(largeIdx)->P());
+    Eigen::Vector3d v2 = Eigen::Vector3d(face.V((largeIdx+2)%3)->P()-face.V(largeIdx)->P());
+    Eigen::Vector3d v3 = Eigen::Vector3d(face.V((largeIdx+2)%3)->P()-face.V((largeIdx+1)%3)->P());
 
-    Point3d aux = v1^v2;
-    Point3d normal = aux^v1;
+    Eigen::Vector3d aux = v1.cross(v2); 
+    Eigen::Vector3d normal = aux.cross(v1);
 
-    float v1Norm = (float)v1.Norm();
-    float v2Norm = (float)v2.Norm();
-    float v3Norm = (float)v3.Norm();
-    float normalNorm = (float)normal.Norm();
+    float v1Norm = (float)v1.norm();
+    float v2Norm = (float)v2.norm();
+    float v3Norm = (float)v3.norm();
+    float normalNorm = (float)normal.norm();
 
-    Point3d v1Dir = v1/v1Norm;
-    Point3d v2Dir = v2/v2Norm;
-    Point3d v3Dir = v3/v3Norm;
-    Point3d normalDir = normal/normalNorm;
+    Eigen::Vector3d v1Dir = v1/v1Norm;
+    Eigen::Vector3d v2Dir = v2/v2Norm;
+    Eigen::Vector3d v3Dir = v3/v3Norm;
+    Eigen::Vector3d normalDir = normal/normalNorm;
 
-    Point3d edgeCenter = v1Dir*(v1Dir*v2) + face.V(largeIdx)->P();
-    int div1 = (int)ceil((face.V(largeIdx)->P()-edgeCenter).Norm()/processCellSize);
-    int div2 = (int)ceil((face.V((largeIdx+1)%3)->P()-edgeCenter).Norm()/processCellSize);
+    Eigen::Vector3d edgeCenter = v1Dir*(v1Dir*v2) + face.V(largeIdx)->P();
+    int div1 = (int)ceil((face.V(largeIdx)->P()-edgeCenter).norm()/processCellSize);
+    int div2 = (int)ceil((face.V((largeIdx+1)%3)->P()-edgeCenter).norm()/processCellSize);
 
     for(int i = 1; i< div1 ; i++) // Saltamos el 0 porque es el mismo vertice.
     {
-        Point3d minPt = v1Dir*i*processCellSize + face.V(largeIdx)->P();
-        Point3d maxPt = v2Dir*((float)i/(float)div1)*v2Norm + face.V(largeIdx)->P(); // Suponemos que al ser triangulo rectangulo mantiene proporciones.
+        Eigen::Vector3d minPt = v1Dir*i*processCellSize + face.V(largeIdx)->P();
+        Eigen::Vector3d maxPt = v2Dir*((float)i/(float)div1)*v2Norm + face.V(largeIdx)->P(); // Suponemos que al ser triangulo rectangulo mantiene proporciones.
 
-        Point3d line = maxPt-minPt;
-        int Ydivs = (int)floor(line.Norm()/processCellSize);
+        Eigen::Vector3d line = maxPt-minPt;
+        int Ydivs = (int)floor(line.norm()/processCellSize);
 
         for(int j = 1; j< Ydivs ; j++) // Saltamos el 0 porque es el mismo vértice.
         {
-            Point3d intPoint = normalDir*j*processCellSize + minPt;
-            Point3i cell = cellId(intPoint);
+            Eigen::Vector3d intPoint = normalDir*j*processCellSize + minPt;
+            Eigen::Vector3i cell = cellId(intPoint);
 
-            if(dimensions.X() <= cell.X() || dimensions.Y() <= cell.Y() || dimensions.Z() <= cell.Z() ||
-               0 > cell.X() || 0 > cell.Y() || 0 > cell.Z()      )
+            if(dimensions.x() <= cell.x() || dimensions.y() <= cell.y() || dimensions.z() <= cell.z() ||
+               0 > cell.x() || 0 > cell.y() || 0 > cell.z()      )
             {
-                printf("Tenemos un punto fuera?? (%d, %d, %d)\n", cell.X(), cell.Y(), cell.Z());
+                printf("Tenemos un punto fuera?? (%d, %d, %d)\n", cell.x(), cell.y(), cell.z());
             }
             else
             {
-				if(cells[cell.X()][cell.Y()][cell.Z()]->data == NULL)
-					cells[cell.X()][cell.Y()][cell.Z()]->data = new cellData();
+				if(cells[cell.x()][cell.y()][cell.z()]->data == NULL)
+					cells[cell.x()][cell.y()][cell.z()]->data = new cellData();
 
-                cells[cell.X()][cell.Y()][cell.Z()]->setType(BOUNDARY);
+                cells[cell.x()][cell.y()][cell.z()]->setType(BOUNDARY);
             }
 
             boundaryCells++;
@@ -2096,28 +2098,28 @@ int grid3d::typeCells(MyFace& face)
 
     for(int i = 1; i< div2 ; i++) // Saltamos el 0 porque es el mismo vertice.
     {
-        Point3d minPt = -v1Dir*i*processCellSize + face.V((largeIdx+1)%3)->P();
-        Point3d maxPt = v3Dir*((float)i/(float)div2)*v3Norm + face.V((largeIdx+1)%3)->P(); // Suponemos que al ser triángulo rectángulo mantiene proporciones.
+        Eigen::Vector3d minPt = -v1Dir*i*processCellSize + face.V((largeIdx+1)%3)->P();
+        Eigen::Vector3d maxPt = v3Dir*((float)i/(float)div2)*v3Norm + face.V((largeIdx+1)%3)->P(); // Suponemos que al ser triángulo rectángulo mantiene proporciones.
 
-        Point3d line = maxPt-minPt;
-        int Ydivs = (int)floor(line.Norm()/processCellSize);
+        Eigen::Vector3d line = maxPt-minPt;
+        int Ydivs = (int)floor(line.norm()/processCellSize);
 
         for(int j = 1; j< Ydivs ; j++) // Saltamos el 0 porque es el mismo vértice.
         {
-            Point3d intPoint = normalDir*j*processCellSize + minPt;
-            Point3i cell = cellId(intPoint);
+            Eigen::Vector3d intPoint = normalDir*j*processCellSize + minPt;
+            Eigen::Vector3i cell = cellId(intPoint);
 
-            if(dimensions.X() <= cell.X() || dimensions.Y() <= cell.Y() || dimensions.Z() <= cell.Z() ||
-               0 > cell.X() || 0 > cell.Y() || 0 > cell.Z()      )
+            if(dimensions.x() <= cell.x() || dimensions.y() <= cell.y() || dimensions.z() <= cell.z() ||
+               0 > cell.x() || 0 > cell.y() || 0 > cell.z()      )
             {
-                printf("Tenemos un punto fuera?? (%d, %d, %d)\n", cell.X(), cell.Y(), cell.Z());
+                printf("Tenemos un punto fuera?? (%d, %d, %d)\n", cell.x(), cell.y(), cell.z());
             }
             else
 			{
-				if(cells[cell.X()][cell.Y()][cell.Z()]->data == NULL)
-					cells[cell.X()][cell.Y()][cell.Z()]->data = new cellData();
+				if(cells[cell.x()][cell.y()][cell.z()]->data == NULL)
+					cells[cell.x()][cell.y()][cell.z()]->data = new cellData();
 
-                cells[cell.X()][cell.Y()][cell.Z()]->setType(BOUNDARY);
+                cells[cell.x()][cell.y()][cell.z()]->setType(BOUNDARY);
 			}
 
             boundaryCells++;
@@ -2126,7 +2128,7 @@ int grid3d::typeCells(MyFace& face)
 
     
     // Podemos ampliar el contorno para estabilizar m�s el c�lculo.
-    /*
+    
 	for(int i = 0; i< cells.size(); i++)
     {
         for(int j = 0; j< cells[i].size(); j++)
@@ -2145,7 +2147,7 @@ int grid3d::typeCells(MyFace& face)
                                 if(l == 0 && m == 0 && n == 0) continue;
 
 
-                                if(l+i < 0 || m+j < 0 || n+k < 0 || dimensions.X() <= l+i || dimensions.Y() <= m+j || dimensions.Z() <= n+k )  continue;
+                                if(l+i < 0 || m+j < 0 || n+k < 0 || dimensions.x() <= l+i || dimensions.y() <= m+j || dimensions.z() <= n+k )  continue;
 
                                 if(cells[i][j][k]->tipo == BOUNDARY) continue;
 
@@ -2162,11 +2164,11 @@ int grid3d::typeCells(MyFace& face)
         }
     }
 
-    */
+    
 
      return boundaryCells;
 }
-
+*/
 
 // Guardamos en binario el grid entero, para no tener que recalcular cada vez
 void grid3d::LoadGridFromFile(string sFileName)
@@ -2178,7 +2180,7 @@ void grid3d::LoadGridFromFile(string sFileName)
     {
         /* DATOS A GUARDAR
         vector< vector< vector< cell3d* > > > cells;
-        Point3i dimensions;
+        Eigen::Vector3i dimensions;
         Box3d bounding;
         int weightSize;
         float cellSize;
@@ -2190,10 +2192,10 @@ void grid3d::LoadGridFromFile(string sFileName)
         myfile.read( (char*) &cellSize, sizeof(float) );
         myfile.read( (char*) &weightSize, sizeof(int));
 
-        Point3d minPt,maxPt ;
+        Eigen::Vector3d minPt,maxPt ;
         myfile.read( (char*) &minPt, sizeof(double)*3);
         myfile.read( (char*) &maxPt, sizeof(double)*3);
-        bounding = Box3d(minPt, maxPt);
+        bounding = MyBox3(minPt, maxPt);
 
         myfile.read( (char*) &valueRange, sizeof(float));
 
@@ -2228,7 +2230,7 @@ void grid3d::SaveGridToFile(string sFileName)
     {
         /* DATOS A GUARDAR
             vector< vector< vector< cell3d* > > > cells;
-            Point3i dimensions;
+            Eigen::Vector3i dimensions;
             Box3d bounding;
             int weightSize;
             float cellSize;

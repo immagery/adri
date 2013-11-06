@@ -1,8 +1,9 @@
 #ifndef UTIL_OPS_H
 #define UTIL_OPS_H
 
-// VCG lib
-#include <vcg/complex/complex.h>
+// Eigen
+#include <Eigen\Core>
+#include <Eigen\Geometry>
 
 // Std lib
 #include <cmath>
@@ -31,13 +32,14 @@ double round(double x);
 
 double sign(double v);
 
-double det(vcg::Point3d u1, vcg::Point3d u2, vcg::Point3d u3);
+double det(Eigen::Vector3d u1, Eigen::Vector3d u2, Eigen::Vector3d u3);
 
 double Deg2Rad(double deg);
 
 double Rad2Deg(double rad);
 
-vcg::Quaternion<double> rotationBetweenTwoVectors(vcg::Point3d v1, vcg::Point3d v2);
-
+Eigen::Quaternion<double> fromEulerAngles(double alpha, double beta, double gamma);
+void toEulerAngles (const Eigen::Quaterniond& q, double& alpha, double& beta, double& gamma);
+void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle);
 
 #endif // UTIL_H

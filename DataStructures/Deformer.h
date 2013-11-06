@@ -5,11 +5,6 @@
 #include "grid3D.h"
 #include "Node.h"
 
-//TODELETE
-//#include <Computation\GreenCoords.h>
-//#include <Computation\HarmonicCoords.h>
-//#include <Computation\MeanValueCoords.h>
-
 #define DYN_CAGE_ID -1
 
 #define MVC_COMP_FILE_NAME "mvc_computation_copy.bin"

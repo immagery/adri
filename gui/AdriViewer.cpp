@@ -48,7 +48,6 @@
 #include <QtCore/QTextStream>
 
 using namespace qglviewer;
-using namespace vcg;
 
 AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::WindowFlags flags)
         : QGLViewer(parent, shareWidget, flags)
@@ -56,7 +55,7 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
     selectionMode_ = NONE;
 
     // Scene variables.
-    m_ptCenter.SetZero();
+	m_ptCenter.setZero();
     m_sceneRadius = 500;
 
     m_sceneMin[0] = -m_sceneRadius;
@@ -135,7 +134,7 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
 
 	CurrentProcessJoints.clear();
 
-	interiorPoint = Point3d(0,0,0);
+	interiorPoint = Eigen::Vector3d(0,0,0);
 
     //ctxMode = CTX_SELECTION;
 
@@ -204,8 +203,8 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
              int id = skt->joints[j]->nodeId;
 
              if (aniManager.objectHasAnimation(id)) {
-                Point3d position = aniManager.getPosition(id, frame);
-                Point3d rotation = aniManager.getRotation(id, frame);
+                Eigen::Vector3d position = aniManager.getPosition(id, frame);
+                Eigen::Vector3d rotation = aniManager.getRotation(id, frame);
                 //TOFIX ((joint*)skt->joints[j])->rot = rotation;
              }
          }
@@ -251,14 +250,17 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
 												((joint*)skt->joints[j])->qrot.X(),
 												((joint*)skt->joints[j])->qrot.Y(),
 												((joint*)skt->joints[j])->qrot.Z());*/
-				   ((joint*)skt->joints[j])->qrot.ToEulerAngles(alfa,beta,gamma);
 
-				   emit jointTransformationValues(((joint*)skt->joints[j])->pos.X(),
-												  ((joint*)skt->joints[j])->pos.Y(),
-												  ((joint*)skt->joints[j])->pos.Z(),
-												  Rad2Deg(alfa),
-												  Rad2Deg(beta),
-												  Rad2Deg(gamma));
+				   //((joint*)skt->joints[j])->qrot.ToEulerAngles(alfa,beta,gamma);
+
+				   toEulerAngles(((joint*)skt->joints[j])->qrot, alfa, beta, gamma);
+
+				   emit jointTransformationValues(((joint*)skt->joints[j])->pos[0],
+												  ((joint*)skt->joints[j])->pos[1],
+												  ((joint*)skt->joints[j])->pos[2],
+												  alfa,
+												  beta,
+												  gamma);
 
                 }
             }
@@ -329,7 +331,7 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
  // Lee una lista de puntos.
 
  bool AdriViewer::readNodes(vector< string >& nodeNames,
-                          vector< Point3d >& nodePoints,
+                          vector< Eigen::Vector3d >& nodePoints,
                           QString sFile)
  {
      nodePoints.clear();
@@ -356,7 +358,7 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
 
          nodeNames[element] = lstr[0].toStdString();
 
-         Point3d pt;
+         Eigen::Vector3d pt;
          for(int i = 0; i< 3; i++)
              pt[i] = lstr[i+1].toDouble();
 
@@ -372,7 +374,7 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
 
 
  // Lee una lista de puntos.
- bool AdriViewer::readPoints(vector< Point3d >& points,
+ bool AdriViewer::readPoints(vector< Eigen::Vector3d >& points,
                            QString sFile)
  {
      points.clear();
@@ -392,7 +394,7 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
          QStringList lstr = str.split(" ");
          assert(lstr.size() == 3);
 
-         Point3d pt;
+         Eigen::Vector3d pt;
          for(int i = 0; i< lstr.size(); i++)
              pt[i] = lstr[i].toDouble();
 
@@ -601,30 +603,30 @@ void AdriViewer::readSkeleton(string fileName)
      // Recomponemos la bounding box de la escena
      for(unsigned int i = 0; i< escena->models.size(); i++)
      {
-         Point3d minAuxPt, maxAuxPt;
+         Eigen::Vector3d minAuxPt, maxAuxPt;
          escena->models[i]->getBoundingBox(minAuxPt, maxAuxPt);
 
 
          if(!init_)
          {
-             minX = minAuxPt.X();
-             minY = minAuxPt.Y();
-             minZ = minAuxPt.Z();
+             minX = minAuxPt.x();
+             minY = minAuxPt.y();
+             minZ = minAuxPt.z();
 
-             maxX = maxAuxPt.X();
-             maxY = maxAuxPt.Y();
-             maxZ = maxAuxPt.Z();
+             maxX = maxAuxPt.x();
+             maxY = maxAuxPt.y();
+             maxZ = maxAuxPt.z();
              init_  = true;
          }
          else
          {
-             minX = min(minAuxPt.X(), minX);
-             minY = min(minAuxPt.Y(), minY);
-             minZ = min(minAuxPt.Y(), minY);
+             minX = min(minAuxPt.x(), minX);
+             minY = min(minAuxPt.y(), minY);
+             minZ = min(minAuxPt.y(), minY);
 
-             maxX = max(maxAuxPt.X(), maxX);
-             maxY = max(maxAuxPt.Y(), maxY);
-             maxZ = max(maxAuxPt.Z(), maxZ);
+             maxX = max(maxAuxPt.x(), maxX);
+             maxY = max(maxAuxPt.y(), maxY);
+             maxZ = max(maxAuxPt.z(), maxZ);
          }
      }
 
@@ -633,49 +635,49 @@ void AdriViewer::readSkeleton(string fileName)
          // TODO
          // Queda mirar esto... lo que tengo previsto es pedir al esqueleto... como con el modelo.
 
-         Point3d minAuxPt, maxAuxPt;
+         Eigen::Vector3d minAuxPt, maxAuxPt;
          escena->skeletons[i]->getBoundingBox(minAuxPt, maxAuxPt);
 
          if(!init_)
          {
-             minX = minAuxPt.X();
-             minY = minAuxPt.Y();
-             minZ = minAuxPt.Z();
+             minX = minAuxPt.x();
+             minY = minAuxPt.y();
+             minZ = minAuxPt.z();
 
-             maxX = maxAuxPt.X();
-             maxY = maxAuxPt.Y();
-             maxZ = maxAuxPt.Z();
+             maxX = maxAuxPt.x();
+             maxY = maxAuxPt.y();
+             maxZ = maxAuxPt.z();
              init_ = true;
          }
          else
          {
-             minX = min(minAuxPt.X(), minX);
-             minY = min(minAuxPt.Y(), minY);
-             minZ = min(minAuxPt.Y(), minY);
+             minX = min(minAuxPt.x(), minX);
+             minY = min(minAuxPt.y(), minY);
+             minZ = min(minAuxPt.y(), minY);
 
-             maxX = max(maxAuxPt.X(), maxX);
-             maxY = max(maxAuxPt.Y(), maxY);
-             maxZ = max(maxAuxPt.Z(), maxZ);
+             maxX = max(maxAuxPt.x(), maxX);
+             maxY = max(maxAuxPt.y(), maxY);
+             maxZ = max(maxAuxPt.z(), maxZ);
          }
      }
 
-     Point3d minPt(minX,minY,minZ);
-     Point3d maxPt(maxX,maxY,maxZ);
+     Vector3d minPt(minX,minY,minZ);
+     Vector3d maxPt(maxX,maxY,maxZ);
 
      for(int i = 0; i< 3; i++) m_sceneMin[i] = (float)minPt[i] ;
      for(int i = 0; i< 3; i++) m_sceneMax[i] = (float)maxPt[i] ;
-     m_ptCenter = Point3d((minX+maxX)/2, (minY+maxY)/2, (minZ+maxZ)/2);
+     m_ptCenter = Vector3d((minX+maxX)/2, (minY+maxY)/2, (minZ+maxZ)/2);
 
     // definimos las condiciones de la escena para el GlViewer.
     setSceneBoundingBox(Vec(m_sceneMin[0],m_sceneMin[1],m_sceneMin[2]),Vec(m_sceneMax[0],m_sceneMax[1],m_sceneMax[2]));
 
-    Point3d minPoint(m_sceneMin[0],m_sceneMin[1],m_sceneMin[2]);
+    Vector3d minPoint(m_sceneMin[0],m_sceneMin[1],m_sceneMin[2]);
 
-    setSceneCenter(Vec(m_ptCenter.X(),m_ptCenter.Y(),m_ptCenter.Z()));
-    setSceneRadius((m_ptCenter - minPoint).Norm());
+    setSceneCenter(Vec(m_ptCenter.x(),m_ptCenter.y(),m_ptCenter.z()));
+    setSceneRadius((m_ptCenter - minPoint).norm());
 
     printf("SceneMinMax: (%f,%f,%f)-(%f,%f,%f)\n",m_sceneMin[0],m_sceneMin[1],m_sceneMin[2],m_sceneMax[0],m_sceneMax[1],m_sceneMax[2]);
-    printf("SceneCenter: (%f,%f,%f)\n",m_ptCenter.X(),m_ptCenter.Y(),m_ptCenter.Z());
+    printf("SceneCenter: (%f,%f,%f)\n",m_ptCenter.x(),m_ptCenter.y(),m_ptCenter.z());
 
     showEntireScene();
 
@@ -794,7 +796,7 @@ void AdriViewer::readSkeleton(string fileName)
 
 	 // SKINNING I SOLVERS
 	 /*if (escena->skeletons.size() > 0 && aniManager.simulationEnabled) {
-		vector<Point3d> rots = escena->solverManager->computeSolvers(frame, this->animationPeriod(), escena->skeletons);
+		vector<Eigen::Vector3d> rots = escena->solverManager->computeSolvers(frame, this->animationPeriod(), escena->skeletons);
 		for (int i = 0; i < escena->skeletons[0]->joints.size(); ++i)
 			escena->skeletons[0]->joints[i]->addRotation(rots[i].X(), rots[i].Y(), rots[i].Z());
 		escena->skeletons[0]->joints[0]->computeWorldPos();
@@ -901,7 +903,7 @@ void AdriViewer::drawSceneGrid(int lines, double width) {
 
 void AdriViewer::startManipulation()
 {
-  Vec averagePosition;
+  /*Vec averagePosition;
   ManipulatedFrameSetConstraint* mfsc = (ManipulatedFrameSetConstraint*)(manipulatedFrame()->constraint());
   mfsc->clearSet();
 
@@ -912,7 +914,7 @@ void AdriViewer::startManipulation()
     }
 
   if (selection_.size() > 0)
-    manipulatedFrame()->setPosition(averagePosition / selection_.size());
+    manipulatedFrame()->setPosition(averagePosition / selection_.size());*/
 }
 
 //   S e l e c t i o n   t o o l s
@@ -1066,8 +1068,8 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
 }
 
 
- void AdriViewer::loadSelectVertexCombo(MyMesh& cage)
- {
+ //void AdriViewer::loadSelectVertexCombo(MyMesh& cage)
+ //{
      //QString vertName("Vertice %1");
      //parent->ui->selectElementComboLabel->setText("Vertices de la caja");
 
@@ -1077,7 +1079,7 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
      //    parent->ui->selectElementCombo->addItem(vertName.arg(idx), QVariant(idx++));
 
      //connect(parent->ui->selectElementCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeVertexSelection(int)));
- }
+ //}
 
  void AdriViewer::changeVertexSelection(int id)
  {
@@ -1427,7 +1429,7 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
            MyMesh::VertexIterator vi;
            for(vi = m->vert.begin(); vi!=m->vert.end(); ++vi ) {
                m->shading->colors[count].resize(3);
-               Point3d pt = vi->P();
+               Eigen::Vector3d pt = vi->P();
 
                Point3i idx = grRend->grid->cellId(pt);
 

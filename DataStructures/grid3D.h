@@ -8,9 +8,12 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <map>
+
+#include "Box3.h"
 
 using namespace std;
-using namespace vcg;
+//using namespace vcg;
 
 class skeleton;
 
@@ -109,7 +112,7 @@ class cellData
     void clearAll();
 
     // Flags for better computation
-    Point3i pos;
+    Eigen::Vector3i pos;
 
     // Distance for optimized front propagation
     double distanceToPos;
@@ -124,7 +127,7 @@ class cellData
     //vector<int> labels;
 
 	// Color para representar varias cosas.
-	Point3f color;
+	Eigen::Vector3f color;
 
     // Segmentation labels
     vector<double> embedding;
@@ -252,19 +255,19 @@ public:
     // constructor
     grid3d();
 
-    grid3d(Box3d bounding, Point3i divisions, int weightsSize);
+    grid3d(MyBox3 bounding, Eigen::Vector3i divisions, int weightsSize);
 
-    void initwithNoData(Box3d bounding_, Point3i divisions);
-    void init(Box3d bounding, Point3i divisions, int weightsSize);
+    void initwithNoData(MyBox3 bounding_, Eigen::Vector3i divisions);
+    void init(MyBox3 bounding, Eigen::Vector3i divisions, int weightsSize);
 
-	void getCoordsFromPoint(Point3d& pt, vector<weight>& weights);
-	void getCoordsFromPointSimple(Point3d& pt, vector<weight>& weights);
+	void getCoordsFromPoint(Eigen::Vector3d& pt, vector<weight>& weights);
+	void getCoordsFromPointSimple(Eigen::Vector3d& pt, vector<weight>& weights);
 
-	bool hasData(Point3i& pt);
-	bool isOut(Point3i& pt);
+	bool hasData(Eigen::Vector3i& pt);
+	bool isOut(Eigen::Vector3i& pt);
 	void copyValues(vector<weight>& weights, vector<weight>& weights_out);
 
-	Point3d getCenterOfCell(int i, int j, int k);
+	Eigen::Vector3d getCenterOfCell(int i, int j, int k);
 
 	void initBasicData();
 
@@ -273,13 +276,14 @@ public:
     void updateStatistics();
 
     // Dimensiones del grid en los tres ejes (vcg)
-    Point3i dimensions;
+    Eigen::Vector3i dimensions;
 
     // Resolution
     int res;
 
     // Bounding box del grid (vcg)
-    Box3d bounding;
+    //Box3d bounding;
+	MyBox3 bounding;
 
     // Numero de vertices representados en el grid
     int weightSize;
@@ -321,7 +325,7 @@ public:
     ////  FUNCTIONS ///
 
     // Marca las celdas con los diferentes tipos segun la geometria de entrada.
-    int typeCells(MyMesh& mesh);
+    //int typeCells(MyMesh& mesh);
 
 	// Marca las celdas con los diferentes tipos segun la geometria de entrada.
 	// Con la nueva estructura de grafo
@@ -347,13 +351,13 @@ public:
 	void cleanZeroInfluences();
 
     // Marca las celdas con los diferentes tipos según la geometría de entrada.
-    int typeCells(MyFace& face);
+    //int typeCells(MyFace& face);
 
     // Devuelve la direccion de la celda a la que pertenece el punto.
-    Point3i cellId(Point3d pt);
+    Eigen::Vector3i cellId(Eigen::Vector3d pt);
 
 	// Devuelve el centro de la celda en coordenadas de mundo.
-    Point3d cellCenter(int i,int j,int k);
+    Eigen::Vector3d cellCenter(int i,int j,int k);
 
     // Rellena las celdas que quedan dentro de los contornos.
     // Se llama cuando el contorno ya está inicializado.

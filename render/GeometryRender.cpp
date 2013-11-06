@@ -7,7 +7,7 @@
 
 //#include <wrap/io_trimesh/import.h>
 //#include <wrap/io_trimesh/export.h>
-#include "wrap/gl/trimesh.h"
+//#include "wrap/gl/trimesh.h"
 
 #include <DataStructures/Geometry.h> 
 
@@ -41,7 +41,7 @@ void GeometryRender::drawFunc(object* obj)
              for(int i = 0; i<3; i++)
              {
 				 int pIdx = geom->triangles[tr]->verts[i]->id;
-				 glNormal3d(geom->faceNormals[tr].X(), geom->faceNormals[tr].Y(), geom->faceNormals[tr].Z());
+				 glNormal3d(geom->faceNormals[tr].x(), geom->faceNormals[tr].y(), geom->faceNormals[tr].z());
                  if(size > 0 && pIdx < size)
                  {
                      if(colors[pIdx].size()== 3)

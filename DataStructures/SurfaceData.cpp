@@ -27,7 +27,7 @@ bool BuildSurfaceFromOFFFile(SurfaceGraph& graph, string sFileName)
 		fscanf(fin, "%f", &value2);
 		fscanf(fin, "%f", &value3);
 		graph.nodes[i] = new GraphNode(i);
-		graph.nodes[i]->position = Point3d(value1,value2,value3);
+		graph.nodes[i]->position = Eigen::Vector3d(value1,value2,value3);
 	}
 
 	// Leemos las caras.
@@ -91,7 +91,7 @@ PointData::PointData()
 
 	//modelVert = -1;
 
-    color = Point3f(0,0,0);
+    color = Eigen::Vector3f(0,0,0);
 
 	isBorder = false;
 }
@@ -165,7 +165,7 @@ PointData::PointData(int weightsSize)
     assigned = false;
     validated = false;
 
-    color = Point3f(0,0,0);
+    color = Eigen::Vector3f(0,0,0);
 
 	isBorder = false;
 
@@ -189,7 +189,7 @@ void PointData::clear()
     // TO DEBUG
     //vertexContainer;
     //Point3f color;
-    color = Point3f(0,0,0);
+    color = Eigen::Vector3f(0,0,0);
 
     // No tocaria
     //vector<double> embedding;

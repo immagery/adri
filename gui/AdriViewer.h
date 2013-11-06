@@ -29,6 +29,7 @@
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 using namespace std;
+using namespace Eigen;
 
 enum viewingModes { DynCage_Mode = 0, Cages_Mode, BHD_Mode, SimpleModel_Mode};
 enum shadingModes { SH_MODE_FLAT = 0, SH_MODE_SMOOTH};
@@ -64,7 +65,7 @@ public:
     // DRAWING FUNCTIONS
     void ReBuildScene();
     void drawSceneGrid(int lines, double width);
-    void drawCube(Point3d o, double cellSize, Point3f color, bool blend = false);
+    void drawCube(Vector3d o, double cellSize, Vector3f color, bool blend = false);
     void initScene();
 
     //SELECTION
@@ -75,7 +76,7 @@ public:
     void drawColored(QVector<QColor> colors);
 
     // VARIABLES
-    vcg::Point3d m_ptCenter; // centro de la escena
+    Vector3d m_ptCenter; // centro de la escena
     float m_sceneMin[3];
     float m_sceneMax[3];
 
@@ -113,7 +114,7 @@ public:
     bool bHComputed;
     bool bMVCComputed;
 
-	Point3d interiorPoint;
+	Eigen::Vector3d interiorPoint;
 
     // Primitives
     //MyMesh simpleCube;
@@ -142,9 +143,9 @@ public:
     vector<float> selectionValuesForColorHC;
     vector<float> selectionValuesForColorMVC;
 
-    vcg::Point2f maxMinGC;
-    vcg::Point2f maxMinHC;
-    vcg::Point2f maxMinMVC;
+    Eigen::Vector2f maxMinGC;
+    Eigen::Vector2f maxMinHC;
+    Eigen::Vector2f maxMinMVC;
 
     vector< vector<QColor> > vertexColorLayers;
 
@@ -189,7 +190,7 @@ public slots:
 	void UpdateVertexSource(int id);
 	void ChangeStillCage(int id);
 	void loadSelectableVertex(Cage* cage);
-	void loadSelectVertexCombo(MyMesh& cage);
+	//void loadSelectVertexCombo(MyMesh& cage);
 	void changeVertexSelection(int id);
 
 	void paintGrid(gridRenderer* grRend);
@@ -208,8 +209,8 @@ public slots:
     //void paintPlaneWithData(bool compute = false);
 	//void setPlaneData(bool drawPlane, int pointPos, int mode, float sliderPos, int orient);
 
-    bool readNodes(vector< string >& nodeNames, vector< Point3d >& nodePoints, QString sFile);
-    bool readPoints(vector< Point3d >& points, QString sFile);
+    bool readNodes(vector< string >& nodeNames, vector< Eigen::Vector3d >& nodePoints, QString sFile);
+    bool readPoints(vector< Eigen::Vector3d >& points, QString sFile);
 
     //void exportWeightsToMaya();
 

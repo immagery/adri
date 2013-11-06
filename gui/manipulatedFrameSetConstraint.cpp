@@ -21,23 +21,23 @@ void ManipulatedFrameSetConstraint::addObjectToSet(DrawObject* o)
 void ManipulatedFrameSetConstraint::constrainTranslation(qglviewer::Vec &translation, Frame *const)
 {
 
-    for (QList<DrawObject*>::iterator it=objects_.begin(), end=objects_.end(); it != end; ++it)
+    /*for (QList<DrawObject*>::iterator it=objects_.begin(), end=objects_.end(); it != end; ++it)
     {
         (*it)->frame.translate(translation);
         int id = (*it)->id;
         Vec pos = (*it)->frame.position();
         if(newCage)
-            newCage->vert[id].P() = vcg::Point3d(pos.x, pos.y, pos.z);
+            newCage->vert[id].P() = Eigen::Vector3d(pos.x, pos.y, pos.z);
     }
 
-    transformed = true;
+    transformed = true;*/
 }
 
 void ManipulatedFrameSetConstraint::constrainRotation(qglviewer::Quaternion &rotation, Frame *const frame)
 {
   // A little bit of math. Easy to understand, hard to guess (tm).
   // rotation is expressed in the frame local coordinates system. Convert it back to world coordinates.
-  const Vec worldAxis = frame->inverseTransformOf(rotation.axis());
+  /*const Vec worldAxis = frame->inverseTransformOf(rotation.axis());
   const Vec pos = frame->position();
   const float angle = rotation.angle();
 
@@ -55,10 +55,10 @@ void ManipulatedFrameSetConstraint::constrainRotation(qglviewer::Quaternion &rot
         int id = (*it)->id;
         Vec pos = (*it)->frame.position();
         if(newCage)
-            newCage->vert[id].P() = vcg::Point3d(pos.x, pos.y, pos.z);
+            newCage->vert[id].P() = Eigen::Vector3d(pos.x, pos.y, pos.z);
 
         //newCage->vert((*it)->id) = (*it)->frame.position();
       }
 
-    transformed = true;
+    transformed = true;*/
 }
