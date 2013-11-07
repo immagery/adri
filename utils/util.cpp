@@ -1,5 +1,7 @@
 #include "util.h"
 
+
+
 void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
 {
 	// extract the rest of turns
@@ -39,7 +41,8 @@ void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
 	{
 		if(a == 180)
 		{
-			q = Eigen::Quaterniond().setFromTwoVectors(Axis3, -Axis2) * Eigen::Quaterniond().setFromTwoVectors(Axis2, Axis3);
+			q = Eigen::Quaterniond().setFromTwoVectors(Axis2, Axis3) * 
+				Eigen::Quaterniond().setFromTwoVectors(Axis3, -Axis2);
 		}
 		else if(a < 180)
 		{
@@ -47,17 +50,20 @@ void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
 		}
 		else if(a > 180)
 		{
-			q = Eigen::Quaterniond().setFromTwoVectors(-Axis2, v) * 
-				Eigen::Quaterniond().setFromTwoVectors(Axis3, -Axis2) * 
-				Eigen::Quaterniond().setFromTwoVectors(Axis2, Axis3);
+			q = Eigen::Quaterniond().setFromTwoVectors(Axis2, Axis3) *
+				Eigen::Quaterniond().setFromTwoVectors(Axis3, -Axis2) *
+				Eigen::Quaterniond().setFromTwoVectors(-Axis2, v);
+				 
+				
 		}
 	}
 	else
 	{
 		if(a == -180)
 		{
-			q = Eigen::Quaterniond().setFromTwoVectors(-Axis3, -Axis2) *
-				Eigen::Quaterniond().setFromTwoVectors(Axis2, -Axis3);
+			q = Eigen::Quaterniond().setFromTwoVectors(Axis2, -Axis3) *
+				Eigen::Quaterniond().setFromTwoVectors(-Axis3, -Axis2);
+				
 		}
 		else if(a > -180)
 		{
@@ -65,9 +71,9 @@ void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
 		}
 		else if(a > -360)
 		{
-			q = Eigen::Quaterniond().setFromTwoVectors(-Axis2, v) *
+			q = Eigen::Quaterniond().setFromTwoVectors(Axis2, -Axis3) * 
 				Eigen::Quaterniond().setFromTwoVectors(-Axis3, -Axis2) *
-				Eigen::Quaterniond().setFromTwoVectors(Axis2, -Axis3);
+				Eigen::Quaterniond().setFromTwoVectors(-Axis2, v);
 		}
 	}
 	

@@ -1219,7 +1219,7 @@
             <item>
              <widget class="QTabWidget" name="NodeInfoTab">
               <property name="currentIndex">
-               <number>2</number>
+               <number>0</number>
               </property>
               <widget class="QWidget" name="render">
                <attribute name="title">
@@ -1379,7 +1379,7 @@
                 </item>
                 <item>
                  <property name="text">
-                  <string>Confidence Level</string>
+                  <string>Secondary Weights</string>
                  </property>
                 </item>
                 <item>

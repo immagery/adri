@@ -340,6 +340,8 @@ void JointRender::computeRestPosRec(joint* jt, joint* father)
 		//rotationMatrix = jt->rRotation.toRotationMatrix();
 	}
 
+	jt->restPos = jt->pos;
+	jt->restRot = jt->qOrient * jt->qrot;
 	
 	//Eigen::Matrix3d rotationMatrix;
 	//rotationMatrix = jt->rRotation.toRotationMatrix();
