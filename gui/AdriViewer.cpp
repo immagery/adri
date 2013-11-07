@@ -1100,6 +1100,9 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
  }
 
  void AdriViewer::paintModelWithData() {
+
+	//AirRig* rig = escena->rig;
+
     for(unsigned int modelIdx = 0; modelIdx < escena->models.size(); modelIdx++)
     {
         Modelo* m = (Modelo*)escena->models[modelIdx];
@@ -1241,7 +1244,7 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
                 }
                 else if(escena->iVisMode == VIS_BONES_SEGMENTATION)
                 {
-                    newvalue = (bd->nodeIds[pd.segmentId]->boneId-100)*13;
+					newvalue = (bd->nodeIds[pd.segmentId]->boneId-100)*13;
                     //newvalue = (newvalue * 25) % 100;
                     value = ((float)(newvalue%25))/25.0;
                 }

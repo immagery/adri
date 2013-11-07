@@ -196,14 +196,14 @@ public slots:
 	void paintGrid(gridRenderer* grRend);
 
 	void doTests(string fileName, string name, string path);
-
-	void paintModelWithData();
-
-	 float calculateDistancesForISOLines(grid3d* grid, vector<double>&  embeddedPoint);
+	float calculateDistancesForISOLines(grid3d* grid, vector<double>&  embeddedPoint);
 
     // GENERAL
     //void ChangeSliceXZ(int slice);
     //void ChangeSliceXY(int slice);
+//protected:
+	virtual void paintModelWithData();
+
 
     void paintModelWithGrid();
     //void paintPlaneWithData(bool compute = false);

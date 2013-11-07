@@ -119,6 +119,47 @@ public:
 	// This value is used to cut the weights and improve the computations.
 	double cuttingThreshold;
 
+	// Serialization
+	bool saveToFile(FILE* fout)
+	{
+		if(!fout)
+		{
+			printf("There is no file to print!\n [AIR_RIG]");
+			return false;
+		}
+		
+		fprintf(fout, "%d %d %d\n", boneId, rootBoneId, childBoneId); fflush(fout);
+		fprintf(fout, "%f %f\n", ratio, expansion); fflush(fout);
+		fprintf(fout, "%f %f\n", precomputedDistances, cuttingThreshold); fflush(fout);
+
+		// TOFIX: Could be computed later, but for been faster I save it
+		fprintf(fout, "%f %f %f\n", pos.x(), pos.y(), pos.z()); fflush(fout);
+		fprintf(fout, "%d\n", enableWeightsComputation); fflush(fout);
+
+		fprintf(fout, "%d %d\n", MVCWeights.size(), weightsSort.size()); fflush(fout);
+		
+		for(int i = 0; i< MVCWeights.size(); i++)
+		{
+			fprintf(fout, "%f ", MVCWeights[i]);
+		}
+		fprintf(fout, "\n");
+
+		for(int i = 0; i< weightsSort.size(); i++)
+		{
+			fprintf(fout, "%d ", weightsSort[i]);
+		}
+		fprintf(fout, "\n");
+
+		return true;
+	}
+
+	// Loads data from this file, it is important to bind
+	// this data with the model and skeleton after this function.
+	bool loadFromFile(FILE* fout)
+	{
+		return false;
+	}
+
 };
 
 #endif // DEFNODE_H
