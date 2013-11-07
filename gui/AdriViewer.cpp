@@ -786,6 +786,7 @@ void AdriViewer::readSkeleton(string fileName)
  void AdriViewer::draw()
  {
 
+	 /*
 	double fps = 1.0/this->animationPeriod()*1000;
 	double currentTime = (double)frame/fps;
 	int numReps = 1;
@@ -793,7 +794,7 @@ void AdriViewer::readSkeleton(string fileName)
 	++frame;
 	particles->drawFunc();
 	return;
-
+	*/
 
 	 //if (escena->skeletons.size() > 0) escena->skeletons[0]->joints[0]->computeWorldPos();
      if(ShadingModeFlag == SH_MODE_SMOOTH)

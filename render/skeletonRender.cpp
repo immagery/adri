@@ -325,10 +325,7 @@ void JointRender::computeRestPosRec(joint* jt, joint* father)
 	if(!father)
 	{
 		jt->rTranslation = jt->pos;
-		Eigen::Quaterniond or = jt->qOrient;
-		Eigen::Quaterniond rot = jt->qrot;
-		
-		jt->rRotation = rot * or;
+		jt->rRotation = jt->qOrient * jt->qrot;
 
 		rotationMatrix = jt->rRotation.toRotationMatrix();
 	}
@@ -337,12 +334,9 @@ void JointRender::computeRestPosRec(joint* jt, joint* father)
 		jt->rTranslation = father->rTranslation + 
 						   father->rRotation._transformVector(jt->pos);
 		
-		Eigen::Quaterniond or = jt->qOrient;
-		Eigen::Quaterniond rot = jt->qrot;
-		
-		jt->rRotation =  father->rRotation * rot * or;
+		jt->rRotation =  father->rRotation * jt->qOrient * jt->qrot;
 
-		rotationMatrix = ( rot * or ).toRotationMatrix();
+		rotationMatrix = ( jt->qOrient * jt->qrot ).toRotationMatrix();
 		//rotationMatrix = jt->rRotation.toRotationMatrix();
 	}
 

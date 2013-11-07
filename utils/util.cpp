@@ -19,7 +19,7 @@ void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
 	Eigen::Vector3d v, Axis2, Axis3;
 	switch(axis)
 	{
-	case 2: // over X
+	case 0: // over X
 		Axis2 << 0,1,0;
 		Axis3 << 0,0,1;
 	break;
@@ -27,7 +27,7 @@ void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
 		Axis2 << 0,0,1;
 		Axis3 << 1,0,0;
 	break;
-	case 0: // over Z
+	case 2: // over Z
 		Axis2 << 1,0,0;
 		Axis3 << 0,1,0;
 	break;
@@ -39,8 +39,7 @@ void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
 	{
 		if(a == 180)
 		{
-			q = Eigen::Quaterniond().setFromTwoVectors(Axis2, Axis3) * 
-				Eigen::Quaterniond().setFromTwoVectors(Axis3, -Axis2);
+			q = Eigen::Quaterniond().setFromTwoVectors(Axis3, -Axis2) * Eigen::Quaterniond().setFromTwoVectors(Axis2, Axis3);
 		}
 		else if(a < 180)
 		{
@@ -48,17 +47,17 @@ void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
 		}
 		else if(a > 180)
 		{
-			q = Eigen::Quaterniond().setFromTwoVectors(Axis2, Axis3) * 
-				Eigen::Quaterniond().setFromTwoVectors(Axis3, -Axis2) *
-				Eigen::Quaterniond().setFromTwoVectors(-Axis2, v);
+			q = Eigen::Quaterniond().setFromTwoVectors(-Axis2, v) * 
+				Eigen::Quaterniond().setFromTwoVectors(Axis3, -Axis2) * 
+				Eigen::Quaterniond().setFromTwoVectors(Axis2, Axis3);
 		}
 	}
 	else
 	{
 		if(a == -180)
 		{
-			q = Eigen::Quaterniond().setFromTwoVectors(Axis2, -Axis3) * 
-				Eigen::Quaterniond().setFromTwoVectors(-Axis3, -Axis2);
+			q = Eigen::Quaterniond().setFromTwoVectors(-Axis3, -Axis2) *
+				Eigen::Quaterniond().setFromTwoVectors(Axis2, -Axis3);
 		}
 		else if(a > -180)
 		{
@@ -66,9 +65,9 @@ void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
 		}
 		else if(a > -360)
 		{
-			q = Eigen::Quaterniond().setFromTwoVectors(Axis2, -Axis3) * 
+			q = Eigen::Quaterniond().setFromTwoVectors(-Axis2, v) *
 				Eigen::Quaterniond().setFromTwoVectors(-Axis3, -Axis2) *
-				Eigen::Quaterniond().setFromTwoVectors(-Axis2, v);
+				Eigen::Quaterniond().setFromTwoVectors(Axis2, -Axis3);
 		}
 	}
 	
