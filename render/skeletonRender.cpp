@@ -20,6 +20,8 @@
 
 float JointRender::jointSize = DEFAULT_SIZE;
 
+using namespace Eigen;
+
 void SkeletonRender::drawFunc(skeleton* obj)
 {
     // transformaciones
@@ -328,6 +330,8 @@ void JointRender::computeRestPosRec(joint* jt, joint* father)
 		jt->rRotation = jt->qOrient * jt->qrot;
 
 		rotationMatrix = jt->rRotation.toRotationMatrix();
+
+		jt->rTwist = Quaterniond::Identity();
 	}
 	else
 	{
@@ -338,11 +342,33 @@ void JointRender::computeRestPosRec(joint* jt, joint* father)
 
 		rotationMatrix = ( jt->qOrient * jt->qrot ).toRotationMatrix();
 		//rotationMatrix = jt->rRotation.toRotationMatrix();
+
+		// TwistComputation:
+		Vector3d axis = jt->translation - father->translation;
+		axis.normalize();
+
+		Vector3d tempRestRot = father->rRotation._transformVector(axis);
+		Quaterniond localRotationChild =  jt->qOrient * jt->qrot;
+		Quaterniond localRotationChildRest =  jt->restRot;
+		Vector3d referenceRest = localRotationChildRest._transformVector(tempRestRot);
+		Vector3d referenceCurr = localRotationChild._transformVector(tempRestRot);
+
+		Quaterniond nonRollrotation;
+		nonRollrotation.setFromTwoVectors(referenceRest, referenceCurr);
+		
+		// Ejes Locales
+		jt->rTwist = localRotationChild*localRotationChildRest.inverse()*nonRollrotation.inverse();
 	}
 
 	jt->restPos = jt->pos;
 	jt->restRot = jt->qOrient * jt->qrot;
-	
+
+	if(father)
+		jt->parentRot = father->restRot;
+	else 
+		jt->parentRot = Eigen::Quaterniond::Identity();
+
+
 	//Eigen::Matrix3d rotationMatrix;
 	//rotationMatrix = jt->rRotation.toRotationMatrix();
 
@@ -443,6 +469,49 @@ void JointRender::computeWorldPos(joint* jt) {
 void JointRender::computeWorldPosRec(joint* jt, joint* father)
 {
 
+	/* COMPUTING twist
+	int skID = data.influences[kk].label;
+	//joint& jt = deformersRestPosition[skID];
+	joint* jt = rig->defRig.defGroupsRef[skID]->transformation;
+
+	Vector3d& restPosition = originalModels[i]->nodes[vertexID]->position;
+	Vector3d restPos2(restPosition.x(), restPosition.y(), restPosition.z());
+
+	Quaterniond apliedRotation;
+	apliedRotation = jt->rotation;
+	//apliedRotation = apliedRotation * 
+
+	if(rig->defRig.defGroupsRef[skID]->relatedGroups.size() == 1)
+	{
+		double twist = 0;
+						
+		Vector3d axis = rig->defRig.defGroupsRef[skID]->relatedGroups[0]->transformation->translation - rig->defRig.defGroupsRef[skID]->transformation->translation;
+		axis.normalize();
+
+		//necesito guardar la transformacion hasta el padre
+
+		Vector3d tempRestRot = rig->defRig.defGroupsRef[skID]->transformation->rRotation._transformVector(axis);
+
+		Quaterniond localRotationChild =  rig->defRig.defGroupsRef[skID]->relatedGroups[0]->transformation->qOrient * 
+											rig->defRig.defGroupsRef[skID]->relatedGroups[0]->transformation->qrot;
+
+		Quaterniond localRotationChildRest =  rig->defRig.defGroupsRef[skID]->relatedGroups[0]->transformation->restRot;
+
+		Vector3d referenceRest = localRotationChildRest._transformVector(tempRestRot);
+		Vector3d referenceCurr = localRotationChild._transformVector(tempRestRot);
+
+		if(!referenceRest.isApprox(referenceCurr))
+			int parar = 0;
+
+		Quaterniond nonRollrotation;
+		nonRollrotation.setFromTwoVectors(referenceRest, referenceCurr);
+						
+		Quaterniond twistExtraction = localRotationChild*localRotationChildRest.inverse()*nonRollrotation.inverse();
+	
+	
+	*/
+
+
 	Eigen::Matrix3d rotationMatrix;
 	if(!father)
 	{
@@ -450,17 +519,42 @@ void JointRender::computeWorldPosRec(joint* jt, joint* father)
 		jt->rotation =  jt->qOrient * jt->qrot;
 
 		rotationMatrix = jt->rotation.toRotationMatrix();
+
+		jt->twist = Quaterniond::Identity();
 	}
 	else
 	{
 		jt->translation = father->translation + 
-						   father->rotation._transformVector(jt->pos);
+						  father->rotation._transformVector(jt->pos);
 		
 		jt->rotation =  father->rotation * jt->qOrient * jt->qrot;
 
 		rotationMatrix = ( jt->qOrient * jt->qrot).toRotationMatrix();
-	}
 
+		// TwistComputation:
+		Vector3d axis = jt->translation - father->translation;
+		axis.normalize();
+
+		Vector3d tempRestRot = father->rRotation._transformVector(axis);
+		Quaterniond localRotationChild =  jt->qOrient * jt->qrot;
+		Quaterniond localRotationChildRest =  jt->restRot;
+		Vector3d referenceRest = localRotationChildRest._transformVector(tempRestRot);
+		Vector3d referenceCurr = localRotationChild._transformVector(tempRestRot);
+
+		Quaterniond nonRollrotation;
+		nonRollrotation.setFromTwoVectors(referenceRest, referenceCurr);
+		
+		// Ejes Locales
+		jt->twist = localRotationChild*localRotationChildRest.inverse()*nonRollrotation.inverse();
+
+		Vector3d quatAxis(jt->twist.x(),jt->twist.y(),jt->twist.z());
+		quatAxis = localRotationChild.inverse()._transformVector(quatAxis);
+	
+		jt->twist.x() = quatAxis.x();
+		jt->twist.y() = quatAxis.y();
+		jt->twist.z() = quatAxis.z();
+
+	}
 	
 	//Eigen::Matrix3d rotationMatrix;
 	//rotationMatrix = jt->rRotation.toRotationMatrix();

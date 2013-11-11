@@ -68,7 +68,7 @@ public slots:
     void jointDataUpdate(float fvalue, int id);
 	void jointTransformUpdate(float x,float y,float z,float alpha,float beta,float gamma);
 	
-	void changeAuxValueInt(int value);
+	virtual void changeAuxValueInt(int value);
 
 	void changeVisModeForPlane(int);
 	void changeSelPointForPlane(int);

@@ -131,49 +131,64 @@ void Skinning::computeRestPositions(const vector< skeleton* >& skeletons) {
 	printf(" done\n");
 }
 
-/*
+
 void Skinning::computeDeformations(const vector< skeleton* >& skeletons) {
 	//for (int v = 0; v < originalModels.size(); ++v) originalModels[v]->shading->visible = false;	 // keep it false ALWAYS
 
-	if (skeletons.size() > 0) {
-		//if (!skeletons[0]->joints[0]->dirtyFlag) return;
-		skeletons[0]->joints[0]->computeWorldPos();
+	// Check if there's at least one dirty skeleton. In that case, proceed
+	bool oneDirtySkeleton = false;
+	for (int i = 0; i < skeletons.size(); ++i) 
+	{
+		if (skeletons[i]->root->dirtyFlag) 
+		{
+			oneDirtySkeleton = true;
+			skeletons[i]->root->computeWorldPos();
+		}
 	}
+	if (!oneDirtySkeleton) return;
+	
 	bool updated = false;
 
-	for (int i = 0; i < deformedModels.size(); ++i) {		// for every deformed model
-		Geometry *m = deformedModels[i];
-		for (int j = 0; j < bindings.size(); ++j) {			// loop through all bindings
-			binding * b = bindings[j];
+	for (int i = 0; i < deformedModels.size(); ++i) 
+	{		
+		// It's a bad way to ensure that we are deforming the right mdoel.
+		if (!deformedModels[i]->shading->visible) return;
 
-			for (int k = 0; k < b->pointData.size(); ++k) // and for each binding, loop over all its points
-			{     
-				PointData data = b->pointData[k];
+		Geometry *m = deformedModels[i];
+		for (int j = 0; j < bindings[i].size(); ++j) 
+		{			
+			// loop through all bindings
+			binding * b = bindings[i][j];
+
+			for (int k = 0; k < b->pointData.size(); ++k) 
+			{ 
+				// and for each binding, loop over all its points
+				PointData& data = b->pointData[k];
 				GraphNode* node = data.node;
 				int vertexID = node->id;
+
 				Vector3d finalPosition (0,0,0);
 				float totalWeight = 0;
-				for (int kk = 0; kk < data.influences.size(); ++kk) {   // and check all joints associated to them
+
+				Vector3d rotDir; 
+				for (int kk = 0; kk < data.influences.size(); ++kk) // and check all joints associated to them
+				{   
 					int skID = data.influences[kk].label;
-					for (int s = 0; s < skeletons.size(); ++s) 
-					{
-						//for (int t = 0; t < skeletons[s]->joints.size(); ++t) {
-							joint* joint = skeletons[s]->getJoint(skID);
-							if(joint)
-							{
-							//joint* joint = skeletons[s]->joints[t];
-							//if (joint->nodeId == skID) {
-								Vector3d restPosition = originalModels[i]->nodes[vertexID]->position;
-								MatrixXf restPos(4,1); restPos << restPosition.X(), restPosition.Y(), restPosition.Z(), 1;
-								MatrixXf finalPos =  joint->W * joint->iT * restPos;
-								finalPosition = finalPosition + Vector3d(finalPos(0,0), finalPos(1,0), finalPos(2,0)) * data.influences[kk].weightValue;
-								totalWeight += data.influences[kk].weightValue;
-								break;
-							}
-							//}
-						//}
-					}
+					//joint& jt = deformersRestPosition[skID];
+					joint* jt = skeletons[0]->jointRef[skID];
+
+					Vector3d& restPosition = originalModels[i]->nodes[vertexID]->position;
+					Vector3d restPos2(restPosition.x(), restPosition.y(), restPosition.z());
+
+					float currentWeight = data.influences[kk].weightValue;
+
+					Vector3d finalPos2 =  jt->rotation._transformVector(jt->rRotation.inverse()._transformVector(restPos2-jt->rTranslation)) + jt->translation;
+					finalPosition = finalPosition + Vector3d(finalPos2(0), finalPos2(1), finalPos2(2)) * currentWeight;
+
+					totalWeight += data.influences[kk].weightValue;
+					
 				}
+
 				finalPosition = finalPosition / totalWeight;
 				if (m->nodes[vertexID]->position != finalPosition) 
 					updated = true;
@@ -183,15 +198,13 @@ void Skinning::computeDeformations(const vector< skeleton* >& skeletons) {
 
 		}
 		if (updated)
-		{
+		{		
 			m->computeNormals();
 		}
 	}
 
-
-
 }
-*/
+
 
 void Skinning::computeDeformationsWithSW(const vector< skeleton* >& skeletons) {
 	// Caluculamos las matrices de Transformacion de cada articulacion
