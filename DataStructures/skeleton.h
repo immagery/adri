@@ -40,6 +40,11 @@ class joint : public object
 		Eigen::Vector3d restPos;
 		Eigen::Quaternion<double> restRot;
 
+		Eigen::Quaternion<double> parentRot;
+
+		Eigen::Quaterniond twist;
+		Eigen::Quaterniond rTwist;
+
 		Eigen::Matrix4f iT;
 		Eigen::Matrix4f W;
 		Eigen::Matrix4f world;
