@@ -232,7 +232,7 @@ void object::addRotation(double rx, double ry, double rz)
 
 void object::addRotation(Eigen::Quaternion<double> q) {
 	q.normalize();
-	qrot = q * qrot;
+	qrot = qrot * q;
 	qrot.normalize();
 	dirtyFlag = true;
 }
