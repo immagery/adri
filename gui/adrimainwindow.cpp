@@ -72,6 +72,8 @@ void AdriMainWindow::connectSignals() {
 	//connect(ui->nextStep_button, SIGNAL(released()), ui->glCustomWidget, SLOT(nextProcessStep()));
 	//connect(ui->allNextStep_button, SIGNAL(released()), ui->glCustomWidget, SLOT(allNextProcessSteps()));
 
+	connect(ui->prop_function_updt, SIGNAL(released()), ui->glCustomWidget, SLOT(PropFunctionConf()));
+
     connect(ui->prop_function_updt, SIGNAL(released()), ui->glCustomWidget, SLOT(PropFunctionConf()));
 
     connect(ui->paintModel_btn, SIGNAL(released()), ui->glCustomWidget, SLOT(paintModelWithGrid()));
@@ -101,7 +103,6 @@ void AdriMainWindow::connectSignals() {
 	connect(ui->thresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(updateThresholdSlidervalue(int)));
 	connect(ui->threshold_enable, SIGNAL(toggled(bool)), this, SLOT(enableThreshold(bool)));
 	
-
     connect(ui->smoothPropagationSlider, SIGNAL(sliderReleased()), this, SLOT(changeSmoothSlider()));
     connect(ui->smoothPropagationSlider, SIGNAL(valueChanged(int)), this, SLOT(updateSmoothSlidervalue(int)));
 
@@ -133,6 +134,11 @@ void AdriMainWindow::connectSignals() {
 	connect(ui->dialY, SIGNAL(valueChanged(int)), this, SLOT(changeTransformRotateAmountY(int)));
     connect(ui->dialZ, SIGNAL(valueChanged(int)), this, SLOT(changeTransformRotateAmountZ(int)));
 
+	// Twist control
+	connect(ui->twistEnableCheck, SIGNAL(clicked()), this, SLOT(changeTwistParameters()));
+	connect(ui->twist_fin_slider, SIGNAL(sliderMoved(int)), this, SLOT(changeTwistParameters(int)));
+	connect(ui->twist_ini_slider, SIGNAL(sliderMoved(int)), this, SLOT(changeTwistParameters(int)));
+
 	// Transform 
 	connect(ui->translationAmountX, SIGNAL(valueChanged(int)), this, SLOT(changeTransformTranslateAmountX(int)));
     connect(ui->translationAmountY, SIGNAL(valueChanged(int)), this, SLOT(changeTransformTranslateAmountY(int)));
@@ -150,6 +156,19 @@ void AdriMainWindow::connectSignals() {
 
 	// Simulation
 	connect(ui->toggleSim, SIGNAL(clicked()), this, SLOT(toggleSimulation()));
+}
+
+void AdriMainWindow::changeTwistParameters()
+{
+	// enable/disable
+	ui->twist_fin_slider->setEnabled(ui->twistEnableCheck->isChecked());
+	ui->twist_ini_slider->setEnabled(ui->twistEnableCheck->isChecked());
+	ui->glCustomWidget->setSliderParams(ui->twist_ini_slider->value()/1000.0, ui->twist_fin_slider->value()/1000.0, ui->twistEnableCheck->isChecked());
+}
+
+void AdriMainWindow::changeTwistParameters(int value)
+{
+	changeTwistParameters();
 }
 
 AdriMainWindow::AdriMainWindow(QWidget *parent) :
@@ -335,6 +354,8 @@ void AdriMainWindow::OpenNewScene()
     QString sModelPrefix = aux.left(aux.length()-4);
 
     ui->glCustomWidget->readScene(fileNames[0].toStdString(), sModelPrefix.toStdString(), sModelPath.toStdString());
+
+	updateSceneView();
 }
 
 void AdriMainWindow::LaunchTests()

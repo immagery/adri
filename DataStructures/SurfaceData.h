@@ -406,6 +406,9 @@ public:
 	vector<TriangleData> virtualTriangles;
 
 	/// Data structure for process faster the geometry
+	SurfaceGraph* mainSurface;
+	vector<SurfaceGraph> surfaces;
+
 	SurfaceGraph surface;
 	unsigned int ntriangles;
 

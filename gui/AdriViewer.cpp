@@ -22,11 +22,11 @@
 
 #include <utils/util.h>
 #include "adrimainwindow.h"
-//#include "ui_mainwindow.h"
 
 #include <DataStructures/Scene.h>
 #include <DataStructures/Cage.h>
 #include <DataStructures/Modelo.h>
+#include <DataStructures/Rig.h>
 #include <render/ShadingNode.h>
 
 #include <render/gridRender.h>
@@ -131,6 +131,7 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
     colorLayerIdx = -1;
 
     escena = new scene();
+	escena->rig = new rig(scene::getNewId());
 
 	CurrentProcessJoints.clear();
 
@@ -426,17 +427,38 @@ void AdriViewer::readSkeleton(string fileName)
         QString sGlobalPath = in.readLine(); in.readLine();
         QString sPath = in.readLine(); in.readLine(); in.readLine();
         QString sModelFile = in.readLine(); in.readLine(); in.readLine();
-        QString sSkeletonFile = in.readLine(); in.readLine(); in.readLine();
-        QString sEmbeddingFile = in.readLine(); in.readLine(); in.readLine();
-		QString sBindingFile, sGridFile;
-		if(!in.atEnd())
+
+		QString sSkeletonFile, sEmbeddingFile, sBindingFile, sGridFile, sRiggingFile;
+
+		QStringList flags = in.readLine().split(" "); in.readLine(); in.readLine();
+		if(flags.size() != 5)
+			return;
+
+		if(flags[0].toInt() != 0 && !in.atEnd())
+		{
+			sSkeletonFile = in.readLine(); in.readLine(); in.readLine();
+		}
+
+		if(flags[1].toInt() != 0 && !in.atEnd())
+		{
+			sEmbeddingFile = in.readLine(); in.readLine(); in.readLine();
+		}
+
+		if(flags[2].toInt() != 0 && !in.atEnd())
 		{
 			sBindingFile = in.readLine(); in.readLine(); in.readLine();
 		}
-		if(!in.atEnd())
+
+		if(flags[3].toInt() != 0 && !in.atEnd())
 		{
 			sGridFile = in.readLine(); in.readLine(); in.readLine();
 		}
+
+		if(flags[4].toInt() != 0 && !in.atEnd())
+		{
+			sRiggingFile = in.readLine(); in.readLine(); in.readLine();
+		}
+
 		modelDefFile.close();
 
 		QString newPath(path.c_str());
@@ -447,23 +469,36 @@ void AdriViewer::readSkeleton(string fileName)
         // Leer modelo
         readModel( (newPath+sModelFile).toStdString(), sSceneName.toStdString(), newPath.toStdString());
 
+		// Constuir datos sobre el modelo
         Modelo* m = ((Modelo*)escena->models.back());
         m->sPath = newPath.toStdString(); // importante para futuras referencias
-
-        // Leer esqueleto
-        readSkeleton((newPath+sSkeletonFile).toStdString());
-
 		BuildSurfaceGraphs(*m, m->bindings);
 
-        // Leer embedding
-        //ReadEmbedding((newPath+sEmbeddingFile).toStdString(), m->embedding);
-		
+        // Leer esqueleto
+		if(!sSkeletonFile.isEmpty())
+		{
+			string sSkeletonFileFullPath = (newPath+sSkeletonFile).toStdString();
+			readSkeletons(sSkeletonFileFullPath, escena->skeletons);
+		}
+
+		// Load Rigging
+		if(!sRiggingFile.isEmpty())
+		{
+			string sRiggingFileFullPath = (newPath+sRiggingFile).toStdString();//path.toStdString();
+			escena->rig->loadRigging(sRiggingFileFullPath);
+
+			// By now is with the skeleton, but soon will be alone
+			escena->rig->bindRigToScene(*m, escena->skeletons);
+		}
+
 		// Skinning
-		//QString path = (sGlobalPath.append(sPath).append("binding.txt"));
-		
-		string sBindingFileFullPath = (newPath+sBindingFile).toStdString();//path.toStdString();
-		escena->loadBindingForModel(m,sBindingFileFullPath);
-        escena->skinner->computeRestPositions(escena->skeletons);
+		if(!sBindingFile.isEmpty())
+		{
+			string sBindingFileFullPath = (newPath+sBindingFile).toStdString();//path.toStdString();
+			escena->loadBindingForModel(m,sBindingFileFullPath);
+			escena->rig->skinning->computeRestPositions(escena->skeletons);
+		}
+
     }
  }
 

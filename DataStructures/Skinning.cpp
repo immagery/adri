@@ -8,9 +8,9 @@
 using namespace Eigen;
 
 Skinning::Skinning() {
-    bindings = map<int,vector<binding*> >();
-	originalModels = vector<Geometry*>(0);
-	deformedModels = vector<Geometry*>(0);
+    bindings.clear();
+	originalModels.clear();
+	deformedModels.clear();
 
 	quaternionDef = 0;
 }
@@ -18,6 +18,9 @@ Skinning::Skinning() {
 
 Skinning::~Skinning()
 {
+	bindings.clear();
+	originalModels.clear();
+	deformedModels.clear();
 }
 
 void Skinning::loadBindingForModel(Modelo *m, string path, const vector< skeleton* >& skeletons) {
@@ -29,16 +32,15 @@ void Skinning::loadBindingForModel(Modelo *m, string path, const vector< skeleto
 		return;
 	}
 
-	int modelIndex = deformedModels.size();
-	bindings[modelIndex] = vector<binding*> ();
+	bindings.resize(1);
 
 	for(int i = 0; i< m->bindings.size(); i++)
-		bindings[modelIndex].push_back(m->bindings[i]);
+		bindings[0].push_back(m->bindings[i]);
 
 	// De momento trabajamos con el primero
 	// DEBUG: we check the last added binding. What happens if a model has more than two bindings? 
 	// TOFIX a model can have more than 1 binding
-	binding* bd = bindings[modelIndex][0];
+	binding* bd = bindings[0][0];
 
 	deformedModels.push_back((Geometry*) m);
 	originalModels.push_back(m->originalModel);

@@ -54,7 +54,7 @@ public:
 
     // LOADING
     void readModel(string fileName, string name, string path);
-    void readScene(string fileName, string name, string path);
+    virtual void readScene(string fileName, string name, string path);
 //    void readDistances(QString fileName);
     void readSkeleton(string fileName);
 
@@ -89,6 +89,14 @@ public:
     void toogleModelToXRay();
     void toogleModelToLines();
     void toogleVisibility(bool toogle);
+
+	virtual void setSliderParams(double ini, double fin, bool enable)
+	{
+		ini = ini; // for delete warning
+		fin = fin; // for delete warning
+		enable = enable; // for delete warning
+	
+	}
 //    void changeVisualizationMode(int);
 //	void updateGridVisualization();
 //    void toogleToShowSegmentation(bool toogle);

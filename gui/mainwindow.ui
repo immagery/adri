@@ -37,28 +37,6 @@
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <zorder>NodeInfoTab</zorder>
-           <zorder>PreprocessingTab</zorder>
-           <zorder>Datos</zorder>
-          </widget>
-         </item>
-         <item>
-          <widget class="QGroupBox" name="groupBox_2">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>30</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>27</height>
-            </size>
-           </property>
-           <property name="title">
-            <string/>
-           </property>
           </widget>
          </item>
          <item>
@@ -1315,26 +1293,6 @@
                  <string>%</string>
                 </property>
                </widget>
-               <zorder>axisX_edit</zorder>
-               <zorder>axisY_edit</zorder>
-               <zorder>axisZ_edit</zorder>
-               <zorder>ip_axisX</zorder>
-               <zorder>label_14</zorder>
-               <zorder>ip_axisY</zorder>
-               <zorder>ip_axisZ</zorder>
-               <zorder>paintModel</zorder>
-               <zorder>drawPlaneCheck</zorder>
-               <zorder>PlaneDataCombo</zorder>
-               <zorder>positionPlaneSlider</zorder>
-               <zorder>groupBox</zorder>
-               <zorder>positionPlaneEdit</zorder>
-               <zorder>dataSource</zorder>
-               <zorder>paintPlane</zorder>
-               <zorder>thresholdSlider</zorder>
-               <zorder>threshold_edit</zorder>
-               <zorder>threshold_enable</zorder>
-               <zorder>threshold_enable_adaptative</zorder>
-               <zorder>NodeInfoTab</zorder>
               </widget>
              </widget>
             </widget>
@@ -2344,8 +2302,6 @@ keyframe</string>
                </widget>
               </item>
              </layout>
-             <zorder>Datos</zorder>
-             <zorder>NodeInfoTab</zorder>
             </widget>
            </widget>
           </item>

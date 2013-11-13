@@ -243,37 +243,6 @@ void BuildSurfaceGraphs(Modelo& m, vector<binding*>& bindings)
 	vector<GraphNode*>& nodes = m.nodes;
 	vector<GraphNodePolygon*>& triangles = m.triangles;
 
-	/*
-	vector<GraphNode*> nodes;
-	nodes.resize(m.vn);
-	for(int i = 0; i< nodes.size(); i++)
-		nodes[i] = new GraphNode(i);
-
-	MyMesh::FaceIterator fi;
-    int idx = 0;
-    for(fi = m.face.begin(); fi!=m.face.end(); ++fi ) 
-	{
-		int pts[3];
-		for(int i = 0; i< 3; i++)
-			pts[i] = (*fi).V(i)->IMark();
-
-		for(int vert = 0; vert < 3; vert++)
-		{
-			bool found = false;
-
-			for(int con = 0; con < nodes[pts[vert]]->connections.size(); con++)
-			{
-				found |= nodes[pts[vert]]->connections[con]->id == pts[(vert+1)%3];
-			}
-			if(!found)
-			{
-				nodes[pts[vert]]->connections.push_back(nodes[pts[(vert+1)%3]]);
-				nodes[pts[(vert+1)%3]]->connections.push_back(nodes[pts[vert]]);
-			}
-		}
-    }
-	*/
-
 	// Buscamos componentes conexas a la vez que nos quedamos
 	// con los datos para luego crear los grafos.
 	int idDispatcher = -1;
@@ -307,7 +276,7 @@ void BuildSurfaceGraphs(Modelo& m, vector<binding*>& bindings)
 		}
 	}
 
-	printf("Count of graphs: %d\n", idDispatcher+1);
+	printf("Count of connex components: %d\n", idDispatcher+1);
 
 	vector<bool> founded;
 	founded.resize(idDispatcher+1, false);
