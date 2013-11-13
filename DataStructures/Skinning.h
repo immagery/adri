@@ -26,7 +26,7 @@ public:
 	vector<Geometry*> originalModels;
 	vector<Geometry*> deformedModels;
 
-	vector< vector<binding*> > bindings;		// index of model -> vector of bindings for that model
+	vector<binding*> bindings;		// index of model -> vector of bindings for that model
 
 	// compact skinning data structures
 	// A. Primary

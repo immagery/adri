@@ -472,7 +472,7 @@ void AdriViewer::readSkeleton(string fileName)
 		// Constuir datos sobre el modelo
         Modelo* m = ((Modelo*)escena->models.back());
         m->sPath = newPath.toStdString(); // importante para futuras referencias
-		BuildSurfaceGraphs(*m, m->bindings);
+		BuildSurfaceGraphs(m);
 
         // Leer esqueleto
 		if(!sSkeletonFile.isEmpty())
@@ -1134,7 +1134,7 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
         double maxdistance = 0.001;
         vector<double> pointdistances;
         vector<double> maxdistances;
-        maxdistances.resize(m->bindings.size());
+        maxdistances.resize(m->bind->surfaces.size());
 
         vector<double> weights;
         vector<int> weightssort(m->vn());
@@ -1238,23 +1238,23 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
         }
 
         double maxError = -9999;
-        if(m->bindings.size() <= 0) continue;
-        for(int currentbinding = 0; currentbinding < m->bindings.size(); currentbinding++)
-        {
-            for(int count = 0; count< m->bindings[currentbinding]->pointData.size(); count++)
+        if(!m->bind) continue;
+		//for(int currentbinding = 0; currentbinding < m->bind->surfaces.size(); currentbinding++)
+        //{
+            for(int count = 0; count< m->bind->pointData.size(); count++)
             {
-                if(m->bindings[currentbinding]->pointData[count].isBorder)
-                    m->addSpotVertex(m->bindings[currentbinding]->pointData[count].node->id);
+                if(m->bind->pointData[count].isBorder)
+                    m->addSpotVertex(m->bind->pointData[count].node->id);
 
                 float value = 0.0;
                 // deberia ser al reves, recorrer el binding y este pinta los puntos del modelo.
                 // hacer un reset antes con el color propio del modelo.
-                binding* bd = m->bindings[currentbinding];
+                binding* bd = m->bind;
                 PointData& pd = bd->pointData[count];
                 int newvalue = 0;
                 if(escena->iVisMode == VIS_LABELS)
                 {
-                    value = (float)pd.component/(float)m->bindings.size();
+					value = (float)pd.component/(float)m->bind->surfaces.size();
                 }
                 else if(escena->iVisMode == VIS_SEGMENTATION)
                 {
@@ -1353,7 +1353,7 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
                         if(maxdistance <= 0)
                             value = 0;
                         else
-                            value = m->bindings[currentbinding]->BihDistances.get(count,escena->desiredVertex) / maxdistance;
+                            value = m->bind->BihDistances.get(count,escena->desiredVertex) / maxdistance;
                     }
                 }
                 else if(escena->iVisMode == VIS_POINTDISTANCES)
@@ -1362,8 +1362,8 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
                         value = 0;
                     else
                     {
-                        int modelvert = m->bindings[currentbinding]->pointData[count].node->id;
-                        value = pointdistances[modelvert] / maxdistances[currentbinding];
+                        int modelvert = m->bind->pointData[count].node->id;
+                        value = pointdistances[modelvert] ;/// maxdistances[currentbinding];
                     }
                 }
                 else if(escena->iVisMode == VIS_ERROR)
@@ -1405,7 +1405,7 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
                 }
                 else if(escena->iVisMode == VIS_WEIGHT_INFLUENCE)
                 {
-                    int modelVert = m->bindings[currentbinding]->pointData[count].node->id;
+                    int modelVert = m->bind->pointData[count].node->id;
                     value = weights[modelVert];
                     //if(maxDistance <= 0)
                     //	value = 0;
@@ -1423,12 +1423,12 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
                 float r,g,b;
                 GetColourGlobal(value,0.0,1.0, r, g, b);
                 //QColor c(r,g,b);
-                m->shading->colors[bd->surface.nodes[count]->id].resize(3);
-                m->shading->colors[bd->surface.nodes[count]->id][0] = r;
-                m->shading->colors[bd->surface.nodes[count]->id][1] = g;
-                m->shading->colors[bd->surface.nodes[count]->id][2] = b;
+                m->shading->colors[count].resize(3);
+                m->shading->colors[count][0] = r;
+                m->shading->colors[count][1] = g;
+                m->shading->colors[count][2] = b;
             }
-        }
+        //}
 
         //printf("Corte:%f\n", threshold); fflush(0);
         //printf("Error max:%f\n", maxError); fflush(0);
