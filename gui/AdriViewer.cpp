@@ -837,22 +837,6 @@ void AdriViewer::readSkeleton(string fileName)
      else if(ShadingModeFlag == SH_MODE_FLAT)
         glShadeModel(GL_FLAT);
 
-	 // Apply skinning
-	 //escena->skinner->computeDeformationsWithSW(escena->skeletons);
-
-	 // SKINNING I SOLVERS
-	 /*if (escena->skeletons.size() > 0 && aniManager.simulationEnabled) {
-		vector<Eigen::Vector3d> rots = escena->solverManager->computeSolvers(frame, this->animationPeriod(), escena->skeletons);
-		for (int i = 0; i < escena->skeletons[0]->joints.size(); ++i)
-			escena->skeletons[0]->joints[i]->addRotation(rots[i].X(), rots[i].Y(), rots[i].Z());
-		escena->skeletons[0]->joints[0]->computeWorldPos();
-		rots = escena->solverManager->computeVerlet(frame, this->animationPeriod(), escena->skeletons);
-		for (int i = 0; i < escena->skeletons[0]->joints.size(); ++i)
-			escena->skeletons[0]->joints[i]->addRotation(rots[i].X(), rots[i].Y(), rots[i].Z());
-	 }
-
-
-	escena->skinner->computeDeformationsWithSW(escena->skeletons);*/
 
 	if (aniManager.simulationEnabled) ++frame;
 	/*
