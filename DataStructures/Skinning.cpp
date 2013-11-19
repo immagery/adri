@@ -174,8 +174,7 @@ void Skinning::computeDeformations(const vector< skeleton* >& skeletons) {
 				for (int kk = 0; kk < data.influences.size(); ++kk) // and check all joints associated to them
 				{   
 					int skID = data.influences[kk].label;
-					//joint& jt = deformersRestPosition[skID];
-					joint* jt = skeletons[0]->jointRef[skID];
+					joint* jt = skeletons[i]->jointRef[skID];
 
 					Vector3d& restPosition = originalModels[i]->nodes[vertexID]->position;
 					Vector3d restPos2(restPosition.x(), restPosition.y(), restPosition.z());
