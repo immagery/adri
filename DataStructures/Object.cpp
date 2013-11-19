@@ -259,6 +259,8 @@ void object::loadIdentity()
 
 bool object::select(bool bToogle, unsigned int id)
 {
+	id = id; // for delete warning
+
     if(shading)
         shading->selected = bToogle;
 

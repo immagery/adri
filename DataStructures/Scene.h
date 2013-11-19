@@ -6,6 +6,7 @@
 #include "skeleton.h"
 #include "Modelo.h"
 #include "Skinning.h"
+#include "rig.h"
 
 // reservamos unos cuantos números para elementos especiales
 #define FIRST_NODE_ID 100
@@ -81,15 +82,13 @@ class inData
 	}
 };
 
-class AirRig;
-
 // Total Scene
 class scene
 {
     public:
     scene()
     {
-		skinner = new Skinning();
+		//skinner = new Skinning();
         scene::sceneIds = FIRST_NODE_ID;
 		modelLoaded = false;
 		skeletonLoaded = false;
@@ -191,10 +190,10 @@ class scene
 	vector< skeleton* > skeletons;
 
 	// Skinning
-	Skinning* skinner;
+	//Skinning* skinner;
 
 	// AirRig
-	AirRig* rig;
+	rig* rig;
 
 	procState state;
 
@@ -210,14 +209,11 @@ class scene
 	bool initialized;
 	bool evaluate;
 
-	//inData inConnexionsTemp;
-
 	void ( *fPrintText)(char*);
 	void ( *fPrintProcessStatus)(int);
 
 	int iVisMode;
 	int desiredVertex;
-
 };
 
 class camera : object

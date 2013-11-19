@@ -775,6 +775,7 @@ void grid3d::getCoordsFromPoint(Eigen::Vector3d& pt, vector<weight>& weights)
 
 void grid3d::init(MyBox3 bounding_, Eigen::Vector3i divisions, int _weightsSize)
 {
+	_weightsSize = _weightsSize;
 	initBasicData();
 
     // comprobamos que las dimensiones tengan sentido
@@ -812,6 +813,8 @@ void grid3d::init(MyBox3 bounding_, Eigen::Vector3i divisions, int _weightsSize)
 
 grid3d::grid3d(MyBox3 bounding_, Eigen::Vector3i divisions, int _weightsSize)
 {
+	_weightsSize = _weightsSize; // for delete warning
+
     // comprobamos que las dimensiones tengan sentido
     assert(divisions.x() != 0 || divisions.y() != 0 || divisions.z() != 0);
 

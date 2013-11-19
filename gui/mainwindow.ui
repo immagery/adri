@@ -40,25 +40,6 @@
           </widget>
          </item>
          <item>
-          <widget class="QGroupBox" name="groupBox_2">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>30</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>0</width>
-             <height>27</height>
-            </size>
-           </property>
-           <property name="title">
-            <string/>
-           </property>
-          </widget>
-         </item>
-         <item>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
             <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -1323,7 +1304,7 @@
               <item>
                <widget class="QTabWidget" name="NodeInfoTab">
                 <property name="currentIndex">
-                 <number>2</number>
+                 <number>1</number>
                 </property>
                 <widget class="QWidget" name="render">
                  <attribute name="title">
@@ -2251,26 +2232,20 @@ keyframe</string>
                    </item>
                   </layout>
                  </widget>
-                 <widget class="QSlider" name="verletStiffness">
+                 <widget class="QSlider" name="velDamp">
                   <property name="geometry">
                    <rect>
-                    <x>150</x>
-                    <y>40</y>
-                    <width>221</width>
+                    <x>20</x>
+                    <y>150</y>
+                    <width>391</width>
                     <height>22</height>
                    </rect>
                   </property>
-                  <property name="minimum">
+                  <property name="maximum">
                    <number>100</number>
                   </property>
-                  <property name="maximum">
-                   <number>500</number>
-                  </property>
-                  <property name="singleStep">
-                   <number>0</number>
-                  </property>
                   <property name="value">
-                   <number>300</number>
+                   <number>50</number>
                   </property>
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
@@ -2285,8 +2260,8 @@ keyframe</string>
                  <widget class="QLabel" name="label_8">
                   <property name="geometry">
                    <rect>
-                    <x>210</x>
-                    <y>10</y>
+                    <x>160</x>
+                    <y>120</y>
                     <width>131</width>
                     <height>16</height>
                    </rect>
@@ -2295,186 +2270,32 @@ keyframe</string>
                    <string>Snake stiffness:</string>
                   </property>
                  </widget>
-                 <widget class="QSlider" name="verletX">
+                 <widget class="QSlider" name="divFactorSlider">
                   <property name="geometry">
                    <rect>
-                    <x>20</x>
-                    <y>170</y>
-                    <width>160</width>
+                    <x>19</x>
+                    <y>190</y>
+                    <width>391</width>
                     <height>22</height>
                    </rect>
                   </property>
                   <property name="minimum">
-                   <number>-400</number>
+                   <number>5</number>
                   </property>
                   <property name="maximum">
-                   <number>400</number>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                 </widget>
-                 <widget class="QSlider" name="verletY">
-                  <property name="geometry">
-                   <rect>
-                    <x>20</x>
-                    <y>200</y>
-                    <width>160</width>
-                    <height>22</height>
-                   </rect>
-                  </property>
-                  <property name="minimum">
-                   <number>-400</number>
-                  </property>
-                  <property name="maximum">
-                   <number>400</number>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                 </widget>
-                 <widget class="QSlider" name="verletZ">
-                  <property name="geometry">
-                   <rect>
-                    <x>20</x>
-                    <y>230</y>
-                    <width>160</width>
-                    <height>22</height>
-                   </rect>
-                  </property>
-                  <property name="minimum">
-                   <number>-400</number>
-                  </property>
-                  <property name="maximum">
-                   <number>400</number>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                 </widget>
-                 <widget class="QLabel" name="label_16">
-                  <property name="geometry">
-                   <rect>
-                    <x>80</x>
-                    <y>140</y>
-                    <width>91</width>
-                    <height>16</height>
-                   </rect>
-                  </property>
-                  <property name="text">
-                   <string>Head controls</string>
-                  </property>
-                 </widget>
-                 <widget class="QLabel" name="label_17">
-                  <property name="geometry">
-                   <rect>
-                    <x>190</x>
-                    <y>170</y>
-                    <width>16</width>
-                    <height>16</height>
-                   </rect>
-                  </property>
-                  <property name="text">
-                   <string>X</string>
-                  </property>
-                 </widget>
-                 <widget class="QLabel" name="label_18">
-                  <property name="geometry">
-                   <rect>
-                    <x>190</x>
-                    <y>200</y>
-                    <width>16</width>
-                    <height>16</height>
-                   </rect>
-                  </property>
-                  <property name="text">
-                   <string>Y</string>
-                  </property>
-                 </widget>
-                 <widget class="QLabel" name="label_24">
-                  <property name="geometry">
-                   <rect>
-                    <x>190</x>
-                    <y>230</y>
-                    <width>16</width>
-                    <height>16</height>
-                   </rect>
-                  </property>
-                  <property name="text">
-                   <string>Z</string>
-                  </property>
-                 </widget>
-                 <widget class="QSlider" name="lookZ">
-                  <property name="geometry">
-                   <rect>
-                    <x>220</x>
-                    <y>230</y>
-                    <width>160</width>
-                    <height>22</height>
-                   </rect>
-                  </property>
-                  <property name="minimum">
-                   <number>-100</number>
-                  </property>
-                  <property name="maximum">
-                   <number>100</number>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                 </widget>
-                 <widget class="QLabel" name="label_25">
-                  <property name="geometry">
-                   <rect>
-                    <x>260</x>
-                    <y>140</y>
-                    <width>91</width>
-                    <height>16</height>
-                   </rect>
-                  </property>
-                  <property name="text">
-                   <string>Look point</string>
-                  </property>
-                 </widget>
-                 <widget class="QSlider" name="lookX">
-                  <property name="geometry">
-                   <rect>
-                    <x>220</x>
-                    <y>170</y>
-                    <width>160</width>
-                    <height>22</height>
-                   </rect>
-                  </property>
-                  <property name="minimum">
-                   <number>-100</number>
-                  </property>
-                  <property name="maximum">
-                   <number>100</number>
+                   <number>20</number>
                   </property>
                   <property name="value">
-                   <number>0</number>
+                   <number>10</number>
                   </property>
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
                   </property>
-                 </widget>
-                 <widget class="QSlider" name="lookY">
-                  <property name="geometry">
-                   <rect>
-                    <x>220</x>
-                    <y>200</y>
-                    <width>160</width>
-                    <height>22</height>
-                   </rect>
+                  <property name="tickPosition">
+                   <enum>QSlider::TicksBelow</enum>
                   </property>
-                  <property name="minimum">
-                   <number>-100</number>
-                  </property>
-                  <property name="maximum">
-                   <number>100</number>
-                  </property>
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
+                  <property name="tickInterval">
+                   <number>3</number>
                   </property>
                  </widget>
                 </widget>
@@ -2514,7 +2335,7 @@ keyframe</string>
               <enum>Qt::ScrollBarAsNeeded</enum>
              </property>
              <property name="horizontalScrollBarPolicy">
-              <enum>Qt::ScrollBarAlwaysOn</enum>
+              <enum>Qt::ScrollBarAsNeeded</enum>
              </property>
              <property name="autoScroll">
               <bool>false</bool>
@@ -2536,7 +2357,7 @@ keyframe</string>
      <x>0</x>
      <y>0</y>
      <width>1345</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFIle">

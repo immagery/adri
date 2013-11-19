@@ -157,6 +157,7 @@ public:
 	// this data with the model and skeleton after this function.
 	bool loadFromFile(FILE* fout)
 	{
+		fout = fout; // for delete warning
 		return false;
 	}
 

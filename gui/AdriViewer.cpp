@@ -22,11 +22,11 @@
 
 #include <utils/util.h>
 #include "adrimainwindow.h"
-//#include "ui_mainwindow.h"
 
 #include <DataStructures/Scene.h>
 #include <DataStructures/Cage.h>
 #include <DataStructures/Modelo.h>
+#include <DataStructures/Rig.h>
 #include <render/ShadingNode.h>
 
 #include <render/gridRender.h>
@@ -131,6 +131,7 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
     colorLayerIdx = -1;
 
     escena = new scene();
+	escena->rig = new rig(scene::getNewId());
 
 	CurrentProcessJoints.clear();
 
@@ -426,17 +427,38 @@ void AdriViewer::readSkeleton(string fileName)
         QString sGlobalPath = in.readLine(); in.readLine();
         QString sPath = in.readLine(); in.readLine(); in.readLine();
         QString sModelFile = in.readLine(); in.readLine(); in.readLine();
-        QString sSkeletonFile = in.readLine(); in.readLine(); in.readLine();
-        QString sEmbeddingFile = in.readLine(); in.readLine(); in.readLine();
-		QString sBindingFile, sGridFile;
-		if(!in.atEnd())
+
+		QString sSkeletonFile, sEmbeddingFile, sBindingFile, sGridFile, sRiggingFile;
+
+		QStringList flags = in.readLine().split(" "); in.readLine(); in.readLine();
+		if(flags.size() != 5)
+			return;
+
+		if(flags[0].toInt() != 0 && !in.atEnd())
+		{
+			sSkeletonFile = in.readLine(); in.readLine(); in.readLine();
+		}
+
+		if(flags[1].toInt() != 0 && !in.atEnd())
+		{
+			sEmbeddingFile = in.readLine(); in.readLine(); in.readLine();
+		}
+
+		if(flags[2].toInt() != 0 && !in.atEnd())
 		{
 			sBindingFile = in.readLine(); in.readLine(); in.readLine();
 		}
-		if(!in.atEnd())
+
+		if(flags[3].toInt() != 0 && !in.atEnd())
 		{
 			sGridFile = in.readLine(); in.readLine(); in.readLine();
 		}
+
+		if(flags[4].toInt() != 0 && !in.atEnd())
+		{
+			sRiggingFile = in.readLine(); in.readLine(); in.readLine();
+		}
+
 		modelDefFile.close();
 
 		QString newPath(path.c_str());
@@ -447,23 +469,36 @@ void AdriViewer::readSkeleton(string fileName)
         // Leer modelo
         readModel( (newPath+sModelFile).toStdString(), sSceneName.toStdString(), newPath.toStdString());
 
+		// Constuir datos sobre el modelo
         Modelo* m = ((Modelo*)escena->models.back());
         m->sPath = newPath.toStdString(); // importante para futuras referencias
+		BuildSurfaceGraphs(m);
 
         // Leer esqueleto
-        readSkeleton((newPath+sSkeletonFile).toStdString());
+		if(!sSkeletonFile.isEmpty())
+		{
+			string sSkeletonFileFullPath = (newPath+sSkeletonFile).toStdString();
+			readSkeletons(sSkeletonFileFullPath, escena->skeletons);
+		}
 
-		BuildSurfaceGraphs(*m, m->bindings);
+		// Load Rigging
+		if(!sRiggingFile.isEmpty())
+		{
+			string sRiggingFileFullPath = (newPath+sRiggingFile).toStdString();//path.toStdString();
+			escena->rig->loadRigging(sRiggingFileFullPath);
 
-        // Leer embedding
-        //ReadEmbedding((newPath+sEmbeddingFile).toStdString(), m->embedding);
-		
+			// By now is with the skeleton, but soon will be alone
+			escena->rig->bindRigToScene(*m, escena->skeletons);
+		}
+
 		// Skinning
-		//QString path = (sGlobalPath.append(sPath).append("binding.txt"));
-		
-		string sBindingFileFullPath = (newPath+sBindingFile).toStdString();//path.toStdString();
-		escena->loadBindingForModel(m,sBindingFileFullPath);
-        escena->skinner->computeRestPositions(escena->skeletons);
+		if(!sBindingFile.isEmpty())
+		{
+			string sBindingFileFullPath = (newPath+sBindingFile).toStdString();//path.toStdString();
+			escena->loadBindingForModel(m,sBindingFileFullPath);
+			escena->rig->skinning->computeRestPositions(escena->skeletons);
+		}
+
     }
  }
 
@@ -1099,7 +1134,7 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
         double maxdistance = 0.001;
         vector<double> pointdistances;
         vector<double> maxdistances;
-        maxdistances.resize(m->bindings.size());
+        maxdistances.resize(m->bind->surfaces.size());
 
         vector<double> weights;
         vector<int> weightssort(m->vn());
@@ -1203,23 +1238,23 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
         }
 
         double maxError = -9999;
-        if(m->bindings.size() <= 0) continue;
-        for(int currentbinding = 0; currentbinding < m->bindings.size(); currentbinding++)
-        {
-            for(int count = 0; count< m->bindings[currentbinding]->pointData.size(); count++)
+        if(!m->bind) continue;
+		//for(int currentbinding = 0; currentbinding < m->bind->surfaces.size(); currentbinding++)
+        //{
+            for(int count = 0; count< m->bind->pointData.size(); count++)
             {
-                if(m->bindings[currentbinding]->pointData[count].isBorder)
-                    m->addSpotVertex(m->bindings[currentbinding]->pointData[count].node->id);
+                if(m->bind->pointData[count].isBorder)
+                    m->addSpotVertex(m->bind->pointData[count].node->id);
 
                 float value = 0.0;
                 // deberia ser al reves, recorrer el binding y este pinta los puntos del modelo.
                 // hacer un reset antes con el color propio del modelo.
-                binding* bd = m->bindings[currentbinding];
+                binding* bd = m->bind;
                 PointData& pd = bd->pointData[count];
                 int newvalue = 0;
                 if(escena->iVisMode == VIS_LABELS)
                 {
-                    value = (float)pd.component/(float)m->bindings.size();
+					value = (float)pd.component/(float)m->bind->surfaces.size();
                 }
                 else if(escena->iVisMode == VIS_SEGMENTATION)
                 {
@@ -1318,7 +1353,7 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
                         if(maxdistance <= 0)
                             value = 0;
                         else
-                            value = m->bindings[currentbinding]->BihDistances.get(count,escena->desiredVertex) / maxdistance;
+                            value = m->bind->BihDistances.get(count,escena->desiredVertex) / maxdistance;
                     }
                 }
                 else if(escena->iVisMode == VIS_POINTDISTANCES)
@@ -1327,8 +1362,8 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
                         value = 0;
                     else
                     {
-                        int modelvert = m->bindings[currentbinding]->pointData[count].node->id;
-                        value = pointdistances[modelvert] / maxdistances[currentbinding];
+                        int modelvert = m->bind->pointData[count].node->id;
+                        value = pointdistances[modelvert] ;/// maxdistances[currentbinding];
                     }
                 }
                 else if(escena->iVisMode == VIS_ERROR)
@@ -1370,7 +1405,7 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
                 }
                 else if(escena->iVisMode == VIS_WEIGHT_INFLUENCE)
                 {
-                    int modelVert = m->bindings[currentbinding]->pointData[count].node->id;
+                    int modelVert = m->bind->pointData[count].node->id;
                     value = weights[modelVert];
                     //if(maxDistance <= 0)
                     //	value = 0;
@@ -1388,12 +1423,12 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
                 float r,g,b;
                 GetColourGlobal(value,0.0,1.0, r, g, b);
                 //QColor c(r,g,b);
-                m->shading->colors[bd->surface.nodes[count]->id].resize(3);
-                m->shading->colors[bd->surface.nodes[count]->id][0] = r;
-                m->shading->colors[bd->surface.nodes[count]->id][1] = g;
-                m->shading->colors[bd->surface.nodes[count]->id][2] = b;
+                m->shading->colors[count].resize(3);
+                m->shading->colors[count][0] = r;
+                m->shading->colors[count][1] = g;
+                m->shading->colors[count][2] = b;
             }
-        }
+        //}
 
         //printf("Corte:%f\n", threshold); fflush(0);
         //printf("Error max:%f\n", maxError); fflush(0);

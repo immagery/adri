@@ -32,8 +32,11 @@ public:
     /// Biharmonic Distances matrix (nxn)
     vector< vector< double> > embedding;
 
-    /// Skeletons binded
-    vector<binding*> bindings;
+	// Bind
+	binding* bind;
+
+	// OldBindings
+    //vector<binding*> bindings;
 
 	vector<TriangleData> virtualTriangles;
 
@@ -42,9 +45,9 @@ public:
 
 	bool computedBindings;
 
-	vector<int> modelVertexDataPoint;
-	vector<int> modelVertexBind;
-	vector<int> globalIndirection;
+	//vector<int> modelVertexDataPoint;
+	//vector<int> modelVertexBind;
+	//vector<int> globalIndirection;
 
     //grid3d* grid;
 
@@ -69,7 +72,7 @@ public:
 	int fn() {return (int)triangles.size();}
 };
 
-void BuildSurfaceGraphs(Modelo& m, vector<binding*>& bindings);
+void BuildSurfaceGraphs(Modelo* m);
 void propagateIdFromNode(int id, vector<int>& frontIds,vector<int>& harvestIds,vector<bool>& visIds,vector<int>& connIds,vector<GraphNode*> nodes);
 
 #endif // MODEL_H

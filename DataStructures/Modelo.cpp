@@ -17,19 +17,21 @@ void Modelo::cleanSpotVertexes()
 
 void Modelo::addSpotVertex(int i)
 {
-	//((GeometryRender*)shading)->spotVertex = i;
-	for(unsigned int b = 0; b < globalIndirection.size(); b++)
-		if(globalIndirection[b]== i)
-		{
-			((GeometryRender*)shading)->spotVertexes.push_back(globalIndirection[b]);
+	((GeometryRender*)shading)->spotVertex = i;
+	//for(unsigned int b = 0; b < globalIndirection.size(); b++)
+	//	if(globalIndirection[b]== i)
+	//	{
+			((GeometryRender*)shading)->spotVertexes.push_back(i);//globalIndirection[b]);
 			return;
-		}
+	//	}
 }
 
 void Modelo::setSpotVertexes(vector<int>& indices)
 {
+	assert(false);
+	/*
 	((GeometryRender*)shading)->spotVertexes.clear();
-	//((GeometryRender*)shading)->spotVertex = i;
+	
 	for(unsigned int b = 0; b < globalIndirection.size(); b++)
 	{
 		for(unsigned int ind = 0; ind < indices.size(); ind++)
@@ -40,17 +42,21 @@ void Modelo::setSpotVertexes(vector<int>& indices)
 			}	
 		}
 	}
+	*/
 }
 
 void Modelo::setSpotVertex(int i)
 {
+	assert(false);
+	// tofix [13/11/13]
+
 	//((GeometryRender*)shading)->spotVertex = i;
-	for(unsigned int b = 0; b < globalIndirection.size(); b++)
-		if(globalIndirection[b]== i)
-		{
-			((GeometryRender*)shading)->spotVertex = globalIndirection[b];
-			return;
-		}
+	//for(unsigned int b = 0; b < globalIndirection.size(); b++)
+	//	if(globalIndirection[b]== i)
+	//	{
+	//		((GeometryRender*)shading)->spotVertex = globalIndirection[b];
+	//		return;
+	//	}
 }
 
 Modelo::Modelo() : Geometry()
@@ -66,10 +72,11 @@ Modelo::Modelo() : Geometry()
     //currentRender = this;
 
     embedding.clear();
-	modelVertexDataPoint.clear();
-	modelVertexBind.clear();
+	//modelVertexDataPoint.clear();
+	//modelVertexBind.clear();
+	//bindings.clear();
 
-	bindings.clear();
+	bind = NULL;
 	computedBindings = false;
 
 	delete shading;
@@ -89,10 +96,12 @@ Modelo::Modelo(unsigned int nodeId) : Geometry(nodeId)
     //currentRender = this;
 
     embedding.clear();
-	modelVertexDataPoint.clear();
-	modelVertexBind.clear();
+	//modelVertexDataPoint.clear();
+	//modelVertexBind.clear();
 
-	bindings.clear();
+	//bindings.clear();
+	
+	bind = NULL;
 	computedBindings = false;
 
 	delete shading;
@@ -114,13 +123,14 @@ Modelo::~Modelo()
     currentCage = NULL;
     //currentRender = NULL;
 
-	modelVertexDataPoint.clear();
-	modelVertexBind.clear();
-	globalIndirection.clear();
+	//modelVertexDataPoint.clear();
+	//modelVertexBind.clear();
+	//globalIndirection.clear();
 	embedding.clear();
+	delete bind;
 
-	for(unsigned int i = 0; i< bindings.size(); i++)
-		delete bindings[i];
+	//for(unsigned int i = 0; i< bindings.size(); i++)
+	//	delete bindings[i];
 }
 
 void initgrid()
@@ -236,51 +246,20 @@ bool Modelo::select(bool bToogle, unsigned int id)
 	return selected;
 }
 
-void BuildSurfaceGraphs(Modelo& m, vector<binding*>& bindings)
+void BuildSurfaceGraphs(Modelo* m)
 {
-	//m->bindings.push_back(new binding(m->vn()));
+	//vector<binding*> bindings;
 
-	vector<GraphNode*>& nodes = m.nodes;
-	vector<GraphNodePolygon*>& triangles = m.triangles;
-
-	/*
-	vector<GraphNode*> nodes;
-	nodes.resize(m.vn);
-	for(int i = 0; i< nodes.size(); i++)
-		nodes[i] = new GraphNode(i);
-
-	MyMesh::FaceIterator fi;
-    int idx = 0;
-    for(fi = m.face.begin(); fi!=m.face.end(); ++fi ) 
-	{
-		int pts[3];
-		for(int i = 0; i< 3; i++)
-			pts[i] = (*fi).V(i)->IMark();
-
-		for(int vert = 0; vert < 3; vert++)
-		{
-			bool found = false;
-
-			for(int con = 0; con < nodes[pts[vert]]->connections.size(); con++)
-			{
-				found |= nodes[pts[vert]]->connections[con]->id == pts[(vert+1)%3];
-			}
-			if(!found)
-			{
-				nodes[pts[vert]]->connections.push_back(nodes[pts[(vert+1)%3]]);
-				nodes[pts[(vert+1)%3]]->connections.push_back(nodes[pts[vert]]);
-			}
-		}
-    }
-	*/
+	vector<GraphNode*>& nodes = m->nodes;
+	vector<GraphNodePolygon*>& triangles = m->triangles;
 
 	// Buscamos componentes conexas a la vez que nos quedamos
 	// con los datos para luego crear los grafos.
 	int idDispatcher = -1;
 	vector<int> connIds;
 	vector<bool> visIds;
-	visIds.resize(m.nodes.size(),false);
-	connIds.resize(m.nodes.size(), -1);
+	visIds.resize(m->nodes.size(),false);
+	connIds.resize(m->nodes.size(), -1);
 
 	for(unsigned int n = 0; n < nodes.size(); n++)
 	{
@@ -307,7 +286,7 @@ void BuildSurfaceGraphs(Modelo& m, vector<binding*>& bindings)
 		}
 	}
 
-	printf("Count of graphs: %d\n", idDispatcher+1);
+	printf("Count of connex components: %d\n", idDispatcher+1);
 
 	vector<bool> founded;
 	founded.resize(idDispatcher+1, false);
@@ -351,16 +330,24 @@ void BuildSurfaceGraphs(Modelo& m, vector<binding*>& bindings)
 		printf("[Connected part %d]-> %d# nodes\n", i, graphNodesCounter[i]);
 	}
 
-	bindings.resize(graphNodesCounter.size());
-	m.modelVertexDataPoint.resize(nodes.size());
-	m.modelVertexBind.resize(nodes.size());
+	m->bind = new binding(nodes.size());
+	binding* bd = m->bind;
+	bd->surfaces.resize(graphNodesCounter.size());
+	if(graphNodesCounter.size() > 0)
+		bd->mainSurface = &bd->surfaces[0];
+	
+	//m->modelVertexDataPoint.resize(nodes.size());
+	//m->modelVertexBind.resize(nodes.size());
 
-	for(int bbIdx = 0; bbIdx < bindings.size(); bbIdx++)
+	int globalCount = 0;
+
+	for(int bbIdx = 0; bbIdx < bd->surfaces.size(); bbIdx++)
 	{
-		bindings[bbIdx] = new binding(graphNodesCounter[bbIdx]);
-		bindings[bbIdx]->bindId = bbIdx;
+		SurfaceGraph* subGraph = &bd->surfaces[bbIdx];
+		//bindings[bbIdx] = new binding(graphNodesCounter[bbIdx]);
+		//bindings[bbIdx]->bindId = bbIdx;
 
-		bindings[bbIdx]->surface.nodes.resize(graphNodesCounter[bbIdx]);
+		subGraph->nodes.resize(graphNodesCounter[bbIdx]);
 
 		//for(int i = 0; i< bindings[bbIdx]->surface.nodes.size(); i++)
 		//	bindings[bbIdx]->surface.nodes[i] = new GraphNode(i);
@@ -372,19 +359,20 @@ void BuildSurfaceGraphs(Modelo& m, vector<binding*>& bindings)
 		{
 			if(connIds[i] == bbIdx)
 			{
-				bindings[bbIdx]->surface.nodes[count] = nodes[i];
-				bindings[bbIdx]->pointData[count].node = nodes[i];
-
-				m.modelVertexBind[nodes[i]->id] = bbIdx;
-				m.modelVertexDataPoint[nodes[i]->id] = count;
+				bd->surfaces[bbIdx].nodes[count] = nodes[i];
+				bd->pointData[globalCount].node = nodes[i];
+				bd->pointData[globalCount].component = bbIdx;
+				//m.modelVertexBind[nodes[i]->id] = bbIdx;
+				//m.modelVertexDataPoint[nodes[i]->id] = count;
 				count++;
 			}
 
+			globalCount++;
 		}
 
 		assert(count == graphNodesCounter[bbIdx]);
 
-		bindings[bbIdx]->surface.triangles.resize(triangles.size());
+		subGraph->triangles.resize(triangles.size());
 		count = 0;
 		for(int i = 0; i< triangles.size(); i++)
 		{
@@ -392,56 +380,23 @@ void BuildSurfaceGraphs(Modelo& m, vector<binding*>& bindings)
 			for(int trTemp = 0; trTemp < triangles[i]->verts.size(); trTemp++)
 			{
 				int vertId = triangles[i]->verts[trTemp]->id;
-				found &= (m.modelVertexBind[vertId] == bbIdx);
+				found &= (bd->pointData[vertId].component == bbIdx);
 			}
 
 			if(found)
 			{
-				bindings[bbIdx]->surface.triangles[count] = triangles[i];
+				subGraph->triangles[count] = triangles[i];
 				count++;
 			}
 		}
 
-		bindings[bbIdx]->surface.triangles.resize(count);
+		subGraph->triangles.resize(count);
 		
 	}
 
-	/*
-	// Construimos estos dos vectores de referencias para ir más rápido en otras
-	// computaciones.
-	vector<int>& modelVertexDataPoint = m.modelVertexDataPoint;
-	vector<int>& modelVertexBind = m.modelVertexBind;
-
-	modelVertexDataPoint.resize(nodes.size());
-	modelVertexBind.resize(nodes.size());
-
-	int count = 0; 
-	for(int i = 0; i< bindings.size(); i++)
-	{
-		for(int j = 0; j< bindings[i]->pointData.size(); j++)
-		{
-			modelVertexBind[bindings[i]->pointData[j].modelVert] = i;
-			modelVertexDataPoint[bindings[i]->pointData[j].modelVert] = j;
-			count++;
-		}
-	}
-
-	assert(count == nodes.size());
-	*/
-
-	// Recorremos los vertices y acumulamos el area de sus triangulos ponderado por 1/3 que le corresponde.
-    //MyMesh::VertexIterator vi;  idx = 0;
-    //for(vi = m.vert.begin(); vi!=m.vert.end(); ++vi ) 
-	/*for(int vi = 0; vi < m.nodes.size(); vi++)
-	{
-		int idBind = m.modelVertexBind[m.nodes[vi]->id];
-		int idVertexInBind = m.modelVertexDataPoint[m.nodes[vi]->id];
-		m.bindings[idBind]->pointData[idVertexInBind].position = m.nodes[vi]->position;
-    }
-	*/
-
 	// Guardamos una indirección para tener ordenados los pesos... esto podría variar
 	// para optimizar los cálculos.
+	/*
 	int counter = 0;
 	m.globalIndirection.resize(m.vn());
 	for(int i = 0; i< bindings.size(); i++)
@@ -453,42 +408,37 @@ void BuildSurfaceGraphs(Modelo& m, vector<binding*>& bindings)
 			counter++;
 		}
 	}
+	*/
 
 	// Construimos una matriz de adyacencia que tambien
 	// recoge si una arista es borde(1) o no (2)
 	vector< vector<short> > edges; 
-	edges.resize(m.vn());
+	edges.resize(m->vn());
 	for(int i = 0; i< edges.size(); i++)
-		edges[i].resize(m.vn(), 0);
+		edges[i].resize(m->vn(), 0);
 	
-	//MyMesh::FaceIterator fj;
-    //for(fj = m.face.begin(); fj!=m.face.end(); ++fj )
-	for(int fj = 0; fj < m.triangles.size(); fj++ )
+	for(int fj = 0; fj < m->triangles.size(); fj++ )
 	{
         Eigen::Vector3d O, c, s;
         Eigen::Vector3i idVerts;
         for(int i = 0; i<3; i++) // Obtenemos los indices de los vertices de t
-			idVerts[i] = m.triangles[fj]->verts[i]->id;
+			idVerts[i] = m->triangles[fj]->verts[i]->id;
 
 		for(int i = 0; i<3; i++)
 			edges[idVerts[i]][idVerts[(i+1)%3]]++;
 	}
 
-	for(int i = 0; i< bindings.size(); i++)
+	for(int pt = 0; pt < m->nodes.size(); pt++)
 	{
-		for(int pt = 0; pt < bindings[i]->pointData.size(); pt++)
+		int vert = bd->pointData[pt].node->id;
+		for(int con = 0; con< m->nodes[pt]->connections.size(); con++)
 		{
-			int vert = bindings[i]->pointData[pt].node->id;
-			for(int con = 0; con< bindings[i]->surface.nodes[pt]->connections.size(); con++)
-			{
-				int conected = bindings[i]->surface.nodes[pt]->connections[con]->id;
-				int modelVertConected = bindings[i]->pointData[conected].node->id;
-				int count = edges[vert][modelVertConected]+edges[modelVertConected][vert];
+			int conected = m->nodes[pt]->connections[con]->id;
+			int count = edges[vert][conected]+edges[conected][vert];
 
-				// Comprobamos si es un borde -> si hay conexion deberia tener valor de mas de uno.
-				bindings[i]->pointData[pt].isBorder |= count < 2;
-				bindings[i]->pointData[conected].isBorder |= count < 2;
-			}
+			// Comprobamos si es un borde -> si hay conexion deberia tener valor de mas de uno.
+			bd->pointData[pt].isBorder |= count < 2;
+			bd->pointData[conected].isBorder |= count < 2;
 		}
 	}
 }

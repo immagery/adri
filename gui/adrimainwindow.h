@@ -98,6 +98,9 @@ public slots:
 	// Simulation
 	void toggleSimulation();
 
+	void changeTwistParameters();
+	void changeTwistParameters(int value);
+
 protected:
     virtual void keyPressEvent(QKeyEvent* event);
 

@@ -111,10 +111,10 @@ public:
 		connections.clear();
 	}
 
-	int id;
+	unsigned int id;
 	vector<GraphNode* > connections;
 
-	Eigen::Vector3d position;
+	Vector3d position;
 
 	bool visited;
 };
@@ -406,7 +406,11 @@ public:
 	vector<TriangleData> virtualTriangles;
 
 	/// Data structure for process faster the geometry
-	SurfaceGraph surface;
+	SurfaceGraph* mainSurface;
+	vector<SurfaceGraph> surfaces;
+	vector<bool> enabledSurfaces;
+
+	//SurfaceGraph surface;
 	unsigned int ntriangles;
 
 	//Biharmonic distances
