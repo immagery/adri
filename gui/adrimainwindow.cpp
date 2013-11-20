@@ -864,7 +864,7 @@ void AdriMainWindow::changeTransformTranslateAmountX(int)
         selectedObject = ui->glCustomWidget->selMgr.selection.back();
 
 	// Aplica la traslacion
-	ui->glCustomWidget->particles->xvalue = ui->translationAmountX->value();
+	ui->glCustomWidget->particles->xvalue  = ui->translationAmountX->value();
     if (selectedObject != NULL) {
         selectedObject->pos.x() = ui->translationAmountX->value();
 		selectedObject->dirtyFlag = true;
