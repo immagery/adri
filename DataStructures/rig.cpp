@@ -98,11 +98,10 @@ bool Rig::bindModel(Modelo* m)
 bool Rig::bindSkeletons(vector<skeleton*>& in_skeletons)
 {
 	// bind skeletons
-	skeletons.resize(in_skeletons.size());
-	for(int i = 0; i< skeletons.size(); i++)
+	for(int i = 0; i< in_skeletons.size(); i++)
 		skeletons.push_back(in_skeletons[i]);
 
-	return false;
+	return true;
 }
 
 bool Rig::loadRigging(string sFile)

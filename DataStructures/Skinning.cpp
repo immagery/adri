@@ -1,9 +1,13 @@
 #include "Skinning.h"
-#include <QtCore/qfile.h>
-#include <QtCore/qtextstream.h>
-#include <QtCore/qstringlist.h>
-#include <QtCore/qregexp.h>
+//#include <QtCore/qfile.h>
+//#include <QtCore/qtextstream.h>
+//#include <QtCore/qstringlist.h>
+//#include <QtCore/qregexp.h>
 #include <set>
+
+#include <iostream>
+#include <fstream>
+#include <string>
 
 #include <dataStructures/scene.h>
 
@@ -25,22 +29,55 @@ Skinning::~Skinning()
 
 void Skinning::loadBindingForModel(Modelo *m, const vector< skeleton* >& skeletons) {
 
-
-	binding* bd = m->bind; //bindings[0][0];
-
-	deformedModel = (Geometry*) m;
-	originalModel = m->originalModel;
-
-	map<string, joint*> allJoints;
-	for(int i = 0; i< skeletons.size(); i++)
-	{
-		for(int idJoint = 0; idJoint < skeletons[i]->joints.size(); idJoint++)
-		{
-			allJoints[skeletons[i]->joints[idJoint]->sName] = skeletons[i]->joints[idJoint];
-		}
-	}
-
 	/*
+	binding* bd = m->bind;
+
+	ifstream file();
+	string line;
+	vector<string> elems;
+
+		getline (in , line);
+		split(line, ' ', elems);
+
+		boneId = atoi(elems[0].c_str());
+		rootBoneId = atoi(elems[1].c_str());
+		childBoneId = atoi(elems[2].c_str());
+		ratio = atof(elems[3].c_str());
+		expansion = atof(elems[4].c_str());
+		precomputedDistances = atof(elems[5].c_str());
+		cuttingThreshold = atof(elems[6].c_str());
+		pos.x() = atof(elems[7].c_str());
+		pos.y() = atof(elems[8].c_str());
+		pos.z() = atof(elems[9].c_str());
+		relPos.x() = atof(elems[10].c_str());
+		relPos.y() = atof(elems[11].c_str());
+		relPos.z() = atof(elems[12].c_str());
+		enableWeightsComputation = atoi(elems[13].c_str());
+
+		int MVCsize = 0, weightSize =0;
+		getline (in , line);
+		split(line, ' ', elems);
+		MVCsize = atoi(elems[0].c_str());
+		weightSize = atoi(elems[1].c_str());
+
+		getline (in , line);
+		split(line, ' ', elems);
+
+		MVCWeights.resize(MVCsize);
+		for(int i = 0; i< MVCWeights.size(); i++)
+		{
+			MVCWeights[i] = atof(elems[i].c_str());
+		} 
+		
+		getline (in , line);
+		split(line, ' ', elems);
+
+		weightsSort.resize(weightSize);
+		for(int i = 0; i< weightsSort.size(); i++)
+		{
+			weightsSort[i] = atoi(elems[i].c_str());
+		}
+
     file.open(QFile::ReadOnly);
     QTextStream in(&file);
     QString line;
@@ -107,9 +144,9 @@ void Skinning::loadBindingForModel(Modelo *m, const vector< skeleton* >& skeleto
 		//printf("\n");
 		//b->pointData.push_back(point);
     }
-	*/
 
 	printf("done\n");
+	*/
 }
 
 
