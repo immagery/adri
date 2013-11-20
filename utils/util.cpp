@@ -1,6 +1,14 @@
 #include "util.h"
 
-
+vector<string> &split(const string &s, char delim, vector<string> &elems) {
+	elems.clear();
+	stringstream ss(s);
+    string item;
+    while (getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+    return elems;
+}
 
 void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle)
 {

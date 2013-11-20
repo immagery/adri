@@ -1,17 +1,21 @@
 #include <DataStructures\Rig.h>
 
-bool rig::bindRigToScene(Modelo& model, vector<skeleton*>& skeletons)
+bool Rig::bindLoadedRigToScene(Modelo* model, vector<skeleton*>& skeletons)
 {
-	//rig* rigPtr = this
+	//TODO
+	assert(false);
+	return false;
+}
 
+bool Rig::bindRigToModelandSkeleton(Modelo* in_model, vector<skeleton*>& in_skeletons)
+{
 	// bind model
-	bindModel(model);
-	
-	/*
-	//bind skeletons
-	for(int i = 0; i< skeletons.size(); i++)
-		rigPtr->skeletons.push_back(skeletons[i]);
+	bindModel(in_model);
 
+	// bindSkeletons
+	bindSkeletons(in_skeletons);
+
+	/*
 	// get joint info
 	map<string, joint*> allJoints;
 	for(int i = 0; i< skeletons.size(); i++)
@@ -73,10 +77,17 @@ bool rig::bindRigToScene(Modelo& model, vector<skeleton*>& skeletons)
 }
 
 
-bool rig::bindModel(Modelo& m)
+bool Rig::bindModel(Modelo* m)
 {
 	// Asign model to this rig
-	model = &m;
+	model = m;
+	skin->bind = model->bind;
+	skin->deformedModel = model;
+
+	if(!m->originalModelLoaded)
+		initModelForDeformation(model);
+
+	skin->originalModel = model->originalModel;
 
 	// TODEBUG: Load data form the model???
 	// for consistency.
@@ -84,24 +95,23 @@ bool rig::bindModel(Modelo& m)
 	return true;
 }
 
-bool rig::bindSkeletons(vector<skeleton*>& skts)
+bool Rig::bindSkeletons(vector<skeleton*>& in_skeletons)
 {
 	// bind skeletons
-	// a) assign every pointer to the corresponding joint.
-	// TOFIX: this is temporal, because the process will be
-	// skeletons independet but control units dependant.
+	skeletons.resize(in_skeletons.size());
+	for(int i = 0; i< skeletons.size(); i++)
+		skeletons.push_back(in_skeletons[i]);
 
 	return false;
 }
 
-bool rig::loadRigging(string sFile)
+bool Rig::loadRigging(string sFile)
 {
 	FILE* fin = NULL;
 	fin = fopen(sFile.c_str(),"r");
 	
 	// Cargar rig
-	assert(false);
-	//if(fin) loadFromFile(fin);
+	// No tiene nada que cargar.
 
 	fclose(fin);
 	return true;

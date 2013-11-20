@@ -1,10 +1,4 @@
-#ifdef WIN32
-#include <GL/glew.h>
-#endif
-
-#ifdef WIN64
-#include <GL/glew.h>
-#endif
+#include <utils/utilGL.h>
 
 //#define VERBOSE false
 
@@ -131,7 +125,7 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
     colorLayerIdx = -1;
 
     escena = new scene();
-	escena->rig = new rig(scene::getNewId());
+	escena->rig = new Rig(scene::getNewId());
 
 	CurrentProcessJoints.clear();
 
@@ -224,6 +218,7 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
     selMgr.selection.clear();
     for(unsigned int i = 0; i< lst.size(); i++)
     {
+		// If it is a model
         for(unsigned int m = 0; m< escena->models.size(); m++)
         {
             if(((object*)escena->models[m])->nodeId == lst[i])
@@ -232,6 +227,7 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
             }
         }
 
+		// If it is a skeleton
         for(unsigned int m = 0; m< escena->skeletons.size(); m++)
         {
             skeleton* skt = ((skeleton*)escena->skeletons[m]);
@@ -244,15 +240,6 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
                                       ((joint*)skt->joints[j])->nodeId);
 
 				   double alfa,beta,gamma;
-				   
-				   //((joint*)skt->joints[j])->qrot.ToEulerAngles(alfa,beta,gamma);
-
-				  /*  Quaternion<double> qAux(((joint*)skt->joints[j])->qrot.W(), 
-												((joint*)skt->joints[j])->qrot.X(),
-												((joint*)skt->joints[j])->qrot.Y(),
-												((joint*)skt->joints[j])->qrot.Z());*/
-
-				   //((joint*)skt->joints[j])->qrot.ToEulerAngles(alfa,beta,gamma);
 
 				   toEulerAngles(((joint*)skt->joints[j])->qrot, alfa, beta, gamma);
 
@@ -265,10 +252,8 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
 
                 }
             }
-
         }
-    }
-
+	}
 }
 
 
@@ -426,9 +411,12 @@ void AdriViewer::readSkeleton(string fileName)
         QString sSceneName = in.readLine(); in.readLine();
         QString sGlobalPath = in.readLine(); in.readLine();
         QString sPath = in.readLine(); in.readLine(); in.readLine();
-        QString sModelFile = in.readLine(); in.readLine(); in.readLine();
 
-		QString sSkeletonFile, sEmbeddingFile, sBindingFile, sGridFile, sRiggingFile;
+		escena->sSceneName = sSceneName.toStdString();
+		escena->sGlobalPath = sGlobalPath.toStdString();
+		escena->sPath = sPath.toStdString();
+
+		QString sModelFile, sSkeletonFile, sEmbeddingFile, sBindingFile, sRiggingFile;
 
 		QStringList flags = in.readLine().split(" "); in.readLine(); in.readLine();
 		if(flags.size() != 5)
@@ -436,22 +424,22 @@ void AdriViewer::readSkeleton(string fileName)
 
 		if(flags[0].toInt() != 0 && !in.atEnd())
 		{
-			sSkeletonFile = in.readLine(); in.readLine(); in.readLine();
+			sModelFile = in.readLine(); in.readLine(); in.readLine();
 		}
 
 		if(flags[1].toInt() != 0 && !in.atEnd())
 		{
-			sEmbeddingFile = in.readLine(); in.readLine(); in.readLine();
+			sSkeletonFile = in.readLine(); in.readLine(); in.readLine();
 		}
 
 		if(flags[2].toInt() != 0 && !in.atEnd())
 		{
-			sBindingFile = in.readLine(); in.readLine(); in.readLine();
+			sEmbeddingFile = in.readLine(); in.readLine(); in.readLine();
 		}
 
 		if(flags[3].toInt() != 0 && !in.atEnd())
 		{
-			sGridFile = in.readLine(); in.readLine(); in.readLine();
+			sBindingFile = in.readLine(); in.readLine(); in.readLine();
 		}
 
 		if(flags[4].toInt() != 0 && !in.atEnd())
@@ -488,18 +476,23 @@ void AdriViewer::readSkeleton(string fileName)
 			escena->rig->loadRigging(sRiggingFileFullPath);
 
 			// By now is with the skeleton, but soon will be alone
-			escena->rig->bindRigToScene(*m, escena->skeletons);
+			escena->rig->bindLoadedRigToScene(m, escena->skeletons);
 		}
 
 		// Skinning
 		if(!sBindingFile.isEmpty())
 		{
 			string sBindingFileFullPath = (newPath+sBindingFile).toStdString();//path.toStdString();
-			escena->loadBindingForModel(m,sBindingFileFullPath);
-			escena->rig->skinning->computeRestPositions(escena->skeletons);
-		}
+			
+			//Cargamos el binding de otra manera
+			if(!m->originalModelLoaded)
+				initModelForDeformation(m);
+				
+			escena->rig->skin->loadBindingForModel(m, path, escena->skeletons);
 
-    }
+			escena->rig->skin->computeRestPositions(escena->skeletons);
+		}
+	 }
  }
 
  void AdriViewer::readModel(string fileName, string name, string path)
@@ -562,6 +555,7 @@ void AdriViewer::readSkeleton(string fileName)
                  nameAbs.chop(4);
                  fileNameAbs = (sPath+"/"+cageFileName);
 
+				 /*
                  // Caja
                  m->modelCage = new Cage(escena->getNewId());
                  m->modelCage->loadModel(fileNameAbs.toStdString(),
@@ -609,6 +603,7 @@ void AdriViewer::readSkeleton(string fileName)
                          //parent->ui->cagesComboBox->addItem(cageStills[i].left(cageStills[i].length()-4), i);
                      }
                  }
+				 */
              }
 
              modelDefFile.close();

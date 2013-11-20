@@ -26,6 +26,8 @@ void AdriMainWindow::connectSignals() {
 	// conexiones
     connect(ui->action_importModel, SIGNAL(triggered()), this, SLOT(ImportNewModel()) );
     connect(ui->actionAction_openScene, SIGNAL(triggered()), this, SLOT(OpenNewScene()));
+	connect(ui->actionAction_cleanScene, SIGNAL(triggered()), this, SLOT(ClearScene()));
+	connect(ui->actionAction_saveScene, SIGNAL(triggered()), this, SLOT(SaveScene()));
 
     connect(ui->import_cage_s, SIGNAL(triggered()), this, SLOT(ImportCages()) );
     connect(ui->import_distances, SIGNAL(triggered()), this, SLOT(ImportDistances()) );
@@ -110,6 +112,8 @@ void AdriMainWindow::connectSignals() {
 
 	//connect(ui->auxValueInt, SIGNAL(valueChanged(int)), this, SLOT(changeAuxValueInt(int)));
 
+	connect(ui->glCustomWidget, SIGNAL(defGroupData(float, float, bool, int)), SLOT(NodeDataUpdate(float, float, bool, int)));
+
     connect(ui->glCustomWidget, SIGNAL(jointDataShow(float, int)), this , SLOT(jointDataUpdate(float,int)));
 	connect(ui->glCustomWidget, SIGNAL(jointTransformationValues(float,float,float,float,float,float)), this , SLOT(jointTransformUpdate(float,float,float,float,float,float)));
 
@@ -163,7 +167,7 @@ void AdriMainWindow::changeTwistParameters()
 	// enable/disable
 	ui->twist_fin_slider->setEnabled(ui->twistEnableCheck->isChecked());
 	ui->twist_ini_slider->setEnabled(ui->twistEnableCheck->isChecked());
-	ui->glCustomWidget->setSliderParams(ui->twist_ini_slider->value()/1000.0, ui->twist_fin_slider->value()/1000.0, ui->twistEnableCheck->isChecked());
+	ui->glCustomWidget->setTwistParams(ui->twist_ini_slider->value()/1000.0, ui->twist_fin_slider->value()/1000.0, ui->twistEnableCheck->isChecked());
 }
 
 void AdriMainWindow::changeTwistParameters(int value)
@@ -271,8 +275,6 @@ AdriMainWindow::AdriMainWindow(QWidget *parent) :
 
 	//connect(ui->auxValueInt, SIGNAL(valueChanged(int)), this, SLOT(changeAuxValueInt(int)));
 
-    connect(ui->glCustomWidget, SIGNAL(jointDataShow(float, int)), this , SLOT(jointDataUpdate(float,int)));
-
 	connect(ui->ip_axisX, SIGNAL(valueChanged(int)), this, SLOT(changeInteriorPointPosition()));
 	connect(ui->ip_axisY, SIGNAL(valueChanged(int)), this, SLOT(changeInteriorPointPosition()));
 	connect(ui->ip_axisZ, SIGNAL(valueChanged(int)), this, SLOT(changeInteriorPointPosition()));
@@ -333,6 +335,32 @@ void AdriMainWindow::ImportNewModel()
     QString sModelPrefix = aux.left(aux.length()-4);
 
     ui->glCustomWidget->readModel(fileNames[0].toStdString(), sModelPrefix.toStdString(), sModelPath.toStdString());
+}
+
+void AdriMainWindow::SaveScene()
+{
+    QFileDialog inFileDialog(0, "Especifica el directorio", ui->glCustomWidget->sPathGlobal, "*.*");
+	inFileDialog.setFileMode(QFileDialog::AnyFile);
+    QStringList fileNames;
+     if (inFileDialog.exec())
+         fileNames = inFileDialog.selectedFiles();
+
+    if(fileNames.size() == 0)
+        return;
+
+    QFileInfo sPathAux(fileNames[0]);
+    QString aux = sPathAux.canonicalPath();
+    QString sModelPath = aux;
+    int ini = fileNames[0].indexOf("/",aux.length());
+    aux = fileNames[0].right(fileNames[0].length()-ini);
+    QString sModelPrefix = aux.left(aux.length()-4);
+
+    ui->glCustomWidget->saveScene(fileNames[0].toStdString(), sModelPrefix.toStdString(), sModelPath.toStdString());
+}
+
+void AdriMainWindow::ClearScene()
+{
+
 }
 
 void AdriMainWindow::OpenNewScene()
@@ -454,6 +482,19 @@ void AdriMainWindow::jointTransformUpdate(float x,float y,float z,float alpha,fl
 	rotationX = Deg2Rad(alpha);
 	rotationY = Deg2Rad(beta);
 	rotationZ = Deg2Rad(gamma);
+}
+
+void AdriMainWindow::NodeDataUpdate(float iniTw, float finTw, bool enableTw, int smooth)
+{
+	ui->twistEnableCheck->setEnabled(enableTw);
+
+	if(enableTw)
+	{
+		ui->twist_ini_slider->setValue((int)(iniTw*1000));
+		ui->twist_fin_slider->setValue((int)(finTw*1000));
+	}
+
+	ui->smoothingPasses->setValue(smooth);
 }
 
 void AdriMainWindow::jointDataUpdate(float fvalue, int id)

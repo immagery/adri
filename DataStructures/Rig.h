@@ -5,33 +5,18 @@
 #include <DataStructures\skeleton.h>
 #include <DataStructures\Skinning.h>
 
-class rig : public node 
+class Rig : public node 
 {
 public:
 
 	//rig() : node(){}
-	rig(unsigned int id) : node(id) 
+	Rig(unsigned int id) : node(id) 
 	{
-		skinning = new Skinning();
+		skin = new Skinning();
 		model = NULL;
 		skeletons.clear();
-	}
-
-	rig(Modelo* in_model, unsigned int id) : node(id) 
-	{
-		skinning = new Skinning();
-		model = in_model;
-	}
-
-	rig(Modelo* in_model, vector<skeleton*> skts, unsigned int id) : node(id) 
-	{
-		skinning = new Skinning();
-		model = in_model;
-		skeletons.resize(skts.size()); 
-		for(int sktIdx = 0; sktIdx< skts.size(); sktIdx++)
-		{
-			skeletons[sktIdx] = skts[sktIdx];
-		}
+		enableDeformation = false;
+		binded = false;
 	}
 
 	// The base model
@@ -41,15 +26,20 @@ public:
 	vector<skeleton*> skeletons;
 
 	//The deformer
-	Skinning* skinning;
+	Skinning* skin;
 
-	virtual bool bindModel(Modelo& m);
-	virtual bool bindSkeletons(vector<skeleton*>& skts);
+	bool enableDeformation;
+	bool binded;
 
 	// Load the rig defined in the file
 	virtual bool loadRigging(string sFile);
 	
-	virtual bool bindRigToScene(Modelo& model, vector<skeleton*>& skeletons);
+	// Connects the Rig to this data set
+	virtual bool bindLoadedRigToScene(Modelo* model, vector<skeleton*>& skeletons);
+	virtual bool bindRigToModelandSkeleton(Modelo* in_model, vector<skeleton*>& in_skeletons);
+
+	virtual bool bindModel(Modelo* m);
+	virtual bool bindSkeletons(vector<skeleton*>& skts);
 
 };
 

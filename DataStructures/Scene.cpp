@@ -51,43 +51,8 @@ void scene::setGlobalSmoothness(float globalSmooth)
 	*/
 }
 
-void scene::loadBindingForModel(Modelo* m, string path) {
 
-	m->originalModel = new Geometry(getNewId());
-	Geometry *modelCopy = m->originalModel;
-
-	modelCopy->nodes.resize(m->nodes.size());
-	for (int i = 0; i < modelCopy->nodes.size(); ++i) 
-	{
-		modelCopy->nodes[i] = new GraphNode(i);
-		modelCopy->nodes[i]->position = m->nodes[i]->position;
-		modelCopy->nodes[i]->connections.resize(m->nodes[i]->connections.size());
-		for (int j = 0; j < modelCopy->nodes[i]->connections.size(); ++j) 
-		{
-			modelCopy->nodes[i]->connections[j] = modelCopy->nodes[m->nodes[i]->connections[j]->id];
-		}
-	}
-
-	// Copiar caras
-	modelCopy->triangles.resize(m->triangles.size());
-	for (int i = 0; i < modelCopy->triangles.size(); ++i) 
-	{
-		modelCopy->triangles[i] = new GraphNodePolygon(i);
-		modelCopy->triangles[i]->verts.resize(m->triangles[i]->verts.size());
-		for (int j = 0; j < modelCopy->triangles[i]->verts.size(); ++j) 
-		{
-			modelCopy->triangles[i]->verts[j] = modelCopy->nodes[m->triangles[i]->verts[j]->id];
-		}
-	}
-
-	modelCopy->shading->visible = false;
-	modelCopy->computeNormals();
-	
-	rig->skinning->loadBindingForModel(m, path, skeletons);
-}
-
-
-bool bindRigToScene(Modelo& model, vector<skeleton*>skeletons, AirRig* rig)
+bool bindRigToScene(Modelo* model, vector<skeleton*>skeletons, AirRig* rig)
 {
 	// bind model
 	rig->bindModel(model);
@@ -140,16 +105,11 @@ bool bindRigToScene(Modelo& model, vector<skeleton*>skeletons, AirRig* rig)
 
 	BuildGroupTree(rig->defRig);
 
-	//rig->skinning.bindings[0] = vector<binding*> ();
-	//for(int i = 0; i< rig->model->bindings.size(); i++)
-	//	rig->skinning.bindings[0].push_back(rig->model->bindings[i]);
-
-	rig->skinning->deformedModels.push_back(rig->model);
-	rig->skinning->originalModels.push_back(rig->model->originalModel);
-	rig->skinning->rig = rig;
+	rig->skin->deformedModel = rig->model;
+	rig->skin->originalModel = rig->model->originalModel;
 
 	// Default initialization
-	rig->skinning->bind = new binding();
+	rig->skin->bind = rig->model->bind;
 
 	return false;
 }

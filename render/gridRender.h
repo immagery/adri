@@ -11,8 +11,6 @@
 class Modelo;
 class skeleton;
 
-void drawPointLocator(Eigen::Vector3d pt, float size, bool spot);
-
 class gridRenderer : public shadingNode
 {
 public:

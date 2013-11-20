@@ -5,23 +5,22 @@
 #include <QtCore/qregexp.h>
 #include <set>
 
+#include <dataStructures/scene.h>
+
 using namespace Eigen;
 
 Skinning::Skinning() {
-
-    bindings.clear();
-	originalModels.clear();
-	deformedModels.clear();
-
-	quaternionDef = 0;
+    bind = NULL;
+	originalModel = NULL;
+	deformedModel = NULL;
 }
 
 
 Skinning::~Skinning()
 {
-	bindings.clear();
-	originalModels.clear();
-	deformedModels.clear();
+	bind = NULL;
+	originalModel = NULL;
+	deformedModel = NULL;
 }
 
 void Skinning::loadBindingForModel(Modelo *m, string path, const vector< skeleton* >& skeletons) {
@@ -33,7 +32,7 @@ void Skinning::loadBindingForModel(Modelo *m, string path, const vector< skeleto
 		return;
 	}
 
-	bindings.resize(1);
+	//bindings.resize(1);
 
 	//for(int i = 0; i< m->bindings.size(); i++)
 	//	bindings[0].push_back(m->bindings[i]);
@@ -43,8 +42,8 @@ void Skinning::loadBindingForModel(Modelo *m, string path, const vector< skeleto
 	// TOFIX a model can have more than 1 binding
 	binding* bd = m->bind; //bindings[0][0];
 
-	deformedModels.push_back((Geometry*) m);
-	originalModels.push_back(m->originalModel);
+	deformedModel = (Geometry*) m;
+	originalModel = m->originalModel;
 
     file.open(QFile::ReadOnly);
     QTextStream in(&file);
@@ -116,6 +115,92 @@ void Skinning::loadBindingForModel(Modelo *m, string path, const vector< skeleto
 	printf("done\n");
 }
 
+
+void copyModel2Model(Geometry * modelCopy, Geometry *modelReference) 
+{
+	//Geometry *modelCopy = m;
+	//Geometry *modelReference = m->originalModel;
+
+	modelCopy->nodes.resize(modelReference->nodes.size());
+	for (int i = 0; i < modelCopy->nodes.size(); ++i) 
+	{
+		modelCopy->nodes[i] = new GraphNode(i);
+		modelCopy->nodes[i]->position = modelReference->nodes[i]->position;
+		modelCopy->nodes[i]->connections.resize(modelReference->nodes[i]->connections.size());
+		for (int j = 0; j < modelCopy->nodes[i]->connections.size(); ++j) 
+		{
+			modelCopy->nodes[i]->connections[j] = modelCopy->nodes[modelReference->nodes[i]->connections[j]->id];
+		}
+	}
+
+	// Copiar caras
+	modelCopy->triangles.resize(modelReference->triangles.size());
+	for (int i = 0; i < modelCopy->triangles.size(); ++i) 
+	{
+		modelCopy->triangles[i] = new GraphNodePolygon(i);
+		modelCopy->triangles[i]->verts.resize(modelReference->triangles[i]->verts.size());
+		for (int j = 0; j < modelCopy->triangles[i]->verts.size(); ++j) 
+		{
+			modelCopy->triangles[i]->verts[j] = modelCopy->nodes[modelReference->triangles[i]->verts[j]->id];
+		}
+	}
+
+	modelCopy->shading->visible = false;
+	modelCopy->computeNormals();
+}
+
+void resetDeformations(Modelo* m) 
+{
+	// Si no ha sido cargado no se puede hacer reset
+	if(m->originalModelLoaded)
+	{
+		Geometry *modelCopy = m;
+		Geometry *modelReference = m->originalModel;
+		copyModel2Model( modelCopy, modelReference);
+	}
+}
+
+void initModelForDeformation(Modelo* m) 
+{
+	Geometry *modelCopy = m->originalModel;
+	Geometry *modelReference = m;
+	copyModel2Model( modelCopy, modelReference);
+	m->originalModelLoaded = true;
+
+	/*
+	m->originalModel = new Geometry(scene::getNewId());
+	Geometry *modelCopy = m->originalModel;
+
+	
+	modelCopy->nodes.resize(m->nodes.size());
+	for (int i = 0; i < modelCopy->nodes.size(); ++i) 
+	{
+		modelCopy->nodes[i] = new GraphNode(i);
+		modelCopy->nodes[i]->position = m->nodes[i]->position;
+		modelCopy->nodes[i]->connections.resize(m->nodes[i]->connections.size());
+		for (int j = 0; j < modelCopy->nodes[i]->connections.size(); ++j) 
+		{
+			modelCopy->nodes[i]->connections[j] = modelCopy->nodes[m->nodes[i]->connections[j]->id];
+		}
+	}
+
+	// Copiar caras
+	modelCopy->triangles.resize(m->triangles.size());
+	for (int i = 0; i < modelCopy->triangles.size(); ++i) 
+	{
+		modelCopy->triangles[i] = new GraphNodePolygon(i);
+		modelCopy->triangles[i]->verts.resize(m->triangles[i]->verts.size());
+		for (int j = 0; j < modelCopy->triangles[i]->verts.size(); ++j) 
+		{
+			modelCopy->triangles[i]->verts[j] = modelCopy->nodes[m->triangles[i]->verts[j]->id];
+		}
+	}
+
+	modelCopy->shading->visible = false;
+	modelCopy->computeNormals();
+	*/
+}
+
 /*
 To compute rest positions: for each model, loop through all their vertices. For each vertex, compute its rest position
 against all joints and store it.
@@ -152,15 +237,15 @@ void Skinning::computeDeformations(const vector< skeleton* >& skeletons) {
 	
 	bool updated = false;
 
-	for (int i = 0; i < deformedModels.size(); ++i) 
+	//for (int i = 0; i < deformedModels.size(); ++i) 
 	{		
 		// It's a bad way to ensure that we are deforming the right mdoel.
-		if (!deformedModels[i]->shading->visible) return;
+		if (!deformedModel->shading->visible) return;
 
-		Geometry *m = deformedModels[i];
+		Geometry *m = deformedModel;
 
 		// loop through all bindings
-		binding * b = bindings[i];
+		binding * b = bind;
 
 		for (int k = 0; k < b->pointData.size(); ++k) 
 		{ 
@@ -177,9 +262,10 @@ void Skinning::computeDeformations(const vector< skeleton* >& skeletons) {
 			{   
 				int skID = data.influences[kk].label;
 				//joint& jt = deformersRestPosition[skID];
+				
 				joint* jt = skeletons[0]->jointRef[skID];
 
-				Vector3d& restPosition = originalModels[i]->nodes[vertexID]->position;
+				Vector3d& restPosition = originalModel->nodes[vertexID]->position;
 				Vector3d restPos2(restPosition.x(), restPosition.y(), restPosition.z());
 
 				float currentWeight = data.influences[kk].weightValue;
@@ -207,183 +293,7 @@ void Skinning::computeDeformations(const vector< skeleton* >& skeletons) {
 }
 
 
-void Skinning::computeDeformationsWithSW(const vector< skeleton* >& skeletons) {
-	// Caluculamos las matrices de Transformacion de cada articulacion
-
-	if (skeletons.size() == 0) return;
-
-	// Check if there's at least one dirty skeleton. In that case, proceed
-	bool oneDirtySkeleton = false;
-	for (int i = 0; i < skeletons.size(); ++i) {
-		if (skeletons[i]->joints[0]->dirtyFlag) {
-			oneDirtySkeleton = true;
-			break;
-		}
-	}
-	if (!oneDirtySkeleton) return;
+void Skinning::computeDeformationsWithSW(const vector< skeleton* >& skeletons) 
+{
 	
-	bool updated = false;
-
-	for (int i = 0; i < deformedModels.size(); ++i) {		// for every deformed model
-		if (skeletons[i]->joints[0]->dirtyFlag) skeletons[i]->joints[0]->computeWorldPos();
-		else continue;
-		if (!deformedModels[i]->shading->visible) return;
-
-		Geometry *m = deformedModels[i];
-		binding * b = bindings[i];
-
-		for (int k = 0; k < b->pointData.size(); ++k) { // and for each binding, loop over all its points
-			PointData& data = b->pointData[k];
-			GraphNode* node = data.node;
-			int vertexID = node->id;
-			Eigen::Vector3d finalPosition (0,0,0);
-			float totalWeight = 0;
-
-			Eigen::Vector3d rotDir; 
-			for (int kk = 0; kk < data.influences.size(); ++kk) // and check all joints associated to them
-			{   
-				int skID = data.influences[kk].label;
-				joint* jo  = NULL;
-				for (int s = 0; s < skeletons.size(); ++s) 
-				{
-					jo = skeletons[s]->getJoint(skID);
-					if(jo) break;
-				}	
-				if(jo)
-				{
-					//Eigen::Quaternion<float> eigenQuatAux(1,0,0,0);
-					double twistInterpolation = 0; 
-							
-					if(data.secondInfluences.size()>0) // Si es cero es que no hay hijos
-					{
-						for(int jointChild = 0; jointChild < jo->childs.size(); jointChild++)
-						{
-
-							if(jointChild == 0)
-							{
-								//rotDir = (jo->childs[jointChild]->pos-jo->pos).Normalize();
-								Eigen::Vector3d& ap = jo->childs[jointChild]->worldPosition;
-								Eigen::Vector4f ap4 = Vector4f(ap.x(),ap.y(),ap.z(),1);
-								ap4 = jo->iT * ap4;
-								rotDir = Eigen::Vector3d(ap4[0],ap4[1],ap4[2]).normalized();
-							}
-							else
-							{
-								//rotDir += (jo->childs[jointChild]->pos-jo->pos).Normalize();
-								Eigen::Vector3d& ap = jo->childs[jointChild]->worldPosition;
-								Eigen::Vector4f ap4 = Vector4f(ap.x(),ap.y(),ap.z(),1);
-								ap4 = jo->iT * ap4;
-								rotDir += Eigen::Vector3d(ap4[0],ap4[1],ap4[2]).normalized();
-							}
-							//jo->childs[jointChild]->qrot.Normalize();
-							// Obtener twist del hijo
-							Eigen::Vector3d axis;
-							//double twist = 2*acos(jo->childs[jointChild]->qrot.X());
-
-							double twist, angle1, angle2; 
-							//jo->childs[jointChild]->qrot.ToAxis(twist2,axis);
-							//jo->childs[jointChild]->qrot.ToEulerAngles(twist, angle1, angle2);
-
-							//double val01,val02,val03;
-							//jo->childs[jointChild]->qrot.ToEulerAngles(val01,val02,val03);
-
-							// Quaternion<double> quatAuxInt =  Quaternion<double>(cos(twist/2),0,0,0);
-							//quatAux += quatAuxInt * data.secondInfluences[kk][jointChild];
-							twistInterpolation += twist*(1-data.secondInfluences[kk][jointChild]);
-
-							//Eigen::Quaternion<float> quatAux2(jo->childs[jointChild]->qrot.X(), jo->childs[jointChild]->qrot.Y(), jo->childs[jointChild]->qrot.Z(),jo->childs[jointChild]->qrot.W());
-							//eigenQuatAux.slerp(data.secondInfluences[kk][jointChild], quatAux2);
-						}
-
-						if(jo->childs.size() > 0)
-						{
-							rotDir.normalize();
-						}
-						else
-							rotDir = Eigen::Vector3d(1,0,0);
-					}
-
-					//if(k == 95)
-					//{
-				//		printf("Esta es la interpolacion %f.\n", twistInterpolation); fflush(0);
-					//}
-
-					// Quaternion<float> quatAux =  Quaternion<float>(cos(twistInterpolation/2),0,0,0);
-					// Quaternion<float> quatAux =  Quaternion<float>(1,0,0,0);
-
-					//Matrix44f twistMatrix;
-					//quatAux.Normalize();
-					//quatAux.ToMatrix(twistMatrix);
-					//Eigen::Quaternionf qOp();
-					//qOp.(cos(twistInterpolation/2), 0, 0, 0);
-					//Eigen::Matrix4f twm; twm << twistMatrix[0][0] ,twistMatrix[0][1], twistMatrix[0][2], twistMatrix[0][3],
-					//							twistMatrix[1][0] ,twistMatrix[1][1], twistMatrix[1][2], twistMatrix[1][3],
-					//							twistMatrix[2][0] ,twistMatrix[2][1], twistMatrix[2][2], twistMatrix[2][3],
-					//							twistMatrix[3][0] ,twistMatrix[3][1], twistMatrix[3][2], twistMatrix[3][3];
-
-					Eigen::Vector3d& restPosition = originalModels[i]->nodes[vertexID]->position;
-					Eigen::Vector4f restPos(restPosition.x(), restPosition.y(), restPosition.z(), 1);
-					Eigen::Vector4f finalPosAux = jo->iT * restPos;
-						
-					Eigen::Vector3f auxPos(finalPosAux[0], finalPosAux[1], finalPosAux[2]);
-
-					// Aplicacion del twist.
-						
-					Eigen::Matrix3f m;
-					Eigen::Vector3f pruebas(rotDir.x(),rotDir.y(),rotDir.z());
-					m = AngleAxisf(twistInterpolation, pruebas);
-					//m = AngleAxisf(twistInterpolation, Vector3f::UnitX());
-					//Vector3f pruebas = Vector3f::UnitX();
-					//pruebas += Vector3f(rotDir.X(),rotDir.Y(),rotDir.Z());
-					//rotDir = Vector3d(1.000, 0.0, 0.0);
-						
-					//Vector3f pruebas(1.0,0,0); 
-					//AngleAxisf(twistInterpolation, pruebas);
-					//auxPos = m*auxPos;
-
-					Eigen::Vector4f finalPos2(auxPos[0], auxPos[1],auxPos[2],1);
-					Eigen::Vector4f finalPos = jo->W * finalPos2;
-						
-
-					//auxPos = auxPos.transpose()*qOp.toRotationMatrix();
-					//auxPos = qOp.toRotationMatrix()*auxPos.transpose();
-						
-
-					/*
-					//qOp.normalize();
-					//Eigen::Quaternionf qOp2 = qOp.conjugate();
-					//qOp2.normalize();
-							
-					//Eigen::Vector3f finalPos;
-					//finalPos << finalPosMatrix(0,0), finalPosMatrix(1,0), finalPosMatrix(2,0); 
-
-					//finalPos = qOp*finalPos;
-					*/
-
-					float weight = data.influences[kk].weightValue;
-					finalPosition = finalPosition + Eigen::Vector3d(finalPos(0), finalPos(1), finalPos(2)) * weight;
-					//finalPosition = finalPosition + Vector3d(finalPos(0), auxPos(1), auxPos(2)) * weight;
-
-					totalWeight += data.influences[kk].weightValue;
-				}
-			}
-
-			// es una comprobacion burda, pero deberia darse.
-			//if(fabs(totalWeight-1)> 0.00001)
-			//	printf("Algo pasa con los valores de los pesos: %f", totalWeight);
-			//assert(fabs(totalWeight-1)< 0.00001);
-
-			finalPosition = finalPosition / totalWeight;
-			if (m->nodes[vertexID]->position != finalPosition) 
-				updated = true;
-
-			m->nodes[vertexID]->position = finalPosition;
-		}
-
-		if (updated)
-		{
-			
-			m->computeNormals();
-		}
-	}
 }

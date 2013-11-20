@@ -173,11 +173,16 @@ class PointData
     PointData(int weightsSize);
 	PointData(const PointData& pd);
 
-    void SaveToFile(ofstream& myfile);
-    void LoadFromFile(ifstream& myfile);
+    //void SaveToFile(ofstream& myfile);
+    //void LoadFromFile(ifstream& myfile);
 
     void clear();
     void clearAll();
+
+	float getDomain(int fatherId);
+
+	void saveToFile(FILE* fout);
+	void loadFromFile(ifstream& myfile);
 
     // The cell contains a vertex or not
     bool vertexContainer;
@@ -186,9 +191,6 @@ class PointData
     Eigen::Vector3f color;
 
 	GraphNode* node;
-
-	// Esta es la posición del punto que representa.
-	//Eigen::Vector3d position;
 
     // Segmentation labels
     vector<double> embedding;
@@ -222,25 +224,11 @@ class PointData
 
 	bool isBorder;
 
-	// Reference to model vertex index
-	//int modelVert;
-
     // Influences assigned to this cell
     vector<weight> influences;
 
 	// Influences assigned to this cell
     vector< vector<float> > secondInfluences;
-
-    float getDomain(int fatherId)
-    {
-        for(unsigned int i = 0; i< influences.size(); i++)
-        {
-            if(influences[i].label == fatherId)
-                return influences[i].weightValue;
-        }
-
-        return 0;
-    }
 };
 
 class EdgeData
@@ -347,6 +335,30 @@ public:
 	}
 
 	binding(int points)
+	{
+        // Init default values
+        setDefaultValues();
+
+        // binded skeletons
+        bindedSkeletons.clear();
+
+        // Node definition data
+        intPoints.clear();
+        nodeIds.clear();
+        traductionTable.clear();
+        embeddedPoints.clear();
+
+		pointData.resize(points);
+		globalIndirection.resize(points);
+
+		weightsSort.clear();
+		weightsRepresentative.clear();
+
+		cutThreshold.clear();
+		weightsFiltered.clear();
+	}
+
+	void resize(int points)
 	{
         // Init default values
         setDefaultValues();

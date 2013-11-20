@@ -1,5 +1,10 @@
 #include "SurfaceData.h"
 
+#include <iostream>
+#include <fstream>
+
+#include <utils\util.h>
+
 
 bool BuildSurfaceFromOFFFile(SurfaceGraph& graph, string sFileName)
 {
@@ -215,6 +220,7 @@ void PointData::clearAll()
     embedding.clear();
 }
 
+/*
 void PointData::SaveToFile(ofstream& myfile)
 {
     // bool vertexContainer
@@ -304,6 +310,7 @@ void PointData::LoadFromFile(ifstream& myfile)
     myfile.read( (char*) &segmentId, sizeof(int) );
 
 }
+*/
 
 void cleanZeroInfluences(binding* bd)
 {
@@ -333,6 +340,112 @@ void cleanZeroInfluences(binding* bd)
         }
 		pd->auxInfluences.clear();
     }
+}
+
+void PointData::saveToFile(FILE* fout)
+{
+	fprintf(fout, "%d %d %f\n", node->id, segmentId, segmentDistance); fflush(fout);
+
+	//fprintf(fout, "%f %f %f\n", color.x(), color.y(), color.z()); fflush(0);
+	//fprintf(fout, "%d \n", vertexContainer); fflush(0);
+
+    // Segmentation labels
+    // vector<double> embedding;
+
+	// En principio no es necesario.
+	// fprintf(fout, "%d %f %f %f\n", ownerLabel, ownerWeight, tempOwnerWeight, confidenceLevel); fflush(0);
+
+    // Domain of influcence
+    //float domain;
+    //int domainId;
+
+    // Iteration pass
+    //int itPass;
+
+	fprintf(fout, "%d %d %d %d\n", validated, component, assigned, isBorder); fflush(fout);
+
+    // ConnexComponents
+    
+	// Reference to model vertex index
+	//int modelVert;
+
+	// Influences
+	fprintf(fout, "%d ", influences.size()); fflush(fout);
+	for(int inflIdx = 0; inflIdx < influences.size(); inflIdx++)
+	{
+		fprintf(fout, "%d %f ", influences[inflIdx].label, influences[inflIdx].weightValue); fflush(fout);
+	}
+	fprintf(fout, "\n"); fflush(fout);
+
+
+	// SecondInfluences
+	fprintf(fout, "%d ", secondInfluences.size()); fflush(fout);
+	for(int inflIdx = 0; inflIdx < secondInfluences.size(); inflIdx++)
+	{
+		fprintf(fout, "%d ", secondInfluences[inflIdx].size());
+		for(int inflSecIdx = 0; inflSecIdx < secondInfluences[inflIdx].size(); inflSecIdx++)
+		{
+			fprintf(fout, "%f ", secondInfluences[inflIdx][inflSecIdx]); fflush(fout);
+		}
+	}
+	fprintf(fout, "\n"); fflush(fout);
+}
+
+float PointData::getDomain(int fatherId)
+{
+    for(unsigned int i = 0; i< influences.size(); i++)
+    {
+        if(influences[i].label == fatherId)
+            return influences[i].weightValue;
+    }
+
+    return 0;
+}
+
+void PointData::loadFromFile(ifstream& in)
+{
+	int nodeReference = 0;
+	string line;
+	vector<string> elems;
+
+	getline (in , line);
+    split(line, ' ', elems);
+
+	nodeReference = atoi(elems[0].c_str());
+	segmentId = atoi(elems[1].c_str());
+	segmentDistance = atof(elems[2].c_str());
+
+	getline (in, line);
+    split(line, ' ', elems);
+
+	validated = atoi(elems[0].c_str());
+	component = atoi(elems[1].c_str());
+	assigned = atoi(elems[2].c_str());
+	isBorder = atoi(elems[3].c_str());
+
+	getline (in, line);
+    split(line, ' ', elems);
+
+	influences.resize(atoi(elems[0].c_str()));
+	for(int inflIdx = 0; inflIdx < influences.size(); inflIdx++)
+	{
+		influences[inflIdx] = weight( atoi(elems[inflIdx*2+1].c_str()), atof(elems[(inflIdx+1)*2].c_str()));
+	}
+
+	//Secondary weights
+	getline (in, line);
+    split(line, ' ', elems);
+
+	int id = 0;
+	secondInfluences.resize(atoi(elems[id].c_str())); id++;
+	for(int inflIdx = 0; inflIdx < secondInfluences.size(); inflIdx++)
+	{
+		secondInfluences[inflIdx].resize(atoi(elems[id].c_str())); id++;
+		for(int inflSecIdx = 0; inflSecIdx < secondInfluences[inflIdx].size(); inflSecIdx++)
+		{
+			secondInfluences[inflIdx][inflSecIdx] = (atof(elems[id].c_str())); id++;
+		}
+	}
 }
 
 void saveBinding(binding* bd, string fileName)

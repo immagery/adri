@@ -15,6 +15,8 @@
 #include "DataStructures/Scene.h"
 #include "DataStructures/Object.h"
 #include "DataStructures/skeleton.h"
+#include "DataStructures\Rig.h"
+#include "DataStructures\Skinning.h"
 #include "DataStructures/Modelo.h"
 #include "DataStructures/AnimationManager.h"
 #include "DataStructures/Particles.h"
@@ -55,6 +57,7 @@ public:
     // LOADING
     void readModel(string fileName, string name, string path);
     virtual void readScene(string fileName, string name, string path);
+	virtual void saveScene(string fileName, string name, string path){}
 //    void readDistances(QString fileName);
     void readSkeleton(string fileName);
 
@@ -69,7 +72,7 @@ public:
     void initScene();
 
     //SELECTION
-    void selectElements(vector<unsigned int > lst);
+    virtual void selectElements(vector<unsigned int > lst);
 
     void testScene();
 
@@ -90,13 +93,10 @@ public:
     void toogleModelToLines();
     void toogleVisibility(bool toogle);
 
-	virtual void setSliderParams(double ini, double fin, bool enable)
-	{
-		ini = ini; // for delete warning
-		fin = fin; // for delete warning
-		enable = enable; // for delete warning
-	
-	}
+
+	virtual void setSmoothPasses(int , int ) {}
+	virtual void setTwistParams(double , double , bool ){}
+
 //    void changeVisualizationMode(int);
 //	void updateGridVisualization();
 //    void toogleToShowSegmentation(bool toogle);
@@ -290,6 +290,7 @@ public slots:
 signals:
     void updateSceneView();
     void jointDataShow(float, int);
+	void defGroupData(float, float, bool, int);
 	void jointTransformationValues(float, float,float,float,float,float);
     void changedFrame(int);
 

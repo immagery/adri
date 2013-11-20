@@ -32,6 +32,10 @@ public:
 public slots:
     void changeSlider(int);
     void OpenNewScene();
+
+	void SaveScene();
+	void ClearScene();
+
 	void LaunchTests();
     void ImportNewModel();
     void CloseApplication();
@@ -66,6 +70,7 @@ public slots:
 	void changeInteriorPointPosition();
     void updateExpansionSlidervalue(int);
     void jointDataUpdate(float fvalue, int id);
+	void NodeDataUpdate(float iniTw, float finTw, bool enableTw, int smooth);
 	void jointTransformUpdate(float x,float y,float z,float alpha,float beta,float gamma);
 	
 	virtual void changeAuxValueInt(int value);

@@ -17,33 +17,42 @@ public:
 
     virtual void Clear();
 
-    Cage* currentCage;
+	// Original geometry for compute deformations
+	Geometry* originalModel;
+	bool originalModelLoaded;
+
+	// Bind
+	binding* bind;
+	bool computedBindings;
+
+	// Temp triangles
+	vector<TriangleData> virtualTriangles;
+
+    string sModelPath; // Ruta donde est‡ el modelo
+    string sModelPrefix; // Prefijo de los ficheros del modelo
+
+    vector< deformer* > deformers; // Applied deformers
+
+    //Cage* currentCage;
 
 	// No se que es, pero debe ser para visulizar deformaciones
     //Geometry* currentRender;
 
-	Geometry* originalModel;
-
+	//TODELETE
     // Cajas para hacer la deformacion
     Cage* modelCage; // Caja envolvente original
     Cage* dynCage; // Caja que puede variar interactivamente
     vector< Cage* > stillCages; // Cajas est‡ticas de posiciones concretas (tests)
+	Cage* currentCage;
 
     /// Biharmonic Distances matrix (nxn)
-    vector< vector< double> > embedding;
-
-	// Bind
-	binding* bind;
+    //vector< vector< double> > embedding;
 
 	// OldBindings
     //vector<binding*> bindings;
 
-	vector<TriangleData> virtualTriangles;
-
 	//Harmonic coords grid
-	grid3d* HCgrid;
-
-	bool computedBindings;
+	//grid3d* HCgrid;
 
 	//vector<int> modelVertexDataPoint;
 	//vector<int> modelVertexBind;
@@ -51,25 +60,21 @@ public:
 
     //grid3d* grid;
 
-    string sModelPath; // Ruta donde est‡ el modelo
-    string sModelPrefix; // Prefijo de los ficheros del modelo
-
-    // Plugs de salida
-    vector< deformer* > deformers; // Applied deformers
-
     virtual void drawFunc();
 
-    virtual bool select(bool bToogle, unsigned int id);
+	// vertex and triangle counters
+	int vn() {return (int)nodes.size();}
+	int fn() {return (int)triangles.size();}
 
-	void initGrid();
+	//void initGrid();
 
+	// For visualization and analisis purposes
 	void setSpotVertex(int i); 
 	void setSpotVertexes(vector<int>& indices);
 	void addSpotVertex(int i);
 	void cleanSpotVertexes();
+	virtual bool select(bool bToogle, unsigned int id);
 
-	int vn() {return (int)nodes.size();}
-	int fn() {return (int)triangles.size();}
 };
 
 void BuildSurfaceGraphs(Modelo* m);

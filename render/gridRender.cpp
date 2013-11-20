@@ -100,34 +100,6 @@ void drawCube(Eigen::Vector3d o, double cellSize, Eigen::Vector3f color,vector<b
     if(!lighting) glEnable(GL_LIGHTING);
 }
 
-void drawPointLocator(Eigen::Vector3d pt, float size, bool spot)
-{
-    glDisable(GL_LIGHTING);
-    if(spot)
-    {
-        glColor3f((GLfloat)0.5, (GLfloat)0.1, (GLfloat)0.1);
-        size = size*2;
-    }
-    else
-    {
-        glColor3f((GLfloat)0.1, (GLfloat)0.4, (GLfloat)0.1);
-    }
-
-    glBegin(GL_LINES);
-    // queda reconstruir el cubo y ver si se pinta bien y se ha calculado correctamente.
-    glVertex3f(pt.x()+size, pt.y(), pt.z());
-    glVertex3f(pt.x()-size, pt.y(), pt.z());
-
-    glVertex3f(pt.x(), pt.y()+size, pt.z());
-    glVertex3f(pt.x(), pt.y()-size, pt.z());
-
-    glVertex3f(pt.x(), pt.y(), pt.z()+size);
-    glVertex3f(pt.x(), pt.y(), pt.z()-size);
-
-    glEnd();
-    glEnable(GL_LIGHTING);
-}
-
 void gridRenderer::drawFunc(object* obj)
 {
     // transformaciones

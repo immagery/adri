@@ -12,5 +12,9 @@
         <file>icons/seleccion_subobj_on.png</file>
         <file>icons/barra_color.jpg</file>
         <file>icons/folder-icon.png</file>
+        <file>icons/3floppy_unmount.png</file>
+        <file>icons/Files-New-File-icon.png</file>
+        <file>icons/open-file-icon.png</file>
+        <file>icons/rig_animation_toogle.png</file>
     </qresource>
 </RCC>

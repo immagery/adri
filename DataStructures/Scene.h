@@ -170,7 +170,10 @@ class scene
 		return "";
 	}
 
-	void loadBindingForModel(Modelo* m, string path);
+	// Scene info
+	string sSceneName;
+    string sGlobalPath;
+    string sPath;
 
 	//Models
     vector< object*   > models;
@@ -193,7 +196,7 @@ class scene
 	//Skinning* skinner;
 
 	// AirRig
-	rig* rig;
+	Rig* rig;
 
 	procState state;
 

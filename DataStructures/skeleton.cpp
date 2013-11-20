@@ -14,6 +14,7 @@
 
 #define ratioExpansion_DEF 0.7
 
+using namespace Eigen;
 
 bool joint::update()
 {
@@ -578,7 +579,9 @@ int subdivideBone(joint* parent, joint* child,
 	{
 		//int globalNodeId = nodePoints.size();
 		ids.push_back(nodePoints.size());	
-		nodePoints.push_back(DefNode(newOrigen+(dir*newSubdivLength*i),boneId));
+		Vector3d newPos = newOrigen+(dir*newSubdivLength*i);
+		nodePoints.push_back(DefNode(newPos,boneId));
+		nodePoints.back().relPos = newPos-origen;
 		nodePoints.back().nodeId = scene::getNewId();
 		nodePoints.back().ratio = (float)i/(float)numDivisions;
 		nodePoints.back().childBoneId = child->nodeId;

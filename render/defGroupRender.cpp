@@ -1,4 +1,4 @@
-#include "SkeletonRender.h"
+#include <render/defGorupRender.h>
 #include <utils/utilGL.h>
 
 #define NORMALR 0.5
@@ -18,42 +18,62 @@
 
 #include <DataStructures/Skeleton.h>
 
-float JointRender::jointSize = DEFAULT_SIZE;
-
 using namespace Eigen;
 
-void SkeletonRender::drawFunc(skeleton* obj)
-{
-    // transformaciones
-    beforeDraw(obj);
 
-    afterDraw(obj);
+void useModelMatrix(Quaterniond rot, Vector3d pos)
+{
+    //glPushMatrix();
+	Eigen::Matrix4d transformMatrix;
+	Eigen::Matrix3d rotateMatrix;
+	rotateMatrix = rot.toRotationMatrix();
+	transformMatrix << rotateMatrix(0,0) , rotateMatrix(0,1) , rotateMatrix(0,2), pos.x(),
+						rotateMatrix(1,0) , rotateMatrix(1,1) , rotateMatrix(1,2), pos.y(),
+						rotateMatrix(2,0) , rotateMatrix(2,1) , rotateMatrix(2,2), pos.z(),
+						0,				0,				0,			1;
+
+	transformMatrix.transposeInPlace();
+
+	GLdouble multiplyingMatrix[16] = {transformMatrix(0,0), transformMatrix(0,1), transformMatrix(0,2), transformMatrix(0,3),
+									  transformMatrix(1,0), transformMatrix(1,1), transformMatrix(1,2), transformMatrix(1,3),
+									  transformMatrix(2,0), transformMatrix(2,1), transformMatrix(2,2), transformMatrix(2,3),
+								      transformMatrix(3,0), transformMatrix(3,1), transformMatrix(3,2), transformMatrix(3,3)
+									};
+
+	glMultMatrixd(multiplyingMatrix);
+	//glPopMatrix();
 }
 
-bool SkeletonRender::updateSkeleton(skeleton* skt)
+void drawStickDefGroup(float length)
 {
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-    skt->root->computeWorldPos();
-    glPopMatrix();
-
-    return true;
-}
-
-
-void drawLine(double x1, double y1, double z1, double x2, double y2, double z2)
-{
-    glDisable(GL_LIGHTING);
+	float relation = length*0.2;
+	float midRelation = relation/2.0;
+	Vector3d pts[4];
+	pts[0] = Vector3d( midRelation,  -midRelation,  -midRelation);
+	pts[1] = Vector3d( midRelation,  midRelation,  -midRelation);
+	pts[2] = Vector3d( midRelation,  midRelation,  midRelation);
+	pts[3] = Vector3d( midRelation,  -midRelation,  midRelation);
+	
+	glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
 
-    glVertex3d(x1,y1,z1);
-    glVertex3d(x2,y2,z2);
+	for(int pt = 0; pt < 4; pt++)
+	{
+		glVertex3d(pts[pt].x(),pts[pt].y(),pts[pt].z());
+		glVertex3d(pts[(pt+1)%4].x(),pts[(pt+1)%4].y(),pts[(pt+1)%4].z());
+
+		glVertex3d(0,0,0);
+		glVertex3d(pts[pt].x(),pts[pt].y(),pts[pt].z());
+
+		glVertex3d(length,0,0);
+		glVertex3d(pts[pt].x(),pts[pt].y(),pts[pt].z());
+	}
 
     glEnd();
     glEnable(GL_LIGHTING);
 }
 
+/*
 void drawLine(double x, double y, double z)
 {
     glDisable(GL_LIGHTING);
@@ -105,25 +125,48 @@ void drawBoneStick(float radius, Eigen::Vector3d& pos)
 	//drawLine(1,0,0, pos.X(), pos.Y(), pos.Z());
 	//drawLine(1,0,0, pos.X(), pos.Y(), pos.Z());
 }
+*/
 
 //JOINT
-void JointRender::drawFunc(joint* jt)
+void DefGroupRender::drawFunc()
 {   
-    glColor3f(1.0,1.0,1.0);
-    glPushMatrix();
+	DefGroup* g = group;
 
-    if(jt->father)
-    {
-        if(jt->father->shading->selected)
-            glColor3f((GLfloat)SELR,(GLfloat)SELG,(GLfloat)SELB);
-        else
-            glColor3f(NORMALR,NORMALG,NORMALB);
+    //if(jt->father)
+    //{
+     //   if(jt->father->shading->selected)
+     //       glColor3f((GLfloat)SELR,(GLfloat)SELG,(GLfloat)SELB);
+     //   else
+     //       glColor3f(NORMALR,NORMALG,NORMALB);
+	//}
 
-		//
-		drawBoneStick(jointSize, jt->pos);
-        //drawLine(jt->pos.X(), jt->pos.Y(),jt->pos.Z());
-    }
+	double maxRelation = 0;
 
+	// Render the bone shape
+	glColor3f(1.0,1.0,1.0);
+	for(int groupIdx = 0; groupIdx < g->relatedGroups.size(); groupIdx++)
+	{
+		DefGroup* child = g->relatedGroups[groupIdx];
+		glPushMatrix();
+		useModelMatrix(child->transformation->parentRot, g->transformation->translation);
+		Vector3d line = child->transformation->translation - g->transformation->translation;
+		drawStickDefGroup(line.norm());
+
+		maxRelation = max(line.norm()*0.2, maxRelation);
+		glPopMatrix();
+	}
+
+	glMatrixMode(GL_MODELVIEW);
+	glPushMatrix();
+	useModelMatrix(g->transformation->rotation, g->transformation->translation);
+	drawAxisHandle(maxRelation);
+	for(int defIdx = 0; defIdx < group->deformers.size(); defIdx++)
+		drawPointLocator(group->deformers[defIdx].relPos, maxRelation*0.25, false);
+
+	glPopMatrix();
+
+
+	/*
 	Eigen::Matrix4f transformMatrix = jt->world;
 
 
@@ -172,16 +215,11 @@ void JointRender::drawFunc(joint* jt)
     //{
     //    drawDeformer(jt->childs[i]->drawFunc());
     //}
-
-    for(unsigned int i = 0; i< jt->childs.size(); i++)
-    {
-        jt->childs[i]->drawFunc();
-    }
-
-    glPopMatrix();
+	
+    glPopMatrix();*/
 }
 
-void JointRender::computeRestPos(joint* jt) {
+void DefGroupRender::computeRestPos(joint* jt) {
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
@@ -189,8 +227,9 @@ void JointRender::computeRestPos(joint* jt) {
 	glPopMatrix();
 }
 
-void JointRender::computeRestPosRec(joint* jt, joint* father)
+void DefGroupRender::computeRestPosRec(joint* jt, joint* father)
 {
+	/*
 	Eigen::Matrix3d rotationMatrix;
 	if(!father)
 	{
@@ -319,9 +358,10 @@ void JointRender::computeRestPosRec(joint* jt, joint* father)
     }
 
     glPopMatrix();
+	*/
 }
 
-void JointRender::computeWorldPos(joint* jt) {
+void DefGroupRender::computeWorldPos(joint* jt) {
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	glLoadIdentity();
@@ -329,52 +369,10 @@ void JointRender::computeWorldPos(joint* jt) {
 	glPopMatrix();
 }
 
-void JointRender::computeWorldPosRec(joint* jt, joint* father)
+void DefGroupRender::computeWorldPosRec(joint* jt, joint* father)
 {
 
-	/* COMPUTING twist
-	int skID = data.influences[kk].label;
-	//joint& jt = deformersRestPosition[skID];
-	joint* jt = rig->defRig.defGroupsRef[skID]->transformation;
-
-	Vector3d& restPosition = originalModels[i]->nodes[vertexID]->position;
-	Vector3d restPos2(restPosition.x(), restPosition.y(), restPosition.z());
-
-	Quaterniond apliedRotation;
-	apliedRotation = jt->rotation;
-	//apliedRotation = apliedRotation * 
-
-	if(rig->defRig.defGroupsRef[skID]->relatedGroups.size() == 1)
-	{
-		double twist = 0;
-						
-		Vector3d axis = rig->defRig.defGroupsRef[skID]->relatedGroups[0]->transformation->translation - rig->defRig.defGroupsRef[skID]->transformation->translation;
-		axis.normalize();
-
-		//necesito guardar la transformacion hasta el padre
-
-		Vector3d tempRestRot = rig->defRig.defGroupsRef[skID]->transformation->rRotation._transformVector(axis);
-
-		Quaterniond localRotationChild =  rig->defRig.defGroupsRef[skID]->relatedGroups[0]->transformation->qOrient * 
-											rig->defRig.defGroupsRef[skID]->relatedGroups[0]->transformation->qrot;
-
-		Quaterniond localRotationChildRest =  rig->defRig.defGroupsRef[skID]->relatedGroups[0]->transformation->restRot;
-
-		Vector3d referenceRest = localRotationChildRest._transformVector(tempRestRot);
-		Vector3d referenceCurr = localRotationChild._transformVector(tempRestRot);
-
-		if(!referenceRest.isApprox(referenceCurr))
-			int parar = 0;
-
-		Quaterniond nonRollrotation;
-		nonRollrotation.setFromTwoVectors(referenceRest, referenceCurr);
-						
-		Quaterniond twistExtraction = localRotationChild*localRotationChildRest.inverse()*nonRollrotation.inverse();
-	
-	
-	*/
-
-
+	/*
 	Eigen::Matrix3d rotationMatrix;
 	if(!father)
 	{
@@ -402,7 +400,7 @@ void JointRender::computeWorldPosRec(joint* jt, joint* father)
 		Quaterniond localRotationChild =  jt->qOrient * jt->qrot;
 		Quaterniond localRotationChildRest =  jt->restRot;
 
-		Vector3d tempRestRot = father->rRotation.inverse()._transformVector(axis);
+		Vector3d tempRestRot = father->rRotation._transformVector(axis);
 
 		Vector3d referenceRest = localRotationChildRest._transformVector(tempRestRot);
 		Vector3d referenceCurr = localRotationChild._transformVector(tempRestRot);
@@ -415,7 +413,6 @@ void JointRender::computeWorldPosRec(joint* jt, joint* father)
 
 		Vector3d quatAxis(jt->twist.x(),jt->twist.y(),jt->twist.z());
 		quatAxis = (localRotationChild).inverse()._transformVector(quatAxis);
-		//quatAxis = father->qOrient._transformVector(quatAxis);
 		//quatAxis = (father->qOrient * father->qrot).inverse()._transformVector(quatAxis);
 	
 		jt->twist.x() = quatAxis.x();
@@ -548,4 +545,6 @@ void JointRender::computeWorldPosRec(joint* jt, joint* father)
     }
 
     glPopMatrix();
+
+	*/
 }

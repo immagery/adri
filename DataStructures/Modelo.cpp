@@ -2,6 +2,7 @@
 #include <render/GeometryRender.h>
 #include <render/ModeloRender.h>
 #include <DataStructures/grid3D.h>
+#include <DataStructures/scene.h>
 
 //#include "GreenCoords.h"
 //#include "HarmonicCoords.h"
@@ -71,12 +72,12 @@ Modelo::Modelo() : Geometry()
     currentCage = NULL;
     //currentRender = this;
 
-    embedding.clear();
+    //embedding.clear();
 	//modelVertexDataPoint.clear();
 	//modelVertexBind.clear();
 	//bindings.clear();
 
-	bind = NULL;
+	bind = new binding();
 	computedBindings = false;
 
 	delete shading;
@@ -91,17 +92,12 @@ Modelo::Modelo(unsigned int nodeId) : Geometry(nodeId)
 
     modelCage = NULL;
     dynCage = NULL;
-
     currentCage = NULL;
-    //currentRender = this;
 
-    embedding.clear();
-	//modelVertexDataPoint.clear();
-	//modelVertexBind.clear();
+	originalModel = new Geometry(scene::getNewId());
+	originalModelLoaded = false;
 
-	//bindings.clear();
-	
-	bind = NULL;
+	bind = new binding();
 	computedBindings = false;
 
 	delete shading;
@@ -126,8 +122,9 @@ Modelo::~Modelo()
 	//modelVertexDataPoint.clear();
 	//modelVertexBind.clear();
 	//globalIndirection.clear();
-	embedding.clear();
+	//embedding.clear();
 	delete bind;
+	delete originalModel;
 
 	//for(unsigned int i = 0; i< bindings.size(); i++)
 	//	delete bindings[i];
@@ -330,7 +327,7 @@ void BuildSurfaceGraphs(Modelo* m)
 		printf("[Connected part %d]-> %d# nodes\n", i, graphNodesCounter[i]);
 	}
 
-	m->bind = new binding(nodes.size());
+	m->bind->resize(nodes.size());
 	binding* bd = m->bind;
 	bd->surfaces.resize(graphNodesCounter.size());
 	if(graphNodesCounter.size() > 0)
