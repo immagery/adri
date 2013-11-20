@@ -1268,7 +1268,7 @@
               <item>
                <widget class="QTabWidget" name="DefGroupParamsTab">
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>2</number>
                 </property>
                 <widget class="QWidget" name="render">
                  <attribute name="title">
@@ -2317,9 +2317,9 @@ passes</string>
                  <widget class="QSlider" name="velDamp">
                   <property name="geometry">
                    <rect>
-                    <x>20</x>
-                    <y>150</y>
-                    <width>391</width>
+                    <x>160</x>
+                    <y>100</y>
+                    <width>101</width>
                     <height>22</height>
                    </rect>
                   </property>
@@ -2342,8 +2342,8 @@ passes</string>
                  <widget class="QLabel" name="label_8">
                   <property name="geometry">
                    <rect>
-                    <x>160</x>
-                    <y>120</y>
+                    <x>150</x>
+                    <y>20</y>
                     <width>131</width>
                     <height>16</height>
                    </rect>
@@ -2355,9 +2355,9 @@ passes</string>
                  <widget class="QSlider" name="divFactorSlider">
                   <property name="geometry">
                    <rect>
-                    <x>19</x>
-                    <y>190</y>
-                    <width>391</width>
+                    <x>280</x>
+                    <y>100</y>
+                    <width>91</width>
                     <height>22</height>
                    </rect>
                   </property>
@@ -2419,6 +2419,120 @@ passes</string>
                    <string>LOAD</string>
                   </property>
                  </widget>
+                 <widget class="QSlider" name="verletX">
+                  <property name="geometry">
+                   <rect>
+                    <x>10</x>
+                    <y>150</y>
+                    <width>160</width>
+                    <height>22</height>
+                   </rect>
+                  </property>
+                  <property name="minimum">
+                   <number>-200</number>
+                  </property>
+                  <property name="maximum">
+                   <number>200</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                 <widget class="QSlider" name="verletY">
+                  <property name="geometry">
+                   <rect>
+                    <x>10</x>
+                    <y>180</y>
+                    <width>160</width>
+                    <height>22</height>
+                   </rect>
+                  </property>
+                  <property name="minimum">
+                   <number>-200</number>
+                  </property>
+                  <property name="maximum">
+                   <number>200</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                 <widget class="QSlider" name="verletZ">
+                  <property name="geometry">
+                   <rect>
+                    <x>10</x>
+                    <y>210</y>
+                    <width>160</width>
+                    <height>22</height>
+                   </rect>
+                  </property>
+                  <property name="minimum">
+                   <number>-200</number>
+                  </property>
+                  <property name="maximum">
+                   <number>200</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                 <widget class="QSlider" name="lookY">
+                  <property name="geometry">
+                   <rect>
+                    <x>200</x>
+                    <y>180</y>
+                    <width>160</width>
+                    <height>22</height>
+                   </rect>
+                  </property>
+                  <property name="minimum">
+                   <number>-200</number>
+                  </property>
+                  <property name="maximum">
+                   <number>200</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                 <widget class="QSlider" name="lookX">
+                  <property name="geometry">
+                   <rect>
+                    <x>200</x>
+                    <y>150</y>
+                    <width>160</width>
+                    <height>22</height>
+                   </rect>
+                  </property>
+                  <property name="minimum">
+                   <number>-200</number>
+                  </property>
+                  <property name="maximum">
+                   <number>200</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                 <widget class="QSlider" name="lookZ">
+                  <property name="geometry">
+                   <rect>
+                    <x>200</x>
+                    <y>210</y>
+                    <width>160</width>
+                    <height>22</height>
+                   </rect>
+                  </property>
+                  <property name="minimum">
+                   <number>-200</number>
+                  </property>
+                  <property name="maximum">
+                   <number>200</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
                 </widget>
                </widget>
               </item>
@@ -2478,7 +2592,7 @@ passes</string>
      <x>0</x>
      <y>0</y>
      <width>1345</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFIle">
