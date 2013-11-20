@@ -435,6 +435,6 @@ public:
 void normalizeWeightsByDomain(binding *bd);
 void cleanZeroInfluences(binding* bd);
 
-void loadBinding(binding* bd, string fileName);
+void loadBinding(binding* bd, string fileName, vector<skeleton*> skts);
 
 #endif // SURFACEDATA_H

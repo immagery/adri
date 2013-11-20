@@ -479,7 +479,7 @@ void AdriViewer::readSkeleton(string fileName)
 			if(!m->originalModelLoaded)
 				initModelForDeformation(m);
 				
-			loadBinding(m->bind, sBindingFileFullPath/*escena->skeletons*/);
+			loadBinding(m->bind, sBindingFileFullPath, escena->skeletons);
 			skinLoaded = true;
 
 			//escena->rig->skin->computeRestPositions(escena->skeletons);
