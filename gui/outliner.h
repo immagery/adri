@@ -8,7 +8,6 @@ class scene;
 class Modelo;
 class skeleton;
 class joint;
-class DefGroup;
 
 enum outlinesNodeTypes {NODETYPE_MODEL = 0, NODETYPE_CAGE , NODETYPE_SKELETON, NODETYPE_JOINT,
                         NODETYPE_CURVE,     NODETYPE_HANDLE,   NODETYPE_CAM,
@@ -37,15 +36,13 @@ public:
 
     outliner(scene* scena){ escena = scena;}
 
-    void getSceneTree(treeNode* root);
+    virtual void getSceneTree(treeNode* root);
+    scene* escena;
 
-private:
     void getSceneTree(joint* j,treeNode* root);
     void getSceneTree(skeleton* s,treeNode* root);
     void getSceneTree(Modelo* m  ,treeNode* root);
-	void getSceneTree(DefGroup* group,treeNode* root);
 
-    scene* escena;
 };
 
 #endif // OUTLINER_H

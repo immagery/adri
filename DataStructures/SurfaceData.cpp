@@ -448,8 +448,60 @@ void PointData::loadFromFile(ifstream& in)
 	}
 }
 
-void saveBinding(binding* bd, string fileName)
+void loadBinding(binding* bd, string fileName)
 {
+	/*
+	std::printf("\nGuardando %s\n",fileName.c_str());
+	FILE* fout = fopen(fileName.c_str(), "w");
+
+	for(int pt = 0; pt< bd->pointData.size(); pt++)
+	{
+		fprintf(fout, "%d", pt);
+
+		for(int infl = 0; infl< bd->pointData[pt].influences.size(); infl++)
+		{
+			int idInfl = bd->pointData[pt].influences[infl].label;
+			float inflValue = bd->pointData[pt].influences[infl].weightValue;
+			string inflName = "dummy";
+
+			joint* jt;
+			for(int skt = 0; skt< bd->bindedSkeletons.size(); skt++)
+			{
+				jt = bd->bindedSkeletons[skt]->jointRef[idInfl];
+				if(jt) break;
+			}
+
+			if(jt) inflName = jt->sName;
+			else
+			{
+				printf("Algo pasa con este indice: %d\n",idInfl);
+				fflush(0);
+			}
+
+			fprintf(fout, " %s %f", inflName.c_str(), inflValue);
+		}
+
+		fprintf(fout, "\n"); fflush(fout);
+
+		for(int infl = 0; infl< bd->pointData[pt].secondInfluences.size(); infl++)
+		{
+			fprintf(fout, "%d ", bd->pointData[pt].secondInfluences[infl].size());
+			for(int child = 0; child < bd->pointData[pt].secondInfluences[infl].size(); child++)
+			{
+				fprintf(fout, "%f ", bd->pointData[pt].secondInfluences[infl][child]);
+			}
+		}
+
+		fprintf(fout, "\n"); fflush(fout);
+	}
+
+	fclose(fout);
+	*/
+}
+
+void binding::saveCompactBinding(string fileName, map<int, string>& deformersRelation)
+{
+	binding* bd = this;
 	std::printf("\nGuardando %s\n",fileName.c_str());
 	FILE* fout = fopen(fileName.c_str(), "w");
 

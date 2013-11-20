@@ -28,6 +28,7 @@ void AdriMainWindow::connectSignals() {
     connect(ui->actionAction_openScene, SIGNAL(triggered()), this, SLOT(OpenNewScene()));
 	connect(ui->actionAction_cleanScene, SIGNAL(triggered()), this, SLOT(ClearScene()));
 	connect(ui->actionAction_saveScene, SIGNAL(triggered()), this, SLOT(SaveScene()));
+	connect(ui->actionAction_saveScene_compact, SIGNAL(triggered()), this, SLOT(SaveSceneCompact()));
 
     connect(ui->import_cage_s, SIGNAL(triggered()), this, SLOT(ImportCages()) );
     connect(ui->import_distances, SIGNAL(triggered()), this, SLOT(ImportDistances()) );
@@ -356,6 +357,27 @@ void AdriMainWindow::SaveScene()
     QString sModelPrefix = aux.left(aux.length()-4);
 
     ui->glCustomWidget->saveScene(fileNames[0].toStdString(), sModelPrefix.toStdString(), sModelPath.toStdString());
+}
+
+void AdriMainWindow::SaveSceneCompact()
+{
+    QFileDialog inFileDialog(0, "Especifica el directorio", ui->glCustomWidget->sPathGlobal, "*.*");
+	inFileDialog.setFileMode(QFileDialog::AnyFile);
+    QStringList fileNames;
+     if (inFileDialog.exec())
+         fileNames = inFileDialog.selectedFiles();
+
+    if(fileNames.size() == 0)
+        return;
+
+    QFileInfo sPathAux(fileNames[0]);
+    QString aux = sPathAux.canonicalPath();
+    QString sModelPath = aux;
+    int ini = fileNames[0].indexOf("/",aux.length());
+    aux = fileNames[0].right(fileNames[0].length()-ini);
+    QString sModelPrefix = aux.left(aux.length()-4);
+
+    ui->glCustomWidget->saveScene(fileNames[0].toStdString(), sModelPrefix.toStdString(), sModelPath.toStdString(), true);
 }
 
 void AdriMainWindow::ClearScene()

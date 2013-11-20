@@ -1,86 +1,10 @@
+
 #include "outliner.h"
 
 #include "dataStructures/Scene.h"
 #include "dataStructures/Modelo.h"
 #include "dataStructures/skeleton.h"
-#include "dataStructures/AirRig.h"
-
-void outliner::getSceneTree(joint* j,treeNode* root)
-{
-    root->sName = j->sName;
-    root->nodeId = j->nodeId;
-    root->type = NODETYPE_JOINT;
-
-    for(int i = 0; i< j->getChildCount(); i++)
-    {
-        treeNode* childnode = new treeNode();
-        getSceneTree(j->getChild(i), childnode);
-        root->childs.push_back(childnode);
-    }
-}
-
-void outliner::getSceneTree(skeleton* s,treeNode* root)
-{
-    root->sName = s->root->sName;
-    root->nodeId = s->root->nodeId;
-    root->type = NODETYPE_JOINT;
-
-    for(int i = 0; i< s->root->getChildCount(); i++)
-    {
-        treeNode* childnode = new treeNode();
-        getSceneTree(s->root->getChild(i), childnode);
-        root->childs.push_back(childnode);
-    }
-}
-
-void outliner::getSceneTree(DefGroup* group,treeNode* root)
-{
-    root->sName = group->sName;
-    root->nodeId = group->nodeId;
-	root->type = NODETYPE_RIG_DEFGROUP;
-
-	for(int i = 0; i< group->relatedGroups.size(); i++)
-    {
-        treeNode* childnode = new treeNode();
-        getSceneTree(group->relatedGroups[i], childnode);
-        root->childs.push_back(childnode);
-    }
-}
-
-void outliner::getSceneTree(Modelo* m,treeNode* root)
-{
-    root->sName = m->sName;
-    root->nodeId = m->nodeId;
-    root->type = NODETYPE_MODEL;
-
-    if(m->modelCage)
-    {
-        treeNode* modelCage = new treeNode();
-        modelCage->sName = m->modelCage->sName;
-        modelCage->nodeId = m->modelCage->nodeId;
-        modelCage->type = NODETYPE_CAGE;
-        root->childs.push_back(modelCage);
-    }
-
-    if(m->dynCage)
-    {
-        treeNode* dynCage = new treeNode();
-        dynCage->sName = m->dynCage->sName;
-        dynCage->nodeId = m->dynCage->nodeId;
-        dynCage->type = NODETYPE_CAGE;
-        root->childs.push_back(dynCage);
-    }
-
-    for(unsigned int i = 0; i< m->stillCages.size(); i++)
-    {
-        treeNode* stcage = new treeNode();
-        stcage->sName = m->stillCages[i]->sName;
-        stcage->nodeId = m->stillCages[i]->nodeId;
-        stcage->type = NODETYPE_CAGE;
-        root->childs.push_back(stcage);
-    }
-
-}
+#include "dataStructures/Rig.h"
 
 void outliner::getSceneTree(treeNode* root)
 {
@@ -125,19 +49,68 @@ void outliner::getSceneTree(treeNode* root)
     defGraph->nodeId = id; id++;
 	defGraph->type = NODETYPE_RIG_DEFGRAPH;
 
-	AirRig* rigStr = (AirRig*)escena->rig;
+}
 
-	for(int i = 0; i< rigStr->defRig.roots.size(); i++)
-	{
-        treeNode* ch = new treeNode();
-        getSceneTree(rigStr->defRig.roots[i], ch);
-        defGraph->childs.push_back(ch);
-	}
 
-	rig->childs.push_back(new treeNode());
-    treeNode* controlGraph = (treeNode*)rig->childs.back();
-    controlGraph->sName = "Control_Graph";
-    controlGraph->nodeId = id; id++;
-	controlGraph->type = NODETYPE_RIG_CONTROLGRP;
+void outliner::getSceneTree(joint* j,treeNode* root)
+{
+    root->sName = j->sName;
+    root->nodeId = j->nodeId;
+    root->type = NODETYPE_JOINT;
+
+    for(int i = 0; i< j->getChildCount(); i++)
+    {
+        treeNode* childnode = new treeNode();
+        getSceneTree(j->getChild(i), childnode);
+        root->childs.push_back(childnode);
+    }
+}
+
+void outliner::getSceneTree(skeleton* s,treeNode* root)
+{
+    root->sName = s->root->sName;
+    root->nodeId = s->root->nodeId;
+    root->type = NODETYPE_JOINT;
+
+    for(int i = 0; i< s->root->getChildCount(); i++)
+    {
+        treeNode* childnode = new treeNode();
+        getSceneTree(s->root->getChild(i), childnode);
+        root->childs.push_back(childnode);
+    }
+}
+
+void outliner::getSceneTree(Modelo* m,treeNode* root)
+{
+    root->sName = m->sName;
+    root->nodeId = m->nodeId;
+    root->type = NODETYPE_MODEL;
+
+    if(m->modelCage)
+    {
+        treeNode* modelCage = new treeNode();
+        modelCage->sName = m->modelCage->sName;
+        modelCage->nodeId = m->modelCage->nodeId;
+        modelCage->type = NODETYPE_CAGE;
+        root->childs.push_back(modelCage);
+    }
+
+    if(m->dynCage)
+    {
+        treeNode* dynCage = new treeNode();
+        dynCage->sName = m->dynCage->sName;
+        dynCage->nodeId = m->dynCage->nodeId;
+        dynCage->type = NODETYPE_CAGE;
+        root->childs.push_back(dynCage);
+    }
+
+    for(unsigned int i = 0; i< m->stillCages.size(); i++)
+    {
+        treeNode* stcage = new treeNode();
+        stcage->sName = m->stillCages[i]->sName;
+        stcage->nodeId = m->stillCages[i]->nodeId;
+        stcage->type = NODETYPE_CAGE;
+        root->childs.push_back(stcage);
+    }
 
 }

@@ -18,7 +18,7 @@ public:
 	~Skinning();
 
 
-    virtual void loadBindingForModel (Modelo *m, string path, const vector< skeleton* >& skeletons);
+    virtual void loadBindingForModel (Modelo *m, const vector< skeleton* >& skeletons);
 
     virtual void computeRestPositions(const vector< skeleton* >& skeletons);
 	virtual void computeDeformations(const vector< skeleton* >& skeletons);
@@ -46,4 +46,3 @@ public:
 void initModelForDeformation(Modelo* m);
 void resetDeformations(Modelo* m);
 void copyModel2Model(Geometry * modelCopy, Geometry *modelReference);
-

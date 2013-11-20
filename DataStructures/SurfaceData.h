@@ -382,6 +382,8 @@ public:
 		weightsFiltered.clear();
 	}
 
+	void saveCompactBinding(string fileName, map<int, string>& deformersRelation);
+
     // Parameters
     float smoothPropagationRatio;
     float worldScale;
@@ -433,6 +435,6 @@ public:
 void normalizeWeightsByDomain(binding *bd);
 void cleanZeroInfluences(binding* bd);
 
-void saveBinding(binding* bd, string fileName);
+void loadBinding(binding* bd, string fileName);
 
 #endif // SURFACEDATA_H

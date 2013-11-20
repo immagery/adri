@@ -2557,9 +2557,11 @@ passes</string>
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="actionAction_cleanScene"/>
    <addaction name="actionAction_openScene"/>
    <addaction name="actionAction_saveScene"/>
-   <addaction name="actionAction_cleanScene"/>
+   <addaction name="actionAction_saveScene_compact"/>
+   <addaction name="separator"/>
    <addaction name="actionSelection"/>
    <addaction name="actionMove"/>
    <addaction name="actionRotate"/>
@@ -2776,6 +2778,21 @@ passes</string>
    </property>
    <property name="text">
     <string>Rigging/Animation</string>
+   </property>
+  </action>
+  <action name="actionAction_saveScene_compact">
+   <property name="icon">
+    <iconset resource="modelViewerResources.qrc">
+     <normaloff>:/modelViewerGeneral/icons/save_compact.png</normaloff>:/modelViewerGeneral/icons/save_compact.png</iconset>
+   </property>
+   <property name="text">
+    <string>action_saveScene_compact</string>
+   </property>
+   <property name="toolTip">
+    <string>Save current scene in compact mode</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
    </property>
   </action>
  </widget>

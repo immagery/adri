@@ -34,6 +34,7 @@ public slots:
     void OpenNewScene();
 
 	void SaveScene();
+	void SaveSceneCompact();
 	void ClearScene();
 
 	void LaunchTests();
@@ -56,7 +57,7 @@ public slots:
     void ChangeSourceVertex();
     void distancesSourceValueChange(int);
 
-    void updateSceneView();
+    virtual void updateSceneView();
     void updateSceneView(TreeItem* treeitem, treeNode* treenode);
     void selectObject(QModelIndex idx);
 

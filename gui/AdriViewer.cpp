@@ -416,10 +416,10 @@ void AdriViewer::readSkeleton(string fileName)
 		escena->sGlobalPath = sGlobalPath.toStdString();
 		escena->sPath = sPath.toStdString();
 
-		QString sModelFile, sSkeletonFile, sEmbeddingFile, sBindingFile, sRiggingFile;
+		QString sModelFile = "", sSkeletonFile = "", sEmbeddingFile = "", sBindingFile = "", sRiggingFile = "";
 
 		QStringList flags = in.readLine().split(" "); in.readLine(); in.readLine();
-		if(flags.size() != 5)
+		if(flags.size() < 5)
 			return;
 
 		if(flags[0].toInt() != 0 && !in.atEnd())
@@ -449,7 +449,7 @@ void AdriViewer::readSkeleton(string fileName)
 
 		modelDefFile.close();
 
-		QString newPath(path.c_str());
+		QString newPath( path.c_str());
         newPath = newPath +"/";
         if(!sPath.isEmpty())
             newPath = newPath+"/"+sPath +"/";
@@ -469,6 +469,22 @@ void AdriViewer::readSkeleton(string fileName)
 			readSkeletons(sSkeletonFileFullPath, escena->skeletons);
 		}
 
+		bool skinLoaded = false, riggLoaded = false;
+		// Skinning
+		if(!sBindingFile.isEmpty())
+		{
+			string sBindingFileFullPath = (newPath+sBindingFile).toStdString();//path.toStdString();
+			
+			//Copia del modelo para poder hacer deformaciones
+			if(!m->originalModelLoaded)
+				initModelForDeformation(m);
+				
+			loadBinding(m->bind, sBindingFileFullPath/*escena->skeletons*/);
+			skinLoaded = true;
+
+			//escena->rig->skin->computeRestPositions(escena->skeletons);
+		}
+
 		// Load Rigging
 		if(!sRiggingFile.isEmpty())
 		{
@@ -476,21 +492,24 @@ void AdriViewer::readSkeleton(string fileName)
 			escena->rig->loadRigging(sRiggingFileFullPath);
 
 			// By now is with the skeleton, but soon will be alone
-			escena->rig->bindLoadedRigToScene(m, escena->skeletons);
+			//escena->rig->bindLoadedRigToScene(m, escena->skeletons);
+			riggLoaded = true;
 		}
 
-		// Skinning
-		if(!sBindingFile.isEmpty())
+		if(riggLoaded)
 		{
-			string sBindingFileFullPath = (newPath+sBindingFile).toStdString();//path.toStdString();
-			
-			//Cargamos el binding de otra manera
-			if(!m->originalModelLoaded)
-				initModelForDeformation(m);
-				
-			escena->rig->skin->loadBindingForModel(m, path, escena->skeletons);
+			// By now is with the skeleton, but soon will be alone
+			escena->rig->bindRigToModelandSkeleton(m, escena->skeletons);
+		}
+
+		if(skinLoaded)
+		{
+			// Now it's time to do a correspondence with the loaded data and the scene.
+			escena->rig->skin->loadBindingForModel(m, escena->skeletons);
 
 			escena->rig->skin->computeRestPositions(escena->skeletons);
+
+			escena->rig->enableDeformation = true;
 		}
 	 }
  }

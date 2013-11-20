@@ -57,7 +57,7 @@ public:
     // LOADING
     void readModel(string fileName, string name, string path);
     virtual void readScene(string fileName, string name, string path);
-	virtual void saveScene(string fileName, string name, string path){}
+	virtual void saveScene(string fileName, string name, string path, bool compactMode = false){}
 //    void readDistances(QString fileName);
     void readSkeleton(string fileName);
 

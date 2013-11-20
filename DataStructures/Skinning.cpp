@@ -23,28 +23,24 @@ Skinning::~Skinning()
 	deformedModel = NULL;
 }
 
-void Skinning::loadBindingForModel(Modelo *m, string path, const vector< skeleton* >& skeletons) {
-	printf("Loading binding data...");
-    QFile file(path.c_str());
-	
-	if (!file.exists()) {
-		printf("\nNo binding file found! Proceeding to load model without bindings\n");
-		return;
-	}
+void Skinning::loadBindingForModel(Modelo *m, const vector< skeleton* >& skeletons) {
 
-	//bindings.resize(1);
 
-	//for(int i = 0; i< m->bindings.size(); i++)
-	//	bindings[0].push_back(m->bindings[i]);
-
-	// De momento trabajamos con el primero
-	// DEBUG: we check the last added binding. What happens if a model has more than two bindings? 
-	// TOFIX a model can have more than 1 binding
 	binding* bd = m->bind; //bindings[0][0];
 
 	deformedModel = (Geometry*) m;
 	originalModel = m->originalModel;
 
+	map<string, joint*> allJoints;
+	for(int i = 0; i< skeletons.size(); i++)
+	{
+		for(int idJoint = 0; idJoint < skeletons[i]->joints.size(); idJoint++)
+		{
+			allJoints[skeletons[i]->joints[idJoint]->sName] = skeletons[i]->joints[idJoint];
+		}
+	}
+
+	/*
     file.open(QFile::ReadOnly);
     QTextStream in(&file);
     QString line;
@@ -111,6 +107,7 @@ void Skinning::loadBindingForModel(Modelo *m, string path, const vector< skeleto
 		//printf("\n");
 		//b->pointData.push_back(point);
     }
+	*/
 
 	printf("done\n");
 }
@@ -297,3 +294,4 @@ void Skinning::computeDeformationsWithSW(const vector< skeleton* >& skeletons)
 {
 	
 }
+

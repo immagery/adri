@@ -3,7 +3,7 @@
 bool Rig::bindLoadedRigToScene(Modelo* model, vector<skeleton*>& skeletons)
 {
 	//TODO
-	assert(false);
+	//assert(false);
 	return false;
 }
 
@@ -107,12 +107,12 @@ bool Rig::bindSkeletons(vector<skeleton*>& in_skeletons)
 
 bool Rig::loadRigging(string sFile)
 {
-	FILE* fin = NULL;
-	fin = fopen(sFile.c_str(),"r");
+	//FILE* fin = NULL;
+	//fin = fopen(sFile.c_str(),"r");
 	
 	// Cargar rig
 	// No tiene nada que cargar.
 
-	fclose(fin);
+	//fclose(fin);
 	return true;
 }
