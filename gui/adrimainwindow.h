@@ -66,7 +66,7 @@ public slots:
     void toogleSelectionTool();
     void changeTool(toolmode newtool);
 
-    void updateSmoothSlidervalue(int);
+   // void updateSmoothSlidervalue(int);
 
 	void changeInteriorPointPosition();
     void updateExpansionSlidervalue(int);

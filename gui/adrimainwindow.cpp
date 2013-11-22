@@ -106,8 +106,8 @@ void AdriMainWindow::connectSignals() {
 	connect(ui->thresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(updateThresholdSlidervalue(int)));
 	connect(ui->threshold_enable, SIGNAL(toggled(bool)), this, SLOT(enableThreshold(bool)));
 	
-    connect(ui->smoothPropagationSlider, SIGNAL(sliderReleased()), this, SLOT(changeSmoothSlider()));
-    connect(ui->smoothPropagationSlider, SIGNAL(valueChanged(int)), this, SLOT(updateSmoothSlidervalue(int)));
+    //connect(ui->smoothPropagationSlider, SIGNAL(sliderReleased()), this, SLOT(changeSmoothSlider()));
+    //connect(ui->smoothPropagationSlider, SIGNAL(valueChanged(int)), this, SLOT(updateSmoothSlidervalue(int)));
 
 	//connect(ui->smoothingPasses, SIGNAL(valueChanged(int)), this, SLOT(changeSmoothingPasses(int)));
 
@@ -429,6 +429,7 @@ void AdriMainWindow::LaunchTests()
 	ui->glCustomWidget->doTests(fileNames[0].toStdString(), sModelPrefix.toStdString(), sModelPath.toStdString());
 }
 
+/*
 void AdriMainWindow::updateSmoothSlidervalue(int)
 {
     float valueAux = ui->smoothPropagationSlider->value();
@@ -436,7 +437,7 @@ void AdriMainWindow::updateSmoothSlidervalue(int)
 
     ui->smoothPropagationEdit->setText(QString("%1").arg(value));
 }
-
+*/
 void AdriMainWindow::updateExpansionSlidervalue(int)
 {
     float valueAux = ui->expansionSlider->value();
@@ -516,7 +517,7 @@ void AdriMainWindow::NodeDataUpdate(float iniTw, float finTw, bool enableTw, int
 		ui->twist_fin_slider->setValue((int)(finTw*1000));
 	}
 
-	ui->smoothingPasses->setValue(smooth);
+	ui->localSmoothingPasses->setValue(smooth);
 }
 
 void AdriMainWindow::jointDataUpdate(float fvalue, int id)

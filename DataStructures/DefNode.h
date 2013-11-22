@@ -89,6 +89,7 @@ public:
 		expansion = def_orig.expansion;
 
 		pos = def_orig.pos;
+		relPos = def_orig.relPos;
 		precomputedDistances = def_orig.precomputedDistances;
 	}
 
@@ -99,8 +100,15 @@ public:
 	}
 
 	// TODEBUG maybe there is redundant data.
-	int boneId; // Who is my parent?
 	int rootBoneId;
+
+	// For faster computation
+	Eigen::Vector3d pos;
+
+	// For drawing
+	Eigen::Vector3d relPos;
+
+	int boneId; // Who is my parent?
 	int childBoneId;
 
 	float ratio; // position over the bone (for blending through the bone)
@@ -108,12 +116,6 @@ public:
 
 	// Aux variable that encapsulates precomputed part af distance calculus.
 	double precomputedDistances;
-
-	// For faster computation
-	Eigen::Vector3d pos;
-
-	// For drawing
-	Eigen::Vector3d relPos;
 
 	// This flag enables weight computation.
 	bool enableWeightsComputation;
