@@ -186,6 +186,8 @@ void Geometry::computeVertNormals()
 		computeFaceNormals();
 
 	vertNormals.resize(nodes.size());
+	edges.resize(nodes.size());
+
 	vector<int> vertTriCounter;
 	vertTriCounter.resize(nodes.size(),0);
 

@@ -17,12 +17,14 @@ class GeometryRender : public shadingNode
         {
 			geom = NULL;
 			spotVertex = 0;
+			shMode = SH_MODE_SMOOTH;
         }
 
         GeometryRender(Geometry* g) : shadingNode()
         {
 			geom = g;
 			spotVertex = 0;
+			shMode = SH_MODE_SMOOTH;
         }
 
 		Geometry* geom;

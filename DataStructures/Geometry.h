@@ -39,6 +39,8 @@ class Geometry : public object , public SurfaceGraph
 		vector<Eigen::Vector3d> faceNormals;
 		vector<Eigen::Vector3d> vertNormals;
 
+		vector<bool> edges;
+
 };
 
 #endif // GEOMETRY_H

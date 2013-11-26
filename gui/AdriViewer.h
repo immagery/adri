@@ -34,7 +34,6 @@ using namespace std;
 using namespace Eigen;
 
 enum viewingModes { DynCage_Mode = 0, Cages_Mode, BHD_Mode, SimpleModel_Mode};
-enum shadingModes { SH_MODE_FLAT = 0, SH_MODE_SMOOTH};
 
 class AdriMainWindow;
 class MainWindow;
@@ -87,6 +86,8 @@ public:
 
     viewingModes viewingMode;
     shadingModes ShadingModeFlag;
+
+	bool bDrawStatistics;
 
     void cleanShadingVariables();
     void toogleModelToXRay();

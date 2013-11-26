@@ -56,8 +56,17 @@ bool BuildSurfaceFromOFFFile(SurfaceGraph& graph, string sFileName)
 
 		for(int j = 0; j< polygonCount; j++)
 		{
-			graph.nodes[indexes[j]]->connections.push_back(graph.nodes[indexes[(j+1)%polygonCount]]);
-			graph.nodes[indexes[(j+1)%polygonCount]]->connections.push_back(graph.nodes[indexes[j]]);
+			int connNodeId = graph.nodes[indexes[(j+1)%polygonCount]]->id;
+			int founded = -1;
+			for(int conIdx = 0; conIdx < graph.nodes[indexes[j]]->connections.size() && founded < 0; conIdx++)
+				if(graph.nodes[indexes[j]]->connections[conIdx]->id == connNodeId)
+					founded = conIdx;
+			
+			if(founded < 0)
+			{
+				graph.nodes[indexes[j]]->connections.push_back(graph.nodes[indexes[(j+1)%polygonCount]]);
+				graph.nodes[indexes[(j+1)%polygonCount]]->connections.push_back(graph.nodes[indexes[j]]);
+			}
 		}
 	}
 
@@ -461,7 +470,8 @@ void PointData::loadFromFile(ifstream& in)
 		secondInfluences[inflIdx].resize(atoi(elems[id].c_str())); id++;
 		for(int inflSecIdx = 0; inflSecIdx < secondInfluences[inflIdx].size(); inflSecIdx++)
 		{
-			secondInfluences[inflIdx][inflSecIdx] = (atof(elems[id].c_str())); id++;
+			secondInfluences[inflIdx][inflSecIdx].alongBone = (float)atof(elems[id].c_str()); id++;
+			//assert(false); // TODO: wideBone read
 		}
 	}
 }

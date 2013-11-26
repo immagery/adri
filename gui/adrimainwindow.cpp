@@ -846,8 +846,8 @@ void AdriMainWindow::keyPressEvent(QKeyEvent* event)
         ui->DataVisualizationCombo->setCurrentIndex(VIS_BONES_SEGMENTATION);
         break;
 	case Qt::Key_4:
-		DataVisualizationChange(VIS_SEG_PASS);
-        ui->DataVisualizationCombo->setCurrentIndex(VIS_SEG_PASS);
+		DataVisualizationChange(VIS_SECW_WIDE);
+        ui->DataVisualizationCombo->setCurrentIndex(VIS_SECW_WIDE);
         break;
 	case Qt::Key_5:
         DataVisualizationChange(VIS_WEIGHTS);
