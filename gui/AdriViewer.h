@@ -96,7 +96,7 @@ public:
 
 
 	virtual void setSmoothPasses(int , int ) {}
-	virtual void setTwistParams(double , double , bool ){}
+	virtual void setTwistParams(double , double , bool, bool ){}
 
 //    void changeVisualizationMode(int);
 //	void updateGridVisualization();
@@ -291,7 +291,7 @@ public slots:
 signals:
     void updateSceneView();
     void jointDataShow(float, int);
-	void defGroupData(float, float, bool, int);
+	void defGroupData(float, float, bool, bool, int);
 	void jointTransformationValues(float, float,float,float,float,float);
     void changedFrame(int);
 

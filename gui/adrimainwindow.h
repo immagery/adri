@@ -48,7 +48,7 @@ public slots:
     void ShadingModeChange(int option);
 
     void DataVisualizationChange(int idx);
-    void toogleVisibility(bool toogle);
+    void toogleVisibility(int);
 
     void EnableColorLayer(bool _b);
     void ChangeColorLayerValue(int value);
@@ -71,7 +71,7 @@ public slots:
 	void changeInteriorPointPosition();
     void updateExpansionSlidervalue(int);
     void jointDataUpdate(float fvalue, int id);
-	void NodeDataUpdate(float iniTw, float finTw, bool enableTw, int smooth);
+	void NodeDataUpdate(float iniTw, float finTw, bool enableTw, bool smoothTw, int smooth);
 	void jointTransformUpdate(float x,float y,float z,float alpha,float beta,float gamma);
 	
 	virtual void changeAuxValueInt(int value);

@@ -1047,7 +1047,7 @@
               <item>
                <widget class="QTabWidget" name="DefGroupParamsTab">
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <widget class="QWidget" name="render">
                  <attribute name="title">
@@ -1105,8 +1105,8 @@
                   </property>
                   <property name="geometry">
                    <rect>
-                    <x>20</x>
-                    <y>280</y>
+                    <x>10</x>
+                    <y>240</y>
                     <width>371</width>
                     <height>22</height>
                    </rect>
@@ -1124,10 +1124,10 @@
                  <widget class="QSlider" name="SliceSelectorXZ">
                   <property name="geometry">
                    <rect>
-                    <x>390</x>
-                    <y>20</y>
+                    <x>380</x>
+                    <y>10</y>
                     <width>20</width>
-                    <height>281</height>
+                    <height>231</height>
                    </rect>
                   </property>
                   <property name="minimum">
@@ -1264,9 +1264,9 @@
                   <property name="geometry">
                    <rect>
                     <x>10</x>
-                    <y>20</y>
+                    <y>10</y>
                     <width>211</width>
-                    <height>161</height>
+                    <height>131</height>
                    </rect>
                   </property>
                   <property name="title">
@@ -1279,7 +1279,7 @@
                    <property name="geometry">
                     <rect>
                      <x>140</x>
-                     <y>110</y>
+                     <y>80</y>
                      <width>81</width>
                      <height>20</height>
                     </rect>
@@ -1295,7 +1295,7 @@
                    <property name="geometry">
                     <rect>
                      <x>10</x>
-                     <y>60</y>
+                     <y>50</y>
                      <width>101</width>
                      <height>51</height>
                     </rect>
@@ -1346,7 +1346,7 @@
                    <property name="geometry">
                     <rect>
                      <x>140</x>
-                     <y>80</y>
+                     <y>60</y>
                      <width>71</width>
                      <height>20</height>
                     </rect>
@@ -1364,8 +1364,8 @@
                    </property>
                    <property name="geometry">
                     <rect>
-                     <x>130</x>
-                     <y>30</y>
+                     <x>100</x>
+                     <y>20</y>
                      <width>42</width>
                      <height>22</height>
                     </rect>
@@ -1374,8 +1374,8 @@
                   <widget class="QCheckBox" name="colorLayersCheck">
                    <property name="geometry">
                     <rect>
-                     <x>40</x>
-                     <y>30</y>
+                     <x>10</x>
+                     <y>20</y>
                      <width>81</width>
                      <height>17</height>
                     </rect>
@@ -1391,7 +1391,7 @@
                    <property name="geometry">
                     <rect>
                      <x>140</x>
-                     <y>60</y>
+                     <y>40</y>
                      <width>91</width>
                      <height>20</height>
                     </rect>
@@ -1406,8 +1406,8 @@
                   <widget class="QCheckBox" name="segmentation_btn">
                    <property name="geometry">
                     <rect>
-                     <x>10</x>
-                     <y>120</y>
+                     <x>60</x>
+                     <y>110</y>
                      <width>111</width>
                      <height>17</height>
                     </rect>
@@ -1468,6 +1468,57 @@
                   </property>
                   <property name="value">
                    <number>0</number>
+                  </property>
+                 </widget>
+                 <widget class="QCheckBox" name="drawSupportInfo">
+                  <property name="geometry">
+                   <rect>
+                    <x>70</x>
+                    <y>150</y>
+                    <width>111</width>
+                    <height>17</height>
+                   </rect>
+                  </property>
+                  <property name="text">
+                   <string>Draw support info</string>
+                  </property>
+                 </widget>
+                 <widget class="QSlider" name="defNodesSize">
+                  <property name="geometry">
+                   <rect>
+                    <x>60</x>
+                    <y>180</y>
+                    <width>160</width>
+                    <height>22</height>
+                   </rect>
+                  </property>
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
+                  <property name="maximum">
+                   <number>2000</number>
+                  </property>
+                  <property name="value">
+                   <number>1000</number>
+                  </property>
+                  <property name="sliderPosition">
+                   <number>1000</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                 <widget class="QLabel" name="label_10">
+                  <property name="geometry">
+                   <rect>
+                    <x>20</x>
+                    <y>180</y>
+                    <width>31</width>
+                    <height>16</height>
+                   </rect>
+                  </property>
+                  <property name="text">
+                   <string>SIZE</string>
                   </property>
                  </widget>
                 </widget>
@@ -1834,10 +1885,10 @@
                     <number>1</number>
                    </property>
                    <property name="maximum">
-                    <number>200</number>
+                    <number>3000</number>
                    </property>
                    <property name="value">
-                    <number>100</number>
+                    <number>1000</number>
                    </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
@@ -2077,6 +2128,19 @@ passes</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
+                   </property>
+                  </widget>
+                  <widget class="QCheckBox" name="smoothTwistCheck">
+                   <property name="geometry">
+                    <rect>
+                     <x>150</x>
+                     <y>0</y>
+                     <width>111</width>
+                     <height>17</height>
+                    </rect>
+                   </property>
+                   <property name="text">
+                    <string>Smooth Twist</string>
                    </property>
                   </widget>
                  </widget>
@@ -2786,6 +2850,7 @@ passes</string>
  <resources>
   <include location="modelViewerResources.qrc"/>
   <include location="modelViewerResources.qrc"/>
+  <include location="../../../../.designer/backup/modelViewerResources.qrc"/>
  </resources>
  <connections>
   <connection>

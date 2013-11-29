@@ -17,6 +17,7 @@
 #define DEFAULT_SIZE 0.05
 
 #include <DataStructures/Skeleton.h>
+#include <DataStructures/Scene.h>
 
 using namespace Eigen;
 
@@ -132,14 +133,6 @@ void DefGroupRender::drawFunc()
 {   
 	DefGroup* g = group;
 
-    //if(jt->father)
-    //{
-     //   if(jt->father->shading->selected)
-     //       glColor3f((GLfloat)SELR,(GLfloat)SELG,(GLfloat)SELB);
-     //   else
-     //       glColor3f(NORMALR,NORMALG,NORMALB);
-	//}
-
 	double maxRelation = 0;
 
 	// Render the bone shape
@@ -159,64 +152,16 @@ void DefGroupRender::drawFunc()
 	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	useModelMatrix(g->transformation->rotation, g->transformation->translation);
-	drawAxisHandle(maxRelation);
-	for(int defIdx = 0; defIdx < group->deformers.size(); defIdx++)
-		drawPointLocator(group->deformers[defIdx].relPos, maxRelation*0.25, false);
-
-	glPopMatrix();
-
-
-	/*
-	Eigen::Matrix4f transformMatrix = jt->world;
-
-
-	GLdouble multiplyingMatrix[16] = {transformMatrix(0,0), transformMatrix(0,1), transformMatrix(0,2), transformMatrix(0,3),
-										transformMatrix(1,0), transformMatrix(1,1), transformMatrix(1,2), transformMatrix(1,3),
-										transformMatrix(2,0), transformMatrix(2,1), transformMatrix(2,2), transformMatrix(2,3),
-										transformMatrix(3,0), transformMatrix(3,1), transformMatrix(3,2), transformMatrix(3,3)
-									};
-
-	glMultMatrixd(multiplyingMatrix);
-
 	
+	drawAxisHandle(maxRelation*scene::drawingNodeStdSize);
 
-    // Pintamos un tri-círculo
-    if(selected)
-        glColor3f((GLfloat)SELR,(GLfloat)SELG,(GLfloat)SELB);
-    else
-        glColor3f(NORMALR,NORMALG,NORMALB);
-
-    // Pintamos 3 los círculos
-    drawTriCircle(12, jointSize);
-
-    // Pintamos los ejes del hueso
-    drawAxisHandle(jointSize*25);
-
-	// Draw twist vector
-	if(jt->childs.size() == 1)
+	if(scene::drawDefNodes)
 	{
-		glDisable(GL_LIGHTING);
-		
-		glLineWidth(5);
-		glBegin(GL_LINES);
-
-		glColor3f(1.0,1.0,1.0);
-		glVertex3d(0,0,0);
-		glVertex3d(jt->childs[0]->twist.x()*10,jt->childs[0]->twist.y()*10,jt->childs[0]->twist.z()*10);
-
-		glEnd();
-		glLineWidth(1);
-		glEnable(GL_LIGHTING);
+		for(int defIdx = 0; defIdx < group->deformers.size(); defIdx++)
+			drawPointLocator(group->deformers[defIdx].relPos, maxRelation*0.25, false);
 	}
 
-    // Pintamos la pelota de expansion
-    //drawExpansionBall(selected, (float)(DEFAULT_SIZE*2*jt->expansion));
-	//for(unsigned int i = 0; i< jt->nodes.size(); i++)
-    //{
-    //    drawDeformer(jt->childs[i]->drawFunc());
-    //}
-	
-    glPopMatrix();*/
+	glPopMatrix();
 }
 
 void DefGroupRender::computeRestPos(joint* jt) {

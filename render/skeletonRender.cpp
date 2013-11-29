@@ -147,7 +147,7 @@ void JointRender::drawFunc(joint* jt)
     drawTriCircle(12, jointSize);
 
     // Pintamos los ejes del hueso
-    drawAxisHandle(jointSize*25);
+    //drawAxisHandle(jointSize*25);
 
 	// Draw twist vector
 	if(jt->childs.size() == 1)

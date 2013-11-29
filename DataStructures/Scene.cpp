@@ -5,6 +5,9 @@
 
 unsigned int scene::sceneIds = FIRST_NODE_ID;
 
+// Global Drawing scene flags
+bool scene::drawDefNodes = true;
+float scene::drawingNodeStdSize = 1.0;
 
 void scene::setSceneScale( float sceneScale)
 {

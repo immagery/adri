@@ -815,7 +815,7 @@ void AdriViewer::readSkeleton(string fileName)
          if(!escena->models[i] || !escena->models[i]->shading)
              continue;
 
-          escena->models[i]->shading->visible = !escena->models[i]->shading->visible;
+          escena->models[i]->shading->visible = toogle;
      }
  }
 
