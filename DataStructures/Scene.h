@@ -104,6 +104,7 @@ class scene
 		desiredVertex = 0;
 
 		rig = NULL;
+		rigsArray = vector<Rig*>();
     }
 
     ~scene()
@@ -197,6 +198,7 @@ class scene
 
 	// AirRig
 	Rig* rig;
+	vector<Rig*> rigsArray;
 
 	procState state;
 

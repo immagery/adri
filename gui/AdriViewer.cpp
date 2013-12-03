@@ -835,16 +835,6 @@ void AdriViewer::readSkeleton(string fileName)
  void AdriViewer::draw()
  {
 
-	 /*
-	double fps = 1.0/this->animationPeriod()*1000;
-	double currentTime = (double)frame/fps;
-	int numReps = 1;
-	for (int k = 0; k < numReps; ++k) particles->solve(currentTime + ((double)k / numReps)*this->animationPeriod()/1000.0);
-	++frame;
-	particles->drawFunc();
-	return;
-	*/
-
 	 //if (escena->skeletons.size() > 0) escena->skeletons[0]->joints[0]->computeWorldPos();
      if(ShadingModeFlag == SH_MODE_SMOOTH)
         glShadeModel(GL_SMOOTH);
@@ -909,10 +899,10 @@ void AdriViewer::readSkeleton(string fileName)
 
 
     // Pintamos el handle en el caso de que haya selecci�n.
-     if (selMgr.ctx != CTX_SELECTION)
+     /*if (selMgr.ctx != CTX_SELECTION)
        drawSelectionRectangle();
      else
-        selMgr.drawFunc();
+        selMgr.drawFunc();*/
 
  }
 

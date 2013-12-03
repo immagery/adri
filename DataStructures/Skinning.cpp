@@ -253,6 +253,67 @@ void Skinning::computeRestPositions(const vector< skeleton* >& skeletons) {
 	printf(" done\n");
 }
 
+void Skinning::computeDeformations2(skeleton* s) {
+	//for (int v = 0; v < originalModels.size(); ++v) originalModels[v]->shading->visible = false;	 // keep it false ALWAYS
+
+	// Check if there's at least one dirty skeleton. In that case, proceed
+	
+	bool updated = false;
+
+	//for (int i = 0; i < deformedModels.size(); ++i) 
+	{		
+		// It's a bad way to ensure that we are deforming the right mdoel.
+		if (!deformedModel->shading->visible) return;
+
+		Geometry *m = deformedModel;
+
+		// loop through all bindings
+		binding * b = bind;
+
+		for (int k = 0; k < b->pointData.size(); ++k) 
+		{ 
+			// and for each binding, loop over all its points
+			PointData& data = b->pointData[k];
+			GraphNode* node = data.node;
+			int vertexID = node->id;
+
+			Vector3d finalPosition (0,0,0);
+			float totalWeight = 0;
+
+			Vector3d rotDir; 
+			for (int kk = 0; kk < data.influences.size(); ++kk) // and check all joints associated to them
+			{   
+				int skID = data.influences[kk].label;
+				//joint& jt = deformersRestPosition[skID];
+				
+				joint* jt = s->jointRef[skID];
+
+				Vector3d& restPosition = originalModel->nodes[vertexID]->position;
+				Vector3d restPos2(restPosition.x(), restPosition.y(), restPosition.z());
+
+				float currentWeight = data.influences[kk].weightValue;
+
+				Vector3d finalPos2 =  jt->rotation._transformVector(jt->rRotation.inverse()._transformVector(restPos2-jt->rTranslation)) + jt->translation;
+				finalPosition = finalPosition + Vector3d(finalPos2(0), finalPos2(1), finalPos2(2)) * currentWeight;
+
+				totalWeight += data.influences[kk].weightValue;
+					
+			}
+
+			finalPosition = finalPosition / totalWeight;
+			if (m->nodes[vertexID]->position != finalPosition) 
+				updated = true;
+
+			m->nodes[vertexID]->position = finalPosition;
+		}
+
+	
+		if (updated)
+		{		
+			m->computeNormals();
+		}
+	}
+}
 
 void Skinning::computeDeformations(const vector< skeleton* >& skeletons) {
 	//for (int v = 0; v < originalModels.size(); ++v) originalModels[v]->shading->visible = false;	 // keep it false ALWAYS

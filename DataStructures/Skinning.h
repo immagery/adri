@@ -22,6 +22,7 @@ public:
 
     virtual void computeRestPositions(const vector< skeleton* >& skeletons);
 	virtual void computeDeformations(const vector< skeleton* >& skeletons);
+	virtual void computeDeformations2(skeleton* s);
 	virtual void computeDeformationsWithSW(const vector< skeleton* >& skeletons);
     
 	Vector3d deformVertex ();
