@@ -56,8 +56,17 @@ bool BuildSurfaceFromOFFFile(SurfaceGraph& graph, string sFileName)
 
 		for(int j = 0; j< polygonCount; j++)
 		{
-			graph.nodes[indexes[j]]->connections.push_back(graph.nodes[indexes[(j+1)%polygonCount]]);
-			graph.nodes[indexes[(j+1)%polygonCount]]->connections.push_back(graph.nodes[indexes[j]]);
+			int connNodeId = graph.nodes[indexes[(j+1)%polygonCount]]->id;
+			int founded = -1;
+			for(int conIdx = 0; conIdx < graph.nodes[indexes[j]]->connections.size() && founded < 0; conIdx++)
+				if(graph.nodes[indexes[j]]->connections[conIdx]->id == connNodeId)
+					founded = conIdx;
+			
+			if(founded < 0)
+			{
+				graph.nodes[indexes[j]]->connections.push_back(graph.nodes[indexes[(j+1)%polygonCount]]);
+				graph.nodes[indexes[(j+1)%polygonCount]]->connections.push_back(graph.nodes[indexes[j]]);
+			}
 		}
 	}
 
@@ -315,29 +324,46 @@ void PointData::LoadFromFile(ifstream& myfile)
 
 void cleanZeroInfluences(binding* bd)
 {
+	float err = 1/pow(10,5);
     for(int i = 0; i< bd->pointData.size();i++)
     {
         PointData* pd = &(bd->pointData[i]);
 
-        // Eliminamos los pesos igual a 0
+        // Eliminamos los pesos igual a 0 o negativos
         pd->auxInfluences.clear();
+		double weightsSum = 0;
+		int count = 0; 
         for(int infl = 0; infl < pd->influences.size(); infl++)
         {
-            if(pd->influences[infl].weightValue > 0)
+            if(pd->influences[infl].weightValue > err)
+			{
                 pd->auxInfluences.push_back(pd->influences[infl]);
+				weightsSum += pd->influences[infl].weightValue;
+				count++;
+			}
 
 			else if(pd->influences[infl].weightValue < 0)
 			{
 				//Comentado temporalmente
-				//printf("[cleanZeroInfluences] - Pesos negativos...no deberia.\n");
+				printf("[cleanZeroInfluences] - Pesos negativos...no deberia haber.\n");
 				fflush(0);
 			}
         }
+
+		if(count > 0)
+			weightsSum /=count;
+		else
+		{
+			printf("No tiene pesos\n"); 
+			fflush(0);
+		}
+
         pd->influences.clear();
+		pd->influences.resize(pd->auxInfluences.size());
         
 		for(int infl = 0; infl < pd->auxInfluences.size(); infl++)
         {
-            pd->influences.push_back(pd->auxInfluences[infl]);
+			pd->influences[infl] = weight(pd->auxInfluences[infl].label, pd->auxInfluences[infl].weightValue/weightsSum);
         }
 		pd->auxInfluences.clear();
     }
@@ -444,7 +470,8 @@ void PointData::loadFromFile(ifstream& in)
 		secondInfluences[inflIdx].resize(atoi(elems[id].c_str())); id++;
 		for(int inflSecIdx = 0; inflSecIdx < secondInfluences[inflIdx].size(); inflSecIdx++)
 		{
-			secondInfluences[inflIdx][inflSecIdx] = (atof(elems[id].c_str())); id++;
+			secondInfluences[inflIdx][inflSecIdx].alongBone = (float)atof(elems[id].c_str()); id++;
+			//assert(false); // TODO: wideBone read
 		}
 	}
 }
@@ -548,8 +575,85 @@ void normalizeWeightsByDomain(binding *bd)
     for(int i = 0; i< bd->pointData.size(); i++)
     {
         PointData* pd = &(bd->pointData[i]);
+		
+		/*
+		// TODELETE
+		if(pd->auxInfluences.size() == 0)
+		{
+			printf("No hay pesos que debatir\n");
+			continue;
+		}
 
-        float childGain = 0;
+		if(pd->auxInfluences.size() == 1)
+		{
+			if(pd->domainId < 0)
+			{
+				pd->influences.push_back(pd->auxInfluences[0]);
+				pd->auxInfluences.clear();
+			}
+			else
+				assert(pd->domainId == pd->auxInfluences[0].label);
+			continue;
+		}
+		
+		float posibleGain = pd->auxInfluences.size();
+		if(posibleGain == 0)
+			continue;
+
+		// Obtener la influencia del padre y quitar lo que tocaria.
+        int fatherId = findWeight(pd->influences, pd->domainId);
+		float fatherWeightValue = 0;
+		bool fatherInfluenceInvolved = fatherId >= 0;
+		
+		if(fatherInfluenceInvolved)
+        {
+			fatherWeightValue = pd->influences[fatherId].weightValue;
+			assert(fatherWeightValue == pd->domain);
+        }
+
+		int fatherAuxId = findWeight(pd->auxInfluences, pd->domainId);
+		if(fatherAuxId < 0)
+		{
+			// No debería pasar.
+			assert(false);
+			continue;
+		}
+
+		float sumasigned = 0;
+        for(int infl = 0; infl< pd->auxInfluences.size(); infl++)
+        {
+            int l = pd->auxInfluences[infl].label;
+            if(l != pd->ownerLabel)
+			{
+				sumasigned+= pd->auxInfluences[infl].weightValue;
+				float w = pd->auxInfluences[infl].weightValue/posibleGain*pd->domain;
+				if(w > 0)
+				{
+					int inflId = findWeight(pd->influences,l);
+					if(inflId < 0)
+						pd->influences.push_back(weight(l,w));
+					else
+						pd->influences[inflId] = weight(l,w);
+				}
+			}
+        }
+
+
+		float w = (posibleGain-sumasigned)/posibleGain*pd->auxInfluences[fatherAuxId].weightValue*pd->domain;
+		
+		int inflId = findWeight(pd->influences,pd->ownerLabel);
+		if(inflId < 0)
+			pd->influences.push_back(weight(pd->ownerLabel,w));
+		else
+			pd->influences[inflId] = weight(pd->ownerLabel,w);
+
+		pd->auxInfluences.clear();
+
+		continue;
+		*/
+		
+
+		float childGain = 0;
         for(int infl = 0; infl< pd->auxInfluences.size(); infl++)
         {
 			// DEBUG info -> to comment
@@ -557,13 +661,13 @@ void normalizeWeightsByDomain(binding *bd)
             if(pd->auxInfluences[infl].weightValue < 0 || (pd->auxInfluences[infl].weightValue - 1.0)>err)
 			{
 				// Algo está pasando...
-                //printf("hay algun problema en la asignacion de pesos.\n");
+                printf("hay algun problema en la asignacion de pesos.\n");
 			}
 
             childGain += pd->auxInfluences[infl].weightValue;
         }
 
-        if(childGain == 0)
+		if(childGain == 0)
         {
             pd->auxInfluences.clear();
             continue;
@@ -578,16 +682,27 @@ void normalizeWeightsByDomain(binding *bd)
                 int fatherId = findWeight(pd->influences, pd->domainId);
                 if(fatherId >= 0)
                 {
+					//float rest = pd->auxInfluences.size()-childGain+;
                     pd->influences[fatherId].weightValue = pd->domain - childGain;
-                }
+                
+				    for(int infl = 0; infl< pd->auxInfluences.size(); infl++)
+					{
+						int l = pd->auxInfluences[infl].label;
+						float w = pd->auxInfluences[infl].weightValue;
+						pd->influences.push_back(weight(l,w));
+					}
+				}
+				else
+				{
+					printf("No hay padre. Si no padre, no hijo...jeje\n"); fflush(0);
+					assert(false);
+				}
             }
-
-            for(int infl = 0; infl< pd->auxInfluences.size(); infl++)
-            {
-                int l = pd->auxInfluences[infl].label;
-                float w = pd->auxInfluences[infl].weightValue;
-                pd->influences.push_back(weight(l,w));
-            }
+			else
+			{
+				// Si es caso base tendría que cubrir todo el domain
+				assert(false);
+			}
         }
         else
         {
@@ -599,32 +714,28 @@ void normalizeWeightsByDomain(binding *bd)
                 {
                     if(pd->influences[fatherId].weightValue != pd->domain)
                     {
+						assert(false);
                         printf("Hay un problema de inicializacion del dominio...\n");
                         fflush(0);
                     }
 
                     pd->influences[fatherId].weightValue = 0;
-                }
+				}
             }
 
-            for(int infl = 0; infl< pd->auxInfluences.size(); infl++)
-            {
-                int l = pd->auxInfluences[infl].label;
-                float w = (pd->auxInfluences[infl].weightValue/childGain)*pd->domain;
+			for(int infl = 0; infl< pd->auxInfluences.size(); infl++)
+			{
+				int l = pd->auxInfluences[infl].label;
+				float w = (pd->auxInfluences[infl].weightValue/childGain)*pd->domain;
+				pd->influences.push_back(weight(l,w));
+			}
 
-                float a = w;
-                if(a != w)
-                {
-                    int problema = 1;
-                    printf("Tenemos un problema curioso.\n");
-                }
-
-                pd->influences.push_back(weight(l,w));
-            }
         }
+		
+		// For test memory issues
+		for(int ai = 0; ai < pd->auxInfluences.size(); ai++)
+			pd->auxInfluences[ai] = weight(-1,0);
 
-        pd->auxInfluences.clear();
-
+		pd->auxInfluences.clear();
     }
-
 }

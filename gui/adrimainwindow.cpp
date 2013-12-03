@@ -92,7 +92,10 @@ void AdriMainWindow::connectSignals() {
     connect(ui->actionMove, SIGNAL(triggered()), this, SLOT(toogleMoveTool()));
     connect(ui->actionSelection, SIGNAL(triggered()), this, SLOT(toogleSelectionTool()));
     connect(ui->actionRotate, SIGNAL(triggered()), this, SLOT(toogleRotateTool()));
-    connect(ui->visibility_btn, SIGNAL(toggled(bool)), this, SLOT(toogleVisibility(bool)));
+
+    connect(ui->visibility_btn, SIGNAL(stateChanged(int)), this, SLOT(toogleVisibility(int)));
+	connect(ui->drawSupportInfo, SIGNAL(stateChanged(int)), this, SLOT(toogleVisibility(int)));
+	connect(ui->defNodesSize, SIGNAL(valueChanged(int)), this, SLOT(toogleVisibility(int)));
 
 	connect(ui->actionDoTests, SIGNAL(triggered()), this, SLOT(LaunchTests()));
 
@@ -106,14 +109,14 @@ void AdriMainWindow::connectSignals() {
 	connect(ui->thresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(updateThresholdSlidervalue(int)));
 	connect(ui->threshold_enable, SIGNAL(toggled(bool)), this, SLOT(enableThreshold(bool)));
 	
-    connect(ui->smoothPropagationSlider, SIGNAL(sliderReleased()), this, SLOT(changeSmoothSlider()));
-    connect(ui->smoothPropagationSlider, SIGNAL(valueChanged(int)), this, SLOT(updateSmoothSlidervalue(int)));
+    //connect(ui->smoothPropagationSlider, SIGNAL(sliderReleased()), this, SLOT(changeSmoothSlider()));
+    //connect(ui->smoothPropagationSlider, SIGNAL(valueChanged(int)), this, SLOT(updateSmoothSlidervalue(int)));
 
 	//connect(ui->smoothingPasses, SIGNAL(valueChanged(int)), this, SLOT(changeSmoothingPasses(int)));
 
 	//connect(ui->auxValueInt, SIGNAL(valueChanged(int)), this, SLOT(changeAuxValueInt(int)));
 
-	connect(ui->glCustomWidget, SIGNAL(defGroupData(float, float, bool, int)), SLOT(NodeDataUpdate(float, float, bool, int)));
+	connect(ui->glCustomWidget, SIGNAL(defGroupData(float, float, bool, bool, int)), SLOT(NodeDataUpdate(float, float, bool, bool, int)));
 
     connect(ui->glCustomWidget, SIGNAL(jointDataShow(float, int)), this , SLOT(jointDataUpdate(float,int)));
 	connect(ui->glCustomWidget, SIGNAL(jointTransformationValues(float,float,float,float,float,float)), this , SLOT(jointTransformUpdate(float,float,float,float,float,float)));
@@ -141,6 +144,7 @@ void AdriMainWindow::connectSignals() {
 
 	// Twist control
 	connect(ui->twistEnableCheck, SIGNAL(clicked()), this, SLOT(changeTwistParameters()));
+	connect(ui->smoothTwistCheck, SIGNAL(clicked()), this, SLOT(changeTwistParameters()));
 	connect(ui->twist_fin_slider, SIGNAL(sliderMoved(int)), this, SLOT(changeTwistParameters(int)));
 	connect(ui->twist_ini_slider, SIGNAL(sliderMoved(int)), this, SLOT(changeTwistParameters(int)));
 
@@ -166,9 +170,12 @@ void AdriMainWindow::connectSignals() {
 void AdriMainWindow::changeTwistParameters()
 {
 	// enable/disable
-	ui->twist_fin_slider->setEnabled(ui->twistEnableCheck->isChecked());
-	ui->twist_ini_slider->setEnabled(ui->twistEnableCheck->isChecked());
-	ui->glCustomWidget->setTwistParams(ui->twist_ini_slider->value()/1000.0, ui->twist_fin_slider->value()/1000.0, ui->twistEnableCheck->isChecked());
+	//ui->twist_fin_slider->setEnabled(ui->twistEnableCheck->isChecked());
+	//ui->twist_ini_slider->setEnabled(ui->twistEnableCheck->isChecked());
+	ui->glCustomWidget->setTwistParams(ui->twist_ini_slider->value()/1000.0, 
+		ui->twist_fin_slider->value()/1000.0, 
+		ui->twistEnableCheck->isChecked(),
+		ui->smoothTwistCheck->isChecked());
 }
 
 void AdriMainWindow::changeTwistParameters(int value)
@@ -184,131 +191,6 @@ AdriMainWindow::AdriMainWindow(QWidget *parent) :
 	rotationX = 0;
 	rotationY = 0;
 	rotationZ = 0;
-
-    /*ui->setupUi(this);
-    ui->glCustomWidget->parent = this;
-	connectSignals();*/
-
-	/*
-    // conexiones
-    connect(ui->action_importModel, SIGNAL(triggered()), this, SLOT(ImportNewModel()) );
-    connect(ui->actionAction_openScene, SIGNAL(triggered()), this, SLOT(OpenNewScene()));
-
-    connect(ui->import_cage_s, SIGNAL(triggered()), this, SLOT(ImportCages()) );
-    connect(ui->import_distances, SIGNAL(triggered()), this, SLOT(ImportDistances()) );
-
-    connect(ui->shadingModeSelection, SIGNAL(currentIndexChanged(int)), this, SLOT(ShadingModeChange(int)) );
-
-    connect(ui->colorLayersCheck, SIGNAL(toggled(bool)), this, SLOT(EnableColorLayer(bool)) );
-    connect(ui->ColorLayerSeletion, SIGNAL(valueChanged(int)), this, SLOT(ChangeColorLayerValue(int)) );
-
-    connect(ui->actionImportSegementation, SIGNAL(triggered()), this, SLOT(DoAction()) );
-
-    //connect(ui->prop_function_updt, SIGNAL(released()), this, SLOT(ChangeSourceVertex()));
-
-    connect(ui->DistancesVertSource, SIGNAL(valueChanged(int)), this, SLOT(distancesSourceValueChange(int)));
-
-    connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(CloseApplication()) );
-    //connect(ui->processGC,  SIGNAL(triggered()), ui->glCustomWidget, SLOT(processGreenCoordinates()) );
-    //connect(ui->processHC,  SIGNAL(triggered()), ui->glCustomWidget, SLOT(processHarmonicCoordinates()));
-    //connect(ui->processMVC, SIGNAL(triggered()), ui->glCustomWidget, SLOT(processMeanValueCoordinates()));
-   // connect(ui->processAll, SIGNAL(triggered()), ui->glCustomWidget, SLOT(processAllCoords()));
-    //connect(ui->deformedMeshCheck, SIGNAL(released()), ui->glCustomWidget, SLOT(showDeformedModelSlot()));
-
-	connect(ui->GridDraw_interior, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
-    connect(ui->GridDraw_exterior, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
-    connect(ui->allGrid_button, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
-    connect(ui->gridSlices_button, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
-    connect(ui->SliceSelectorXY, SIGNAL(valueChanged(int)), ui->glCustomWidget, SLOT(ChangeSliceXY(int)));
-    connect(ui->SliceSelectorXZ, SIGNAL(valueChanged(int)), ui->glCustomWidget, SLOT(ChangeSliceXZ(int)));
-
-    connect(ui->cagesComboBox, SIGNAL(currentIndexChanged(int)), ui->glCustomWidget, SLOT(ChangeStillCage(int)));
-    connect(ui->enableStillCage, SIGNAL(toggled(bool)), this, SLOT(enableStillCage(bool)));
-
-    connect(ui->HCGridDraw, SIGNAL(released()), ui->glCustomWidget, SLOT(showHCoordinatesSlot()));
-    connect(ui->GridDraw_boundary, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
-
-    // Actualizaciones del grid.
-    //connect(ui->GridDraw_interior, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
-    //connect(ui->GridDraw_exterior, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
-    //connect(ui->allGrid_button, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
-    //connect(ui->gridSlices_button, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
-    //connect(ui->SliceSelectorXY, SIGNAL(valueChanged(int)), ui->glCustomWidget, SLOT(ChangeSliceXY(int)));
-    //connect(ui->SliceSelectorXZ, SIGNAL(valueChanged(int)), ui->glCustomWidget, SLOT(ChangeSliceXZ(int)));
-
-	//connect(ui->nextStep_button, SIGNAL(released()), ui->glCustomWidget, SLOT(nextProcessStep()));
-	//connect(ui->allNextStep_button, SIGNAL(released()), ui->glCustomWidget, SLOT(allNextProcessSteps()));
-
-    connect(ui->prop_function_updt, SIGNAL(released()), ui->glCustomWidget, SLOT(PropFunctionConf()));
-
-    connect(ui->paintModel_btn, SIGNAL(released()), ui->glCustomWidget, SLOT(paintModelWithGrid()));
-    connect(ui->metricUsedCheck, SIGNAL(released()), ui->glCustomWidget, SLOT(PropFunctionConf()));
-
-    connect(ui->drawInfluences_check, SIGNAL(released()), ui->glCustomWidget, SLOT(showHCoordinatesSlot()));
-
-    connect(ui->coordTab, SIGNAL(currentChanged(int)), ui->glCustomWidget, SLOT(active_GC_vs_HC(int)));
-
-    connect(ui->glCustomWidget, SIGNAL(updateSceneView()), this, SLOT(updateSceneView()));
-    connect(ui->outlinerView, SIGNAL(clicked(QModelIndex)), this, SLOT(selectObject(QModelIndex)));
-
-    connect(ui->actionMove, SIGNAL(triggered()), this, SLOT(toogleMoveTool()));
-    connect(ui->actionSelection, SIGNAL(triggered()), this, SLOT(toogleSelectionTool()));
-    connect(ui->actionRotate, SIGNAL(triggered()), this, SLOT(toogleRotateTool()));
-    connect(ui->visibility_btn, SIGNAL(toggled(bool)), this, SLOT(toogleVisibility(bool)));
-
-	connect(ui->actionDoTests, SIGNAL(triggered()), this, SLOT(LaunchTests()));
-
-    connect(ui->segmentation_btn, SIGNAL(toggled(bool)), this, SLOT(toogleToShowSegmentation(bool)));
-    connect(ui->DataVisualizationCombo, SIGNAL(currentIndexChanged(int)),this, SLOT(DataVisualizationChange(int)) );
-
-    connect(ui->exportWeights_btn, SIGNAL(released()), ui->glCustomWidget, SLOT(exportWeightsToMaya()));
-
-    connect(ui->expansionSlider, SIGNAL(valueChanged(int)), this, SLOT(updateExpansionSlidervalue(int)));
-
-	connect(ui->thresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(updateThresholdSlidervalue(int)));
-	connect(ui->threshold_enable, SIGNAL(toggled(bool)), this, SLOT(enableThreshold(bool)));
-	
-
-    connect(ui->smoothPropagationSlider, SIGNAL(sliderReleased()), this, SLOT(changeSmoothSlider()));
-    connect(ui->smoothPropagationSlider, SIGNAL(valueChanged(int)), this, SLOT(updateSmoothSlidervalue(int)));
-
-	//connect(ui->smoothingPasses, SIGNAL(valueChanged(int)), this, SLOT(changeSmoothingPasses(int)));
-
-	//connect(ui->auxValueInt, SIGNAL(valueChanged(int)), this, SLOT(changeAuxValueInt(int)));
-
-	connect(ui->ip_axisX, SIGNAL(valueChanged(int)), this, SLOT(changeInteriorPointPosition()));
-	connect(ui->ip_axisY, SIGNAL(valueChanged(int)), this, SLOT(changeInteriorPointPosition()));
-	connect(ui->ip_axisZ, SIGNAL(valueChanged(int)), this, SLOT(changeInteriorPointPosition()));
-
-	connect(ui->paintModel, SIGNAL(clicked()), this, SLOT(updateModelColors()));
-	connect(ui->paintPlane, SIGNAL(clicked()), this, SLOT(updateClipingPlaneColor()));
-
-	connect(ui->drawPlaneCheck, SIGNAL(clicked()), this, SLOT(updateClipingPlaneData()));
-	connect(ui->PlaneOrientX, SIGNAL(clicked()), this, SLOT(updateClipingPlaneData()));
-	connect(ui->planeOrientY, SIGNAL(clicked()), this, SLOT(updateClipingPlaneData()));
-	connect(ui->planeOrientZ, SIGNAL(clicked()), this, SLOT(updateClipingPlaneData()));
-	connect(ui->PlaneDataCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeVisModeForPlane(int)));
-	
-	connect(ui->dataSource, SIGNAL(valueChanged(int)), this, SLOT(distancesSourceValueChange(int)));
-	connect(ui->positionPlaneSlider, SIGNAL(sliderMoved(int)), this, SLOT(changeSelPointForPlane(int)));
-
-	// Transform
-    connect(ui->rotationAmountX, SIGNAL(valueChanged(int)), this, SLOT(changeTransformRotateAmountX(int)));
-    connect(ui->rotationAmountY, SIGNAL(valueChanged(int)), this, SLOT(changeTransformRotateAmountY(int)));
-    connect(ui->rotationAmountZ, SIGNAL(valueChanged(int)), this, SLOT(changeTransformRotateAmountZ(int)));
-    connect(ui->resetRotation, SIGNAL(clicked()), this, SLOT(resetRotationValues()));
-
-    // Animation
-    connect(ui->addKeyframe, SIGNAL(clicked()), this, SLOT(addAnimationKeyframe()));
-    connect(ui->toggleAnim, SIGNAL(clicked()), this, SLOT(toggleAnimation()));
-    connect(ui->animSlider, SIGNAL(valueChanged(int)), this, SLOT(changeFrame(int)));
-    connect(ui->glCustomWidget, SIGNAL(changedFrame(int)), this, SLOT(changeAnimSlider(int)));
-	connect(ui->saveAnim, SIGNAL(clicked()), this, SLOT(saveAnimation()));
-	connect(ui->loadAnim, SIGNAL(clicked()), this, SLOT(loadAnimation()));
-
-	// Simulation
-	connect(ui->toggleSim, SIGNAL(clicked()), this, SLOT(toggleSimulation()));
-	//connect(ui->speedDmp, SIGNAL(valueChanged(int)), this, SLOT(changeSpeedDampingSlider(int)));*/
 }
 
 
@@ -429,6 +311,7 @@ void AdriMainWindow::LaunchTests()
 	ui->glCustomWidget->doTests(fileNames[0].toStdString(), sModelPrefix.toStdString(), sModelPath.toStdString());
 }
 
+/*
 void AdriMainWindow::updateSmoothSlidervalue(int)
 {
     float valueAux = ui->smoothPropagationSlider->value();
@@ -436,17 +319,20 @@ void AdriMainWindow::updateSmoothSlidervalue(int)
 
     ui->smoothPropagationEdit->setText(QString("%1").arg(value));
 }
-
+*/
 void AdriMainWindow::updateExpansionSlidervalue(int)
 {
     float valueAux = ui->expansionSlider->value();
     float value = 0;
-    if(valueAux <= 100)
+    
+	/*if(valueAux <= 100)
         value = ((float)ui->expansionSlider->value())/100.0;
     else
     {
         value = (((valueAux-100)/100)*9)+1.0;
-    }
+    }*/
+
+	value = valueAux / 1000.0;
 
     ui->expansionValueEdit->setText(QString("%1").arg(value));
 }
@@ -506,21 +392,21 @@ void AdriMainWindow::jointTransformUpdate(float x,float y,float z,float alpha,fl
 	rotationZ = Deg2Rad(gamma);
 }
 
-void AdriMainWindow::NodeDataUpdate(float iniTw, float finTw, bool enableTw, int smooth)
+void AdriMainWindow::NodeDataUpdate(float iniTw, float finTw, bool enableTw, bool smoothTw, int smooth)
 {
-	ui->twistEnableCheck->setEnabled(enableTw);
+	ui->twistEnableCheck->setChecked(enableTw);
 
-	if(enableTw)
-	{
-		ui->twist_ini_slider->setValue((int)(iniTw*1000));
-		ui->twist_fin_slider->setValue((int)(finTw*1000));
-	}
+	ui->smoothTwistCheck->setChecked(smoothTw);
 
-	ui->smoothingPasses->setValue(smooth);
+	ui->twist_ini_slider->setValue((int)(iniTw*1000));
+	ui->twist_fin_slider->setValue((int)(finTw*1000));
+
+	ui->localSmoothingPasses->setValue(smooth);
 }
 
 void AdriMainWindow::jointDataUpdate(float fvalue, int id)
 {
+	/*
     if(fvalue <=1)
     {
 		ui->expansionSlider->setValue((int)round(fvalue*100));
@@ -529,9 +415,15 @@ void AdriMainWindow::jointDataUpdate(float fvalue, int id)
     {
         int value = ((int)round((fvalue-1)/9*100)+100);
         ui->expansionSlider->setValue(value);
-    }
+    }*/
 
-    ui->expansionValueEdit->setText(QString("%1").arg(fvalue));
+	int value = (int)round(fvalue*1000.0);
+	if(value > 3000) value = 3000;
+	if(value < 1) value = 1;
+
+	ui->expansionSlider->setValue(value);
+
+    ui->expansionValueEdit->setText(QString("%1").arg((float)value/1000.0));
 
     ui->DistancesVertSource->setValue(id);
     distancesSourceValueChange(id);
@@ -653,9 +545,12 @@ void AdriMainWindow::ShadingModeChange(int option)
     }
 }
 
-void AdriMainWindow::toogleVisibility(bool toogle)
+void AdriMainWindow::toogleVisibility(int)
 {
-   ui->glCustomWidget->toogleVisibility(toogle);
+	ui->glCustomWidget->toogleVisibility(ui->visibility_btn->isChecked());
+
+	scene::drawDefNodes = ui->drawSupportInfo->isChecked();
+	scene::drawingNodeStdSize = ui->defNodesSize->value()/1000.0;
 }
 
 void AdriMainWindow::DataVisualizationChange(int mode)
@@ -845,8 +740,8 @@ void AdriMainWindow::keyPressEvent(QKeyEvent* event)
         ui->DataVisualizationCombo->setCurrentIndex(VIS_BONES_SEGMENTATION);
         break;
 	case Qt::Key_4:
-		DataVisualizationChange(VIS_SEG_PASS);
-        ui->DataVisualizationCombo->setCurrentIndex(VIS_SEG_PASS);
+		DataVisualizationChange(VIS_SECW_WIDE);
+        ui->DataVisualizationCombo->setCurrentIndex(VIS_SECW_WIDE);
         break;
 	case Qt::Key_5:
         DataVisualizationChange(VIS_WEIGHTS);

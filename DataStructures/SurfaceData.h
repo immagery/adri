@@ -228,7 +228,10 @@ class PointData
     vector<weight> influences;
 
 	// Influences assigned to this cell
-    vector< vector<float> > secondInfluences;
+    //vector< vector<float> > secondInfluences;
+
+	// Influences temporary assigned to childs.
+    vector< vector<secWeight> >secondInfluences;
 };
 
 class EdgeData
@@ -428,7 +431,7 @@ public:
 	unsigned int ntriangles;
 
 	//Biharmonic distances
-	symMatrix BihDistances;
+	vector<symMatrix> BihDistances;
 };
 
 

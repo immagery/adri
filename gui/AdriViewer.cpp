@@ -815,7 +815,7 @@ void AdriViewer::readSkeleton(string fileName)
          if(!escena->models[i] || !escena->models[i]->shading)
              continue;
 
-          escena->models[i]->shading->visible = !escena->models[i]->shading->visible;
+          escena->models[i]->shading->visible = toogle;
      }
  }
 
@@ -837,9 +837,13 @@ void AdriViewer::readSkeleton(string fileName)
 
 	 //if (escena->skeletons.size() > 0) escena->skeletons[0]->joints[0]->computeWorldPos();
      if(ShadingModeFlag == SH_MODE_SMOOTH)
+	 {
         glShadeModel(GL_SMOOTH);
+	 }
      else if(ShadingModeFlag == SH_MODE_FLAT)
+	 {
         glShadeModel(GL_FLAT);
+	 }
 
 
 	if (aniManager.simulationEnabled) ++frame;
@@ -886,6 +890,7 @@ void AdriViewer::readSkeleton(string fileName)
          if(!escena->models[i] || !escena->models[i]->shading->visible)
              continue;
 
+		 ((Modelo*)escena->models[i])->shading->shMode = ShadingModeFlag;
          ((Modelo*)escena->models[i])->drawFunc();
      }
 
@@ -1292,15 +1297,11 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
                     //if (sum < 1)
                     //	printf("no se cumple la particion de unidad: %f.\n", sum);
                 }
-                else if(escena->iVisMode == VIS_SEG_PASS)
+				else if(escena->iVisMode == VIS_SECW_WIDE)
                 {
-                    value = 0.0;
-                    if(bd->nodeIds[pd.segmentId]->boneId == escena->desiredVertex)
-                    {
-                        value = 1.0;
-                    }
+                    assert(false);
                 }
-                else if(escena->iVisMode == VIS_CONFIDENCE_LEVEL)
+                else if(escena->iVisMode == VIS_SECW_ALONG)
                 {
 					value = 0.0;
 
@@ -1319,9 +1320,9 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
 						if(pd.secondInfluences[searchedindex].size()> 0)
 						{
 							if(valueAux < pd.secondInfluences[searchedindex].size())
-								value = pd.secondInfluences[searchedindex][valueAux];
+								value = pd.secondInfluences[searchedindex][valueAux].alongBone;
 							else
-								value = pd.secondInfluences[searchedindex][pd.secondInfluences[searchedindex].size()-1];
+								value = pd.secondInfluences[searchedindex][pd.secondInfluences[searchedindex].size()-1].alongBone;
 						}
 						else
 						{
@@ -1357,7 +1358,7 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
                         if(maxdistance <= 0)
                             value = 0;
                         else
-                            value = m->bind->BihDistances.get(count,escena->desiredVertex) / maxdistance;
+                            value = m->bind->BihDistances[0].get(count,escena->desiredVertex) / maxdistance;
                     }
                 }
                 else if(escena->iVisMode == VIS_POINTDISTANCES)
@@ -1389,9 +1390,9 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
 						if(pd.secondInfluences[searchedindex].size()> 0)
 						{
 							if(valueAux < pd.secondInfluences[searchedindex].size())
-								value = pd.secondInfluences[searchedindex][valueAux]*pd.influences[searchedindex].weightValue;
+								value = pd.secondInfluences[searchedindex][valueAux].alongBone*pd.influences[searchedindex].weightValue;
 							else
-								value = pd.secondInfluences[searchedindex][pd.secondInfluences[searchedindex].size()-1]*pd.influences[searchedindex].weightValue;
+								value = pd.secondInfluences[searchedindex][pd.secondInfluences[searchedindex].size()-1].alongBone*pd.influences[searchedindex].weightValue;
 						}
 						else
 						{
@@ -1598,7 +1599,7 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
                        //if(!cell->data->validated)
                        //	colorValue = -1;
                    break;
-               case VIS_SEG_PASS:
+               case VIS_SECW_WIDE:
 				   /*
                        if(cell->data->ownerLabel>0 && cell->data->ownerLabel< grRend->grid->valueRange)
                        {
@@ -1640,7 +1641,7 @@ void AdriViewer::loadSelectableVertex(Cage* cage /* MyMesh& cage*/)
 					   */
                    break;
 
-               case VIS_CONFIDENCE_LEVEL:
+               case VIS_SECW_ALONG:
                        colorValue = cell->data->confidenceLevel;
                        confidenceLimit = grRend->grid->minConfidenceLevel;
                        if(colorValue > confidenceLimit )

@@ -59,46 +59,6 @@ public:
 
 };
 
-// This class represents an influence
-class weight
-{
-public:
-
-	weight()
-	{
-		label = -1;
-		relativeLabel = -1;
-		weightValue = 0;
-	}
-
-	weight(const weight& temp)
-	{
-		label = temp.label;
-		relativeLabel = temp.relativeLabel;
-		weightValue = temp.weightValue;
-	}
-
-	weight(int label_in, float weight_in)
-	{
-		label = label_in;
-		relativeLabel = -1;
-		weightValue = weight_in;
-	}
-
-	weight(int label_in, int relative_label_in, float weight_in)
-	{
-		label = label_in;
-		relativeLabel = relative_label_in;
-		weightValue = weight_in;
-	}
-
-	int label;
-	int relativeLabel; // For secondaryWeights
-	float weightValue;
-};
-
-int findWeight(vector<weight>& weights, int label);
-
 class cellData
 {
     public:

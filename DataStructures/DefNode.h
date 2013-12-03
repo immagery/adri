@@ -16,6 +16,73 @@
 
 using namespace std;
 
+// This class represents an influence
+class weight
+{
+public:
+
+	weight()
+	{
+		label = -1;
+		relativeLabel = -1;
+		weightValue = 0;
+	}
+
+	weight(const weight& temp)
+	{
+		label = temp.label;
+		relativeLabel = temp.relativeLabel;
+		weightValue = temp.weightValue;
+	}
+
+	weight(int label_in, float weight_in)
+	{
+		label = label_in;
+		relativeLabel = -1;
+		weightValue = weight_in;
+	}
+
+	weight(int label_in, int relative_label_in, float weight_in)
+	{
+		label = label_in;
+		relativeLabel = relative_label_in;
+		weightValue = weight_in;
+	}
+
+	int label;
+	int relativeLabel; // For secondaryWeights
+	float weightValue;
+};
+
+// This class represents an influence
+class secWeight
+{
+public:
+
+	secWeight()
+	{
+		wideBone = 1;
+		alongBone = 0;
+	}
+
+	secWeight(const secWeight& temp)
+	{
+		wideBone = temp.wideBone;
+		alongBone = temp.alongBone;
+	}
+
+	secWeight(float wideBone_in, int alongBone_in)
+	{
+		wideBone = wideBone_in;
+		alongBone = alongBone_in;
+	}
+
+	float wideBone; // Weight for fight between childs
+	float alongBone; // Weight over a bone
+};
+
+int findWeight(vector<weight>& weights, int label);
+
 /*
 	-	DEFNODE -
 	Definition: This class is constructed for compute deformations.
@@ -89,6 +156,7 @@ public:
 		expansion = def_orig.expansion;
 
 		pos = def_orig.pos;
+		relPos = def_orig.relPos;
 		precomputedDistances = def_orig.precomputedDistances;
 	}
 
@@ -99,8 +167,15 @@ public:
 	}
 
 	// TODEBUG maybe there is redundant data.
-	int boneId; // Who is my parent?
 	int rootBoneId;
+
+	// For faster computation
+	Eigen::Vector3d pos;
+
+	// For drawing
+	Eigen::Vector3d relPos;
+
+	int boneId; // Who is my parent?
 	int childBoneId;
 
 	float ratio; // position over the bone (for blending through the bone)
@@ -108,12 +183,6 @@ public:
 
 	// Aux variable that encapsulates precomputed part af distance calculus.
 	double precomputedDistances;
-
-	// For faster computation
-	Eigen::Vector3d pos;
-
-	// For drawing
-	Eigen::Vector3d relPos;
 
 	// This flag enables weight computation.
 	bool enableWeightsComputation;

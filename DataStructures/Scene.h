@@ -193,9 +193,6 @@ class scene
 	map<int, joint*> deformerRef; // A reference to all the joints from id.
 	vector< skeleton* > skeletons;
 
-	// Skinning
-	//Skinning* skinner;
-
 	// AirRig
 	Rig* rig;
 	vector<Rig*> rigsArray;
@@ -207,6 +204,10 @@ class scene
 	bool skeletonLoaded;
 	bool embeddingLoaded;
 	bool weightsUpdated;
+
+	// Scene draw flags
+	static bool drawDefNodes;
+	static float drawingNodeStdSize;
 
 	double weightsThreshold;
 

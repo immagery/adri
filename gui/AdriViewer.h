@@ -34,7 +34,6 @@ using namespace std;
 using namespace Eigen;
 
 enum viewingModes { DynCage_Mode = 0, Cages_Mode, BHD_Mode, SimpleModel_Mode};
-enum shadingModes { SH_MODE_FLAT = 0, SH_MODE_SMOOTH};
 
 class AdriMainWindow;
 class MainWindow;
@@ -88,6 +87,8 @@ public:
     viewingModes viewingMode;
     shadingModes ShadingModeFlag;
 
+	bool bDrawStatistics;
+
     void cleanShadingVariables();
     void toogleModelToXRay();
     void toogleModelToLines();
@@ -95,7 +96,7 @@ public:
 
 
 	virtual void setSmoothPasses(int , int ) {}
-	virtual void setTwistParams(double , double , bool ){}
+	virtual void setTwistParams(double , double , bool, bool ){}
 
 //    void changeVisualizationMode(int);
 //	void updateGridVisualization();
@@ -290,7 +291,7 @@ public slots:
 signals:
     void updateSceneView();
     void jointDataShow(float, int);
-	void defGroupData(float, float, bool, int);
+	void defGroupData(float, float, bool, bool, int);
 	void jointTransformationValues(float, float,float,float,float,float);
     void changedFrame(int);
 

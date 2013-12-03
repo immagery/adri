@@ -2,11 +2,11 @@
 #define SHADINGNODE_H
 #include <DataStructures/Node.h>
 
+enum shadingModes{ SH_MODE_FLAT = 0, SH_MODE_SMOOTH};
 enum shadingMode{T_POINTS = 0, T_LINES, T_POLY, T_XRAY, T_INVISIBLE};
 
 #include <vector>
 using namespace std;
-
 
 class object;
 class shadingNode: public node
@@ -28,6 +28,9 @@ public:
         colors.clear();
 
 		m_bDrawPoints = false;
+		shMode = SH_MODE_SMOOTH;
+
+
     }
 
     shadingNode(unsigned int id) : node(id)
@@ -45,7 +48,9 @@ public:
 
         colors.clear();
 		m_bDrawPoints = false;
-    }
+
+		shMode = SH_MODE_SMOOTH;
+	}
 
     bool visible;
     bool selected;
@@ -53,7 +58,9 @@ public:
 
     bool xray;
 
-    shadingMode shtype;
+	shadingModes shMode;
+    
+	shadingMode shtype;
 
 	bool m_bDrawPoints;
 

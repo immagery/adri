@@ -41,7 +41,12 @@ void GeometryRender::drawFunc(object* obj)
              for(int i = 0; i<3; i++)
              {
 				 int pIdx = geom->triangles[tr]->verts[i]->id;
-				 glNormal3d(geom->faceNormals[tr].x(), geom->faceNormals[tr].y(), geom->faceNormals[tr].z());
+					
+				 if(shMode == SH_MODE_FLAT)
+				 {
+					glNormal3d(geom->faceNormals[tr].x(), geom->faceNormals[tr].y(), geom->faceNormals[tr].z());
+				 }
+
                  if(size > 0 && pIdx < size)
                  {
                      if(colors[pIdx].size()== 3)
@@ -56,7 +61,11 @@ void GeometryRender::drawFunc(object* obj)
                         glColor4f(color[0]*blend, color[1]*blend, color[2]*blend,blend);
                  }
 			
-                 //glNormal3d(geom->vertNormals[pIdx].X(), geom->vertNormals[pIdx].Y(), geom->vertNormals[pIdx].Z());
+				 if(shMode != SH_MODE_FLAT)
+				 {
+					glNormal3d(geom->vertNormals[pIdx].x(), geom->vertNormals[pIdx].y(), geom->vertNormals[pIdx].z());
+				 }
+
                  glVertex(geom->nodes[pIdx]->position);
              }
          }
@@ -140,9 +149,9 @@ void GeometryRender::drawFunc(object* obj)
         glEnable(GL_LIGHTING);
 
 		glDisable(GL_LIGHTING);
-		float pointSize = 5;
+		float pointSize = 25;
 		glColor3f(0.5, 0, 0.5);
-		glPointSize(pointSize*0.9);
+		glPointSize(pointSize);
 
 		glBegin(GL_POINTS);
 		// vertices normales

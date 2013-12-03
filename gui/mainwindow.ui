@@ -166,7 +166,7 @@
                </rect>
               </property>
               <property name="currentIndex">
-               <number>2</number>
+               <number>1</number>
               </property>
               <widget class="QWidget" name="tab_5">
                <attribute name="title">
@@ -403,22 +403,6 @@
                  <bool>true</bool>
                 </property>
                </widget>
-               <widget class="QSpinBox" name="auxValueInt">
-                <property name="geometry">
-                 <rect>
-                  <x>370</x>
-                  <y>80</y>
-                  <width>42</width>
-                  <height>22</height>
-                 </rect>
-                </property>
-                <property name="maximum">
-                 <number>10000</number>
-                </property>
-                <property name="value">
-                 <number>0</number>
-                </property>
-               </widget>
                <widget class="QLineEdit" name="bonesSubdivisionRatio">
                 <property name="geometry">
                  <rect>
@@ -433,24 +417,6 @@
                 </property>
                 <property name="readOnly">
                  <bool>false</bool>
-                </property>
-               </widget>
-               <widget class="QLabel" name="label_19">
-                <property name="geometry">
-                 <rect>
-                  <x>310</x>
-                  <y>70</y>
-                  <width>61</width>
-                  <height>41</height>
-                 </rect>
-                </property>
-                <property name="font">
-                 <font>
-                  <pointsize>10</pointsize>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>aux Value</string>
                 </property>
                </widget>
                <widget class="QLabel" name="label_20">
@@ -661,61 +627,6 @@
                  <string>Export Weights</string>
                 </property>
                </widget>
-               <widget class="QSlider" name="smoothPropagationSlider">
-                <property name="geometry">
-                 <rect>
-                  <x>20</x>
-                  <y>150</y>
-                  <width>311</width>
-                  <height>19</height>
-                 </rect>
-                </property>
-                <property name="maximum">
-                 <number>350</number>
-                </property>
-                <property name="value">
-                 <number>10</number>
-                </property>
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-               </widget>
-               <widget class="QLineEdit" name="smoothPropagationEdit">
-                <property name="geometry">
-                 <rect>
-                  <x>350</x>
-                  <y>150</y>
-                  <width>61</width>
-                  <height>20</height>
-                 </rect>
-                </property>
-                <property name="text">
-                 <string>1.0</string>
-                </property>
-                <property name="readOnly">
-                 <bool>true</bool>
-                </property>
-               </widget>
-               <widget class="QLabel" name="label_11">
-                <property name="geometry">
-                 <rect>
-                  <x>30</x>
-                  <y>180</y>
-                  <width>171</width>
-                  <height>20</height>
-                 </rect>
-                </property>
-                <property name="font">
-                 <font>
-                  <pointsize>8</pointsize>
-                  <weight>50</weight>
-                  <bold>false</bold>
-                 </font>
-                </property>
-                <property name="text">
-                 <string>GLOBAL SMOOTH PROPAGATION</string>
-                </property>
-               </widget>
                <widget class="QGroupBox" name="groupBox_3">
                 <property name="geometry">
                  <rect>
@@ -728,122 +639,6 @@
                 <property name="title">
                  <string>Joint parameters</string>
                 </property>
-                <widget class="QLineEdit" name="expansionValueEdit">
-                 <property name="geometry">
-                  <rect>
-                   <x>210</x>
-                   <y>30</y>
-                   <width>61</width>
-                   <height>20</height>
-                  </rect>
-                 </property>
-                 <property name="text">
-                  <string>1.0</string>
-                 </property>
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-                <widget class="QLineEdit" name="propagationValueEdit">
-                 <property name="geometry">
-                  <rect>
-                   <x>210</x>
-                   <y>60</y>
-                   <width>61</width>
-                   <height>20</height>
-                  </rect>
-                 </property>
-                 <property name="text">
-                  <string>1.0</string>
-                 </property>
-                 <property name="readOnly">
-                  <bool>true</bool>
-                 </property>
-                </widget>
-                <widget class="QSlider" name="expansionSlider">
-                 <property name="geometry">
-                  <rect>
-                   <x>10</x>
-                   <y>34</y>
-                   <width>181</width>
-                   <height>19</height>
-                  </rect>
-                 </property>
-                 <property name="minimum">
-                  <number>1</number>
-                 </property>
-                 <property name="maximum">
-                  <number>200</number>
-                 </property>
-                 <property name="value">
-                  <number>100</number>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
-                <widget class="QLabel" name="label_10">
-                 <property name="geometry">
-                  <rect>
-                   <x>10</x>
-                   <y>18</y>
-                   <width>171</width>
-                   <height>20</height>
-                  </rect>
-                 </property>
-                 <property name="font">
-                  <font>
-                   <pointsize>8</pointsize>
-                   <weight>50</weight>
-                   <bold>false</bold>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string>EXPANSION/CONTRACTION</string>
-                 </property>
-                </widget>
-                <widget class="QLabel" name="label_13">
-                 <property name="geometry">
-                  <rect>
-                   <x>10</x>
-                   <y>48</y>
-                   <width>171</width>
-                   <height>20</height>
-                  </rect>
-                 </property>
-                 <property name="font">
-                  <font>
-                   <pointsize>8</pointsize>
-                   <weight>50</weight>
-                   <bold>false</bold>
-                  </font>
-                 </property>
-                 <property name="text">
-                  <string>INFLUENCE PROPAGATION</string>
-                 </property>
-                </widget>
-                <widget class="QSlider" name="propagationSlider">
-                 <property name="geometry">
-                  <rect>
-                   <x>10</x>
-                   <y>64</y>
-                   <width>181</width>
-                   <height>19</height>
-                  </rect>
-                 </property>
-                 <property name="minimum">
-                  <number>1</number>
-                 </property>
-                 <property name="maximum">
-                  <number>200</number>
-                 </property>
-                 <property name="value">
-                  <number>100</number>
-                 </property>
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                </widget>
                </widget>
                <widget class="QPushButton" name="prop_function_updt">
                 <property name="geometry">
@@ -858,22 +653,6 @@
                  <string>Update func</string>
                 </property>
                </widget>
-               <zorder>label</zorder>
-               <zorder>label_2</zorder>
-               <zorder>alphavalue_in</zorder>
-               <zorder>kvalue_in</zorder>
-               <zorder>label_5</zorder>
-               <zorder>label_6</zorder>
-               <zorder>ColorInterpolationBar</zorder>
-               <zorder>label_7</zorder>
-               <zorder>label_9</zorder>
-               <zorder>DistancesVertSource</zorder>
-               <zorder>exportWeights_btn</zorder>
-               <zorder>smoothPropagationEdit</zorder>
-               <zorder>label_11</zorder>
-               <zorder>smoothPropagationSlider</zorder>
-               <zorder>groupBox_3</zorder>
-               <zorder>prop_function_updt</zorder>
               </widget>
               <widget class="QWidget" name="tab_8">
                <attribute name="title">
@@ -1268,7 +1047,7 @@
               <item>
                <widget class="QTabWidget" name="DefGroupParamsTab">
                 <property name="currentIndex">
-                 <number>2</number>
+                 <number>0</number>
                 </property>
                 <widget class="QWidget" name="render">
                  <attribute name="title">
@@ -1326,8 +1105,8 @@
                   </property>
                   <property name="geometry">
                    <rect>
-                    <x>20</x>
-                    <y>280</y>
+                    <x>10</x>
+                    <y>240</y>
                     <width>371</width>
                     <height>22</height>
                    </rect>
@@ -1345,10 +1124,10 @@
                  <widget class="QSlider" name="SliceSelectorXZ">
                   <property name="geometry">
                    <rect>
-                    <x>390</x>
-                    <y>20</y>
+                    <x>380</x>
+                    <y>10</y>
                     <width>20</width>
-                    <height>281</height>
+                    <height>231</height>
                    </rect>
                   </property>
                   <property name="minimum">
@@ -1403,12 +1182,17 @@
                   </item>
                   <item>
                    <property name="text">
-                    <string>SegmPass</string>
+                    <string>Weights</string>
                    </property>
                   </item>
                   <item>
                    <property name="text">
-                    <string>Weights</string>
+                    <string>SW along</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>SW wide</string>
                    </property>
                   </item>
                   <item>
@@ -1424,11 +1208,6 @@
                   <item>
                    <property name="text">
                     <string>interiorDistanceToPoint</string>
-                   </property>
-                  </item>
-                  <item>
-                   <property name="text">
-                    <string>Secondary Weights</string>
                    </property>
                   </item>
                   <item>
@@ -1485,9 +1264,9 @@
                   <property name="geometry">
                    <rect>
                     <x>10</x>
-                    <y>20</y>
+                    <y>10</y>
                     <width>211</width>
-                    <height>161</height>
+                    <height>131</height>
                    </rect>
                   </property>
                   <property name="title">
@@ -1500,7 +1279,7 @@
                    <property name="geometry">
                     <rect>
                      <x>140</x>
-                     <y>110</y>
+                     <y>80</y>
                      <width>81</width>
                      <height>20</height>
                     </rect>
@@ -1516,7 +1295,7 @@
                    <property name="geometry">
                     <rect>
                      <x>10</x>
-                     <y>60</y>
+                     <y>50</y>
                      <width>101</width>
                      <height>51</height>
                     </rect>
@@ -1567,7 +1346,7 @@
                    <property name="geometry">
                     <rect>
                      <x>140</x>
-                     <y>80</y>
+                     <y>60</y>
                      <width>71</width>
                      <height>20</height>
                     </rect>
@@ -1585,8 +1364,8 @@
                    </property>
                    <property name="geometry">
                     <rect>
-                     <x>130</x>
-                     <y>30</y>
+                     <x>100</x>
+                     <y>20</y>
                      <width>42</width>
                      <height>22</height>
                     </rect>
@@ -1595,8 +1374,8 @@
                   <widget class="QCheckBox" name="colorLayersCheck">
                    <property name="geometry">
                     <rect>
-                     <x>40</x>
-                     <y>30</y>
+                     <x>10</x>
+                     <y>20</y>
                      <width>81</width>
                      <height>17</height>
                     </rect>
@@ -1612,7 +1391,7 @@
                    <property name="geometry">
                     <rect>
                      <x>140</x>
-                     <y>60</y>
+                     <y>40</y>
                      <width>91</width>
                      <height>20</height>
                     </rect>
@@ -1627,8 +1406,8 @@
                   <widget class="QCheckBox" name="segmentation_btn">
                    <property name="geometry">
                     <rect>
-                     <x>10</x>
-                     <y>120</y>
+                     <x>60</x>
+                     <y>110</y>
                      <width>111</width>
                      <height>17</height>
                     </rect>
@@ -1655,6 +1434,91 @@
                   </property>
                   <property name="checked">
                    <bool>true</bool>
+                  </property>
+                 </widget>
+                 <widget class="QLabel" name="label_19">
+                  <property name="geometry">
+                   <rect>
+                    <x>270</x>
+                    <y>160</y>
+                    <width>61</width>
+                    <height>41</height>
+                   </rect>
+                  </property>
+                  <property name="font">
+                   <font>
+                    <pointsize>10</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>Aux</string>
+                  </property>
+                 </widget>
+                 <widget class="QSpinBox" name="auxValueInt">
+                  <property name="geometry">
+                   <rect>
+                    <x>300</x>
+                    <y>170</y>
+                    <width>42</width>
+                    <height>22</height>
+                   </rect>
+                  </property>
+                  <property name="maximum">
+                   <number>10000</number>
+                  </property>
+                  <property name="value">
+                   <number>0</number>
+                  </property>
+                 </widget>
+                 <widget class="QCheckBox" name="drawSupportInfo">
+                  <property name="geometry">
+                   <rect>
+                    <x>70</x>
+                    <y>150</y>
+                    <width>111</width>
+                    <height>17</height>
+                   </rect>
+                  </property>
+                  <property name="text">
+                   <string>Draw support info</string>
+                  </property>
+                 </widget>
+                 <widget class="QSlider" name="defNodesSize">
+                  <property name="geometry">
+                   <rect>
+                    <x>60</x>
+                    <y>180</y>
+                    <width>160</width>
+                    <height>22</height>
+                   </rect>
+                  </property>
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
+                  <property name="maximum">
+                   <number>2000</number>
+                  </property>
+                  <property name="value">
+                   <number>1000</number>
+                  </property>
+                  <property name="sliderPosition">
+                   <number>1000</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                 <widget class="QLabel" name="label_10">
+                  <property name="geometry">
+                   <rect>
+                    <x>20</x>
+                    <y>180</y>
+                    <width>31</width>
+                    <height>16</height>
+                   </rect>
+                  </property>
+                  <property name="text">
+                   <string>SIZE</string>
                   </property>
                  </widget>
                 </widget>
@@ -1992,7 +1856,7 @@
                   <property name="title">
                    <string>Def Group parameters</string>
                   </property>
-                  <widget class="QLineEdit" name="expansionValueEdit_2">
+                  <widget class="QLineEdit" name="expansionValueEdit">
                    <property name="geometry">
                     <rect>
                      <x>160</x>
@@ -2008,7 +1872,7 @@
                     <bool>true</bool>
                    </property>
                   </widget>
-                  <widget class="QSlider" name="expansionSlider_2">
+                  <widget class="QSlider" name="expansionSlider">
                    <property name="geometry">
                     <rect>
                      <x>10</x>
@@ -2021,10 +1885,10 @@
                     <number>1</number>
                    </property>
                    <property name="maximum">
-                    <number>200</number>
+                    <number>3000</number>
                    </property>
                    <property name="value">
-                    <number>100</number>
+                    <number>1000</number>
                    </property>
                    <property name="orientation">
                     <enum>Qt::Horizontal</enum>
@@ -2264,6 +2128,19 @@ passes</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
+                   </property>
+                  </widget>
+                  <widget class="QCheckBox" name="smoothTwistCheck">
+                   <property name="geometry">
+                    <rect>
+                     <x>150</x>
+                     <y>0</y>
+                     <width>111</width>
+                     <height>17</height>
+                    </rect>
+                   </property>
+                   <property name="text">
+                    <string>Smooth Twist</string>
                    </property>
                   </widget>
                  </widget>
@@ -2603,7 +2480,7 @@ passes</string>
      <x>0</x>
      <y>0</y>
      <width>1345</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFIle">
@@ -2944,6 +2821,7 @@ passes</string>
  <resources>
   <include location="modelViewerResources.qrc"/>
   <include location="modelViewerResources.qrc"/>
+  <include location="../../../../.designer/backup/modelViewerResources.qrc"/>
  </resources>
  <connections>
   <connection>
