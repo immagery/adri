@@ -424,7 +424,7 @@ void AdriMainWindow::jointDataUpdate(float fvalue, int id)
 	ui->expansionSlider->setValue(value);
 
     ui->expansionValueEdit->setText(QString("%1").arg((float)value/1000.0));
-
+	
     ui->DistancesVertSource->setValue(id);
     distancesSourceValueChange(id);
 }

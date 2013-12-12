@@ -881,7 +881,7 @@ void AdriViewer::readSkeleton(string fileName)
          if(!escena->skeletons[i] || !escena->skeletons[i]->shading->visible)
              continue;
 
-         ((skeleton*)escena->skeletons[i])->drawFunc();
+		 ((skeleton*)escena->skeletons[i])->drawFunc();
      }
 
 
