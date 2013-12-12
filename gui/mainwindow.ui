@@ -2360,8 +2360,8 @@ passes</string>
                  <widget class="QLabel" name="label_12">
                   <property name="geometry">
                    <rect>
-                    <x>50</x>
-                    <y>130</y>
+                    <x>10</x>
+                    <y>120</y>
                     <width>53</width>
                     <height>16</height>
                    </rect>
@@ -2374,7 +2374,7 @@ passes</string>
                   <property name="geometry">
                    <rect>
                     <x>10</x>
-                    <y>150</y>
+                    <y>140</y>
                     <width>121</width>
                     <height>31</height>
                    </rect>
@@ -2639,6 +2639,22 @@ passes</string>
                   </property>
                   <property name="text">
                    <string>T2</string>
+                  </property>
+                 </widget>
+                 <widget class="QCheckBox" name="verletRigidness">
+                  <property name="geometry">
+                   <rect>
+                    <x>20</x>
+                    <y>180</y>
+                    <width>121</width>
+                    <height>20</height>
+                   </rect>
+                  </property>
+                  <property name="text">
+                   <string>Rigidness forces</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </widget>
