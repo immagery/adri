@@ -161,7 +161,7 @@ public:
 
 // Builds the Sruface Graph form an OFF file
 // The file needs to be in a correct OFF format.
-bool BuildSurfaceFromOFFFile(SurfaceGraph& graph, string sFileName);
+bool BuildSurfaceFromOFFFile(SurfaceGraph& graph, string& sFileName);
 
 /////////////////////////////////////////
 /// \brief The PointData class

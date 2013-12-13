@@ -7,7 +7,7 @@
 #include <utils\util.h>
 
 
-bool BuildSurfaceFromOFFFile(SurfaceGraph& graph, string sFileName)
+bool BuildSurfaceFromOFFFile(SurfaceGraph& graph, string& sFileName)
 {
 	FILE* fin;
     fin = fopen(sFileName.c_str(), "r");
