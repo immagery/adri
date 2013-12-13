@@ -22,6 +22,7 @@ class joint : public object
         vector< DefNode* > nodes;
 
 		Eigen::Quaternion<double> qOrient;
+		Eigen::Quaternion<double> restOrient;
 
 		int deformerId;
 
@@ -48,6 +49,8 @@ class joint : public object
 		Eigen::Matrix4f iT;
 		Eigen::Matrix4f W;
 		Eigen::Matrix4f world;
+
+		vector<Eigen::Quaterniond> rots;
 
         float expansion;
 		float smoothness;
@@ -81,6 +84,7 @@ class joint : public object
                                  double  ojY,
                                  double  ojZ,
 								 bool radians = false);
+		virtual void setRotation(double rx, double ry, double rz, bool radians = true);
 
         void setWorldPosition(Eigen::Vector3d pos);
         Eigen::Vector3d getJointOrientation();

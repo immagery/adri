@@ -37,6 +37,8 @@ void joint::initDefaults()
 {
 	father = NULL;
     qOrient = Eigen::Quaternion<double>(1,0,0,0);
+	restOrient = qOrient;
+	rots = vector<Eigen::Quaterniond>(3, Eigen::Quaterniond::Identity());
 	
 	//orientJoint = Eigen::Vector3d(0,0,0);
     childs.clear();
@@ -134,6 +136,8 @@ joint::joint(joint* _father, unsigned int nodeId) : object(nodeId)
     father = _father;
     //orientJoint = Eigen::Vector3d(0,0,0);
 	qOrient = Eigen::Quaternion<double>(1,0,0,0);
+	restOrient = qOrient;
+	rots = vector<Eigen::Quaterniond>(3, Eigen::Quaterniond::Identity());
     //JointSkeletonId = 0;
     childs.clear();
     nodes.clear();
@@ -161,6 +165,7 @@ joint::~joint()
 
     //orientJoint = Eigen::Vector3d(0,0,0);
 	qOrient = Eigen::Quaternion<double>(1,0,0,0);
+	restOrient = qOrient;
 }
 
 void joint::setFather(joint* f)
@@ -284,15 +289,45 @@ void joint::setJointOrientation(double ojX,double  ojY,double  ojZ, bool radians
 	}
 
 	// Rotation over each axis
-	for(int i = 0; i< 3; i++)
+	for(int i = 0; i< 3; i++) {
 		getAxisRotationQuaternion(q[i], i, angles[i]);
+		rots[i] = q[i];
+	}
 
 	// Concatenate all the values in X-Y-Z order
 	Eigen::Quaterniond qrotAux =  q[2] * q[1] * q[0];
 
+
 	qOrient = qrotAux; 
+	restOrient = qOrient;
 }
 
+void joint::setRotation(double rx, double ry, double rz, bool radians) {
+	Eigen::Quaterniond q[3];
+	double angles[3];
+
+	angles[0] = rx;
+	angles[1] = ry;
+	angles[2] = rz;
+
+	if(radians)
+	{
+		// Convert to degrees
+		for(int i = 0; i< 3; i++)
+			angles[i] = angles[i]*360/(M_PI*2);
+	}
+
+	// Rotation over each axis
+	for(int i = 0; i< 3; i++) {
+		getAxisRotationQuaternion(q[i], i, angles[i]);
+		rots[i] = q[i];
+	}
+
+	// Concatenate all the values in X-Y-Z order
+	Eigen::Quaterniond qrotAux =  q[2] * q[1] * q[0];
+
+	qrot = qrotAux; // Quaternion<double>(qrotAux.w(), qrotAux.x(),qrotAux.y(),qrotAux.z());
+}
 
 void joint::getRelatives(vector<joint*>& joints)
 {
