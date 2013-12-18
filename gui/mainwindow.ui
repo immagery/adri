@@ -1045,9 +1045,9 @@
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_5">
               <item>
-               <widget class="QTabWidget" name="solverParameters">
+               <widget class="QTabWidget" name="solverParameters2">
                 <property name="currentIndex">
-                 <number>2</number>
+                 <number>3</number>
                 </property>
                 <widget class="QWidget" name="render">
                  <attribute name="title">
@@ -2655,6 +2655,43 @@ passes</string>
                   </property>
                   <property name="checked">
                    <bool>true</bool>
+                  </property>
+                 </widget>
+                </widget>
+                <widget class="QWidget" name="tab_12">
+                 <attribute name="title">
+                  <string>Solvers (2)</string>
+                 </attribute>
+                 <widget class="QSlider" name="twistPropagationSlider">
+                  <property name="geometry">
+                   <rect>
+                    <x>20</x>
+                    <y>20</y>
+                    <width>160</width>
+                    <height>22</height>
+                   </rect>
+                  </property>
+                  <property name="maximum">
+                   <number>20</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                 <widget class="QSlider" name="twistSmoothingSlider">
+                  <property name="geometry">
+                   <rect>
+                    <x>20</x>
+                    <y>50</y>
+                    <width>160</width>
+                    <height>22</height>
+                   </rect>
+                  </property>
+                  <property name="maximum">
+                   <number>10</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
                   </property>
                  </widget>
                 </widget>
