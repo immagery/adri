@@ -1047,7 +1047,7 @@
               <item>
                <widget class="QTabWidget" name="solverParameters2">
                 <property name="currentIndex">
-                 <number>3</number>
+                 <number>2</number>
                 </property>
                 <widget class="QWidget" name="render">
                  <attribute name="title">
@@ -2534,8 +2534,11 @@ passes</string>
                     <height>22</height>
                    </rect>
                   </property>
+                  <property name="minimum">
+                   <number>-500</number>
+                  </property>
                   <property name="maximum">
-                   <number>100</number>
+                   <number>0</number>
                   </property>
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
