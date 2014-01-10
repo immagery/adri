@@ -2535,10 +2535,10 @@ passes</string>
                    </rect>
                   </property>
                   <property name="minimum">
-                   <number>-500</number>
+                   <number>0</number>
                   </property>
                   <property name="maximum">
-                   <number>0</number>
+                   <number>1000</number>
                   </property>
                   <property name="orientation">
                    <enum>Qt::Horizontal</enum>
