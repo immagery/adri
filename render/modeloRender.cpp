@@ -8,6 +8,8 @@ void ModeloRender::drawFunc(object* obj)
 {
 	GeometryRender::drawFunc( obj);
 
+	if(shMode == SH_MODE_SELECTION) return;
+
 	// transformaciones
 	beforeDraw(obj);
 

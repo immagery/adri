@@ -40,10 +40,10 @@ static void drawCircle(int res, double r)
     glBegin(GL_LINE_LOOP);
 
     for(int i = 0; i< res; i++)
-        glVertex3d(cos(passAngle*i)*r,sin(passAngle*i)*r,0);
+        glVertex3d(0,cos(passAngle*i)*r,sin(passAngle*i)*r);
 
     // repetimos el punto inicial para cerrar el círculo.
-    glVertex3d(r,0,0);
+    glVertex3d(0,r,0);
 
     glEnd();
 
@@ -115,6 +115,41 @@ static void drawAxisHandle(double r)
     glVertex3d(0,0,r);
 
     glEnd();
+    glEnable(GL_LIGHTING);
+}
+
+static void drawAxisHandleWithExtremes(double r)
+{
+    glDisable(GL_LIGHTING);
+    glBegin(GL_LINES);
+
+    glColor3f(1.0,0,0);
+    glVertex3d(0,0,0);
+    glVertex3d(r,0,0);
+
+    glColor3f(0,1.0,0);
+    glVertex3d(0,0,0);
+    glVertex3d(0,r,0);
+
+    glColor3f(0,0,1.0);
+    glVertex3d(0,0,0);
+    glVertex3d(0,0,r);
+
+    glEnd();
+
+	glPointSize(r/5);
+
+	glBegin(GL_POINTS);
+	glColor3f(1.0,0,0);
+    glVertex3d(r,0,0);
+
+    glColor3f(0,1.0,0);
+    glVertex3d(0,r,0);
+
+    glColor3f(0,0,1.0);
+	glVertex3d(0,0,r);
+	glEnd();
+
     glEnable(GL_LIGHTING);
 }
 

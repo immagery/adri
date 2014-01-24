@@ -32,6 +32,7 @@ class GeometryRender : public shadingNode
 		vector<int> spotVertexes;
 
         virtual void drawFunc(object* obj);
+		virtual void drawNamesFunc(object* obj);
 };
 
 #endif // GEOMETRY_RENDER_H

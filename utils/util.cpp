@@ -273,3 +273,134 @@ double Rad2Deg(double rad)
 {
 	return (rad*360)/(M_PI*2);
 }
+
+
+// intersect3D_RayTriangle(): find the 3D intersection of a ray with a triangle
+//    Input:  a ray R, and a triangle T
+//    Output: *I = intersection point (when it exists)
+//    Return: -1 = triangle is degenerate (a segment or point)
+//             0 =  disjoint (no intersect)
+//             1 =  intersect in unique point I1
+//             2 =  are in the same plane
+int intersect3D_RayPlane( Ray R, Vector3d& origin, Vector3d& u, Vector3d& v, Vector3d& I )
+{
+    Vector3d n;              // triangle vectors
+    Vector3d    dir, w0, w;           // ray vectors
+    double       r, a, b;              // params to calc ray-plane intersect
+
+    // get triangle edge vectors and plane normal
+    
+	//u = T.V1 - T.V0;
+    //v = T.V2 - T.V0;
+	
+	n = u.cross(v);									  // cross product
+	if (n.squaredNorm() < 0.00000001)             // triangle is degenerate
+        return -1;								  // do not deal with this case
+
+    dir = R.P1 - R.P0;    // ray direction vector
+
+    w0 = R.P0 - origin;
+	a = - n.dot(w0);
+
+    b = n.dot(dir);
+    
+	if (fabs(b) < SMALL_NUM) {     // ray is  parallel to triangle plane
+        if (a == 0)                 // ray lies in triangle plane
+            return 2;
+        else return 0;              // ray disjoint from plane
+    }
+
+    // get intersect point of ray with triangle plane
+    r = a / b;
+  
+	//if (r < 0.0)                    // ray goes away from triangle -> considering a ray
+    //    return 0;                   // => no intersect
+    // for a segment, also test if (r > 1.0) => no intersect
+
+    I = R.P0 + r * dir;            // intersect point of ray and plane
+
+    // is I inside T?
+    /*double uu, uv, vv, wu, wv, D;
+    uu = u.dot(u);
+    uv = u.dot(v);
+    vv = v.dot(v);
+    w = I - T.V0;
+    wu = w.dot(u);
+    wv = w.dot(v);
+    D = uv * uv - uu * vv;
+
+    // get and test parametric coords
+    double s, t;
+    s = (uv * wv - vv * wu) / D;
+    if (s < 0.0 || s > 1.0)         // I is outside T
+        return 0;
+    t = (uv * wu - uu * wv) / D;
+    if (t < 0.0 || (s + t) > 1.0)  // I is outside T
+        return 0;
+
+	*/
+    return 1;                       // I is in T
+}
+
+
+// intersect3D_RayTriangle(): find the 3D intersection of a ray with a triangle
+//    Input:  a ray R, and a triangle T
+//    Output: *I = intersection point (when it exists)
+//    Return: -1 = triangle is degenerate (a segment or point)
+//             0 =  disjoint (no intersect)
+//             1 =  intersect in unique point I1
+//             2 =  are in the same plane
+int intersect3D_RayTriangle( Ray R, TriangleAux T, Vector3d& I )
+{
+    Vector3d    u, v, n;              // triangle vectors
+    Vector3d    dir, w0, w;           // ray vectors
+    double       r, a, b;              // params to calc ray-plane intersect
+
+    // get triangle edge vectors and plane normal
+    
+	u = T.V1 - T.V0;
+    v = T.V2 - T.V0;
+	n = u.cross(v);									  // cross product
+	if (n.squaredNorm() < 0.00000001)             // triangle is degenerate
+        return -1;								  // do not deal with this case
+
+    dir = R.P1 - R.P0;              // ray direction vector
+    w0 = R.P0 - T.V0;
+	a = - n.dot(w0);
+    b = n.dot(dir);
+    if (fabs(b) < SMALL_NUM) {     // ray is  parallel to triangle plane
+        if (a == 0)                 // ray lies in triangle plane
+            return 2;
+        else return 0;              // ray disjoint from plane
+    }
+
+    // get intersect point of ray with triangle plane
+    r = a / b;
+    if (r < 0.0)                    // ray goes away from triangle
+        return 0;                   // => no intersect
+    // for a segment, also test if (r > 1.0) => no intersect
+
+    I = R.P0 + r * dir;            // intersect point of ray and plane
+
+    // is I inside T?
+    double uu, uv, vv, wu, wv, D;
+    uu = u.dot(u);
+    uv = u.dot(v);
+    vv = v.dot(v);
+    w = I - T.V0;
+    wu = w.dot(u);
+    wv = w.dot(v);
+    D = uv * uv - uu * vv;
+
+    // get and test parametric coords
+    double s, t;
+    s = (uv * wv - vv * wu) / D;
+    if (s < 0.0 || s > 1.0)         // I is outside T
+        return 0;
+    t = (uv * wu - uu * wv) / D;
+    if (t < 0.0 || (s + t) > 1.0)  // I is outside T
+        return 0;
+
+	
+    return 1;                       // I is in T
+}

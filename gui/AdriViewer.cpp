@@ -22,6 +22,7 @@
 #include <DataStructures/Modelo.h>
 #include <DataStructures/Rig.h>
 #include <render/ShadingNode.h>
+#include <render/GeometryRender.h>
 
 #include <render/gridRender.h>
 #include <render/clipingPlaneRender.h>
@@ -159,6 +160,10 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
     ManipulatedFrameSetConstraint* mfsc = (ManipulatedFrameSetConstraint*)(manipulatedFrame()->constraint());
     mfsc->newCage = &m.dynCage;
     */
+	 
+	// A ManipulatedFrameSetConstraint will apply displacements to the selection
+	setManipulatedFrame(new ManipulatedFrame());
+	manipulatedFrame()->setConstraint(new ManipulatedFrameSetConstraint());
 
     // Used to display semi-transparent relection rectangle
     glBlendFunc(GL_ONE, GL_ONE);
@@ -174,6 +179,9 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
     restoreStateFromFile();
     setAnimationPeriod(20);
     startAnimation();
+
+	// Define 'Control+Q' as the new exit shortcut (default was 'Escape')
+	setShortcut(EXIT_VIEWER, Qt::CTRL+Qt::Key_Q);
 
     //testScene();
  }
@@ -641,11 +649,11 @@ void AdriViewer::readSkeleton(string fileName)
      setFPSIsDisplayed(true);
 
      // Restore previous viewer state.
-     restoreStateFromFile();
+     //restoreStateFromFile();
  }
 
  // Inicializates the scene taking in account all the models of the scene.
-                                             void AdriViewer::ReBuildScene(){
+void AdriViewer::ReBuildScene(){
 
      double minX = 0, minY = 0, minZ = 0, maxX = 0, maxY = 0, maxZ = 0;
      bool init_ = false;
@@ -741,6 +749,41 @@ void AdriViewer::readSkeleton(string fileName)
 
  void AdriViewer::drawWithNames()
  {
+	 if(selMgr.ctx == CTX_CREATE_SKT)
+	 {
+		 if(selMgr.selection.size() == 0)
+		 {
+			 // New selection
+
+		 }
+		 else if(selMgr.selection.size() == 1)
+		 {
+			 // Change selection
+		 }
+
+	 }
+	 // Pintar el modelo y asignar un id a cada triángulo.
+	 //for (int i=0; i<int(objects_.size()); i++)
+    //{
+     // glPushName(i);
+     // objects_.at(i)->draw();
+     // glPopName();
+    //}
+
+	 if(selMgr.ctx == CTX_MOVE || selMgr.ctx == CTX_ROTATION || selMgr.ctx == CTX_SCALE)
+	 {
+		 for(unsigned int i = 0; i< escena->models.size(); i++)
+		 {
+			 if(!escena->models[i] || !escena->models[i]->shading->visible)
+				 continue;
+
+			 glPushName(escena->models[i]->nodeId);
+			 ((Modelo*)escena->models[i])->shading->shMode = SH_MODE_SELECTION;
+			 ((Modelo*)escena->models[i])->drawFunc();
+			 glPopName();
+		 }
+	 }
+
      //TODO
      /*
 
@@ -884,7 +927,6 @@ void AdriViewer::readSkeleton(string fileName)
 		 ((skeleton*)escena->skeletons[i])->drawFunc();
      }
 
-
      for(unsigned int i = 0; i< escena->models.size(); i++)
      {
          if(!escena->models[i] || !escena->models[i]->shading->visible)
@@ -896,7 +938,21 @@ void AdriViewer::readSkeleton(string fileName)
 
 
      glDisable(GL_LIGHTING);
-     drawPointLocator(interiorPoint, 1, true);
+     
+	   // Draws manipulatedFrame (the set's rotation center)
+	  if (manipulatedFrame()->isManipulated())
+	  {
+		  glPushMatrix();
+		  glMultMatrixd(manipulatedFrame()->matrix());
+		  drawAxis(0.5);
+		  glPopMatrix();
+	 }
+	 
+	// Draws rectangular selection area. Could be done in postDraw() instead.
+	//if (selectionMode_ != NONE)
+	//	drawSelectionRectangle();
+
+	 //drawPointLocator(interiorPoint, 1, true);
      glEnable(GL_LIGHTING);
 
      // Pintamos el handle en el caso de que haya selecci�n.
@@ -910,6 +966,154 @@ void AdriViewer::readSkeleton(string fileName)
         selMgr.drawFunc();*/
 
  }
+
+//void AdriViewer::postSelection(const QPoint& point)
+//{
+
+	/*
+  qglviewer::Vec orig, dir, selectedPoint;
+  
+  // Compute orig and dir, used to draw a representation of the intersecting line
+  camera()->convertClickToLine(point, orig, dir);
+
+  // Find the selectedPoint coordinates, using camera()->pointUnderPixel().
+  bool found;
+  selectedPoint = camera()->pointUnderPixel(point, found);
+
+  // Construimos un rayo suficientemente largo
+  Ray r;
+  Vector3d origenPt = Vector3d(orig[0],orig[1],orig[2]);
+  Vector3d selPt = Vector3d(selectedPoint[0],selectedPoint[1],selectedPoint[2]);
+  r.P0 = origenPt;
+  r.P1 = (selPt-origenPt)*10+origenPt;
+
+  Vector3d rayDir(dir.x, dir.y, dir.z); 
+
+  // Recorremos todos los triángulos y evaluamos si intersecta, en ese caso lo apilamos.
+  vector<unsigned int> ids;
+  TriangleAux tr;
+
+  vector<float> dephts;
+  vector<Vector3d> intersecPoints;
+  vector<int> triangleIdx;
+
+  Geometry* geom = (Geometry*)(escena->models[0]);
+  GeometryRender* geomRender = (GeometryRender*)(escena->models[0]->shading);
+  for(int trIdx = 0; trIdx< geom->triangles.size(); trIdx++ )
+  {
+	int pIdx = geom->triangles[trIdx]->verts[0]->id;
+	tr.V0 = geom->nodes[pIdx]->position;
+
+	pIdx = geom->triangles[trIdx]->verts[1]->id;
+	tr.V1 = geom->nodes[pIdx]->position;
+
+ 	pIdx = geom->triangles[trIdx]->verts[2]->id;
+	tr.V2 = geom->nodes[pIdx]->position; 
+
+	Vector3d I;
+	int res = intersect3D_RayTriangle(r, tr, I);
+  
+	if(res > 0 && res < 2)
+	{
+		printf("Interseccion con: %d\n", trIdx);
+		
+		float depth = (origenPt-I).norm();
+
+		vector<float>::iterator it = dephts.begin();
+		vector<Vector3d>::iterator it2 = intersecPoints.begin();
+		vector<int>::iterator it3 = triangleIdx.begin();
+
+		bool inserted = false;
+		// Lo anadimos a la lista de intersecciones, pero ordenado por profundidad.
+		for(int dIdx = 0; dIdx< dephts.size(); dIdx++)
+		{
+			if(dephts[dIdx] > depth)
+			{
+				dephts.insert(it, depth);
+				intersecPoints.insert(it2, I);
+				triangleIdx.insert(it3, trIdx);
+				inserted = true;
+				break;
+			}
+
+			++it2;
+			++it;
+		}
+
+		if(!inserted)
+		{
+			dephts.push_back(depth);
+			intersecPoints.push_back(I);
+			triangleIdx.push_back(trIdx);
+		}
+	}
+  }
+
+  int firstIn = -1;
+  int firstOut = -1;
+  // A partir del vector ordenado por profundidades cojo el primer rango in/out, para eso usamos la normal
+  // del triangulo -vs- la direccion del rayo
+  for(int intrIdx = 0; intrIdx < triangleIdx.size(); intrIdx++)
+  {
+	  float orient = rayDir.dot(geom->faceNormals[triangleIdx[intrIdx]]);
+	  if(orient >= 0)
+	  {
+		  if(firstIn >= 0)
+			  firstOut = intrIdx;
+		  
+		  if(firstIn >= 0 && firstOut > 0)
+			  break;
+	  }
+	  else
+	  {
+		  if(firstIn < 0) firstIn = intrIdx;
+	  }
+  }
+
+  if(firstIn>=0 && firstOut>0)
+  {
+	printf("El punto seleccionado es...");
+
+	Vector3d intermedio((intersecPoints[firstIn] + intersecPoints[firstOut])/2);
+	sktCr->addNewJoint(intermedio);
+
+	printf("%f %f %f a profundidad %f", intermedio.x(), intermedio.y(), intermedio.z(), dephts[firstIn]+dephts[firstOut]/2);
+  }
+  else
+  {
+	  printf("No hay punto...\n");
+  }
+
+  */
+
+//}
+
+
+void AdriViewer::endSelection(const QPoint&)
+{
+  // Flush GL buffers
+  //glFlush();
+
+  // Get the number of objects that were seen through the pick matrix frustum. Reset GL_RENDER mode.
+  //GLint nbHits = glRenderMode(GL_RENDER);
+
+  /*
+  if (nbHits > 0)
+    {
+      // Interpret results : each object created 4 values in the selectBuffer().
+      // (selectBuffer())[4*i+3] is the id pushed on the stack.
+      for (int i=0; i<nbHits; ++i)
+	switch (selectionMode_)
+	  {
+	  case ADD    : addIdToSelection((selectBuffer())[4*i+3]); break;
+	  case REMOVE : removeIdFromSelection((selectBuffer())[4*i+3]);  break;
+	  default : break;
+	  }
+    }
+	*/
+
+  //selectionMode_ = NONE;
+}
 
 // Pinta un grid de l�neas que abarca un cuadrado de lado width con
 // tantas l�nes como indica lines.
@@ -933,27 +1137,6 @@ void AdriViewer::drawSceneGrid(int lines, double width) {
     }
 
     glEnd();
-}
-
- void AdriViewer::setContextMode(contextMode ctx)
- {
-    selMgr.ctx = ctx;
- }
-
-void AdriViewer::startManipulation()
-{
-  /*Vec averagePosition;
-  ManipulatedFrameSetConstraint* mfsc = (ManipulatedFrameSetConstraint*)(manipulatedFrame()->constraint());
-  mfsc->clearSet();
-
-  for (QList<int>::const_iterator it=selection_.begin(), end=selection_.end(); it != end; ++it)
-    {
-      mfsc->addObjectToSet(objects_[*it]);
-      averagePosition += objects_[*it]->frame.position();
-    }
-
-  if (selection_.size() > 0)
-    manipulatedFrame()->setPosition(averagePosition / selection_.size());*/
 }
 
 //   S e l e c t i o n   t o o l s
@@ -997,33 +1180,13 @@ void AdriViewer::drawSelectionRectangle() const
   stopScreenCoordinatesSystem();
 }
 
-void AdriViewer::endSelection(const QPoint&)
-{
-  // Flush GL buffers
-  glFlush();
-
-  // Get the number of objects that were seen through the pick matrix frustum. Reset GL_RENDER mode.
-  GLint nbHits = glRenderMode(GL_RENDER);
-
-  if (nbHits > 0)
-    {
-      // Interpret results : each object created 4 values in the selectBuffer().
-      // (selectBuffer())[4*i+3] is the id pushed on the stack.
-      for (int i=0; i<nbHits; ++i)
-        switch (selectionMode_)
-          {
-          case ADD    : addIdToSelection((selectBuffer())[4*i+3]); break;
-          case REMOVE : removeIdFromSelection((selectBuffer())[4*i+3]);  break;
-          default : break;
-          }
-    }
-  selectionMode_ = NONE;
-}
-
  //   C u s t o m i z e d   m o u s e   e v e n t s
 
  void AdriViewer::mousePressEvent(QMouseEvent* e)
  {
+
+   selection_.clear();
+
    // Start selection. Mode is ADD with Shift key and TOGGLE with Alt key.
    rectangle_ = QRect(e->pos(), e->pos());
 
@@ -1060,7 +1223,11 @@ void AdriViewer::endSelection(const QPoint&)
 
  void AdriViewer::mouseReleaseEvent(QMouseEvent* e)
  {
-   if (selectionMode_ != NONE)
+	//if(selMgr.ctx == CTX_CREATE_SKT)
+	//	postSelection(e->pos());
+
+	/*
+   if (selectionMode_ != NONE) // Seleccion con cuadrado
      {
        // Actual selection on the rectangular area.
        // Possibly swap left/right and top/bottom to make rectangle_ valid.
@@ -1083,8 +1250,28 @@ void AdriViewer::endSelection(const QPoint&)
        updateGL();
      }
    else
+   {*/
+	
+	 
      QGLViewer::mouseReleaseEvent(e);
+   //}
  }
+
+ void AdriViewer::startManipulation()
+{
+  Vec averagePosition;
+  ManipulatedFrameSetConstraint* mfsc = (ManipulatedFrameSetConstraint*)(manipulatedFrame()->constraint());
+  mfsc->clearSet();
+
+  for (QList<int>::const_iterator it=selection_.begin(), end=selection_.end(); it != end; ++it)
+    {
+      //mfsc->addObjectToSet(objects_[*it]);
+      //averagePosition += objects_[*it]->frame.position();
+    }
+
+  if (selection_.size() > 0)
+    manipulatedFrame()->setPosition(averagePosition / selection_.size());
+}
 
  void AdriViewer::ChangeStillCage(int id)
 {

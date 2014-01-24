@@ -89,9 +89,12 @@ void AdriMainWindow::connectSignals() {
     connect(ui->glCustomWidget, SIGNAL(updateSceneView()), this, SLOT(updateSceneView()));
     connect(ui->outlinerView, SIGNAL(clicked(QModelIndex)), this, SLOT(selectObject(QModelIndex)));
 
+	connect(ui->actionSelection, SIGNAL(triggered()), this, SLOT(toogleSelectionTool()));
     connect(ui->actionMove, SIGNAL(triggered()), this, SLOT(toogleMoveTool()));
-    connect(ui->actionSelection, SIGNAL(triggered()), this, SLOT(toogleSelectionTool()));
     connect(ui->actionRotate, SIGNAL(triggered()), this, SLOT(toogleRotateTool()));
+
+	connect(ui->actionCreateSkeletonTool, SIGNAL(triggered()), this, SLOT(toogleCreateSkeletonTool()));
+	connect(ui->actionRigging_Animation, SIGNAL(triggered()), this, SLOT(toogleAnimationRiggingTool()));
 
     connect(ui->visibility_btn, SIGNAL(stateChanged(int)), this, SLOT(toogleVisibility(int)));
 	connect(ui->drawSupportInfo, SIGNAL(stateChanged(int)), this, SLOT(toogleVisibility(int)));
@@ -456,12 +459,7 @@ void AdriMainWindow::ImportCages()
 
 void AdriMainWindow::toogleMoveTool()
 {
-    if(toolSelected == T_MOVETOOL)
-    {
-        ui->actionMove->setChecked(true);
-        return;
-    }
-
+    ui->actionMove->setChecked(true);
     ui->actionRotate->setChecked(false);
     ui->actionSelection->setChecked(false);
     changeTool(T_MOVETOOL);
@@ -469,12 +467,7 @@ void AdriMainWindow::toogleMoveTool()
 
 void AdriMainWindow::toogleRotateTool()
 {
-    if(toolSelected == T_ROTATETOOL)
-    {
-       ui->actionRotate->setChecked(true);
-        return;
-    }
-
+    ui->actionRotate->setChecked(true);
     ui->actionMove->setChecked(false);
     ui->actionSelection->setChecked(false);
     changeTool(T_ROTATETOOL);
@@ -483,15 +476,37 @@ void AdriMainWindow::toogleRotateTool()
 
 void AdriMainWindow::toogleSelectionTool()
 {
-    if(toolSelected == T_SELECTTOOL)
-    {
-        ui->actionSelection->setChecked(true);
-        return;
-    }
-
+    ui->actionSelection->setChecked(true);
     ui->actionMove->setChecked(false);
     ui->actionRotate->setChecked(false);
+
+
     changeTool(T_SELECTTOOL);
+}
+
+void AdriMainWindow::toogleCreateSkeletonTool()
+{
+	ui->actionSelection->setChecked(false);
+    ui->actionMove->setChecked(false);
+    ui->actionRotate->setChecked(false);
+
+	if(ui->actionCreateSkeletonTool->isChecked())
+		changeTool(T_CREATE_SKELETON_TOOL);
+	else
+		changeTool(T_RIGGING_TOOL);
+}
+
+void AdriMainWindow::toogleAnimationRiggingTool()
+{
+
+	ui->actionSelection->setChecked(false);
+    ui->actionMove->setChecked(false);
+    ui->actionRotate->setChecked(false);
+
+	if(ui->actionRigging_Animation->isChecked())
+		changeTool(T_ANIMATION_TOOL);
+	else
+		changeTool(T_RIGGING_TOOL);
 }
 
 void AdriMainWindow::changeTool(toolmode newtool)
@@ -507,7 +522,22 @@ void AdriMainWindow::changeTool(toolmode newtool)
     case T_ROTATETOOL:
         ui->glCustomWidget->setContextMode(CTX_ROTATION);
         break;
-    default:
+
+    case T_CREATE_SKELETON_TOOL:
+        ui->glCustomWidget->setContextMode(CTX_CREATE_SKT);
+        break;
+
+    case T_ANIMATION_TOOL:
+        ui->glCustomWidget->setContextMode(CTX_ANIM);
+        break;
+    case T_RIGGING_TOOL:
+        ui->glCustomWidget->setContextMode(CTX_RIGG);
+        break;
+    case T_TESTING_TOOL:
+        ui->glCustomWidget->setContextMode(CTX_TEST);
+        break;
+
+	default:
         printf("Hay algún problema con la seleccion de contexto.\n"); fflush(0);
         ui->glCustomWidget->setContextMode(CTX_SELECTION);
         break;

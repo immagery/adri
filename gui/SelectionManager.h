@@ -9,7 +9,7 @@ class object;
 
 // trabajo en objeto o subobjeto.
 enum selectionMode { SM_SUBOBJECT = 0, SM_OBJECT};
-enum contextMode { CTX_SELECTION = 0, CTX_MOVE, CTX_ROTATION}; // contexto de herramienta
+enum contextMode { CTX_SELECTION = 0, CTX_MOVE, CTX_ROTATION, CTX_SCALE, CTX_CREATE_SKT, CTX_RIGG, CTX_ANIM, CTX_TEST}; // contexto de herramienta
 
 using namespace std;
 class selectionManager : public node

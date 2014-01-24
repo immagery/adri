@@ -2,7 +2,7 @@
 #define SHADINGNODE_H
 #include <DataStructures/Node.h>
 
-enum shadingModes{ SH_MODE_FLAT = 0, SH_MODE_SMOOTH};
+enum shadingModes{ SH_MODE_FLAT = 0, SH_MODE_SMOOTH, SH_MODE_SELECTION};
 enum shadingMode{T_POINTS = 0, T_LINES, T_POLY, T_XRAY, T_INVISIBLE};
 
 #include <vector>

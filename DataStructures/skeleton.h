@@ -112,6 +112,13 @@ class skeleton : public object
     skeleton(unsigned int nodeId);
     ~skeleton();
 
+	void clear()
+	{
+		joints.clear();
+		jointRef.clear();
+		root = NULL;
+	}
+
     // Variables
     joint* root;
     vector< joint* > joints; // all the joints of the skeleton

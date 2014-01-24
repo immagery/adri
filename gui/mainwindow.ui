@@ -2782,7 +2782,7 @@ passes</string>
      <x>0</x>
      <y>0</y>
      <width>1345</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFIle">
@@ -2875,6 +2875,7 @@ passes</string>
    <addaction name="separator"/>
    <addaction name="actionDoTests"/>
    <addaction name="separator"/>
+   <addaction name="actionCreateSkeletonTool"/>
    <addaction name="actionRigging_Animation"/>
   </widget>
   <action name="actionExit">
@@ -3076,6 +3077,9 @@ passes</string>
    </property>
   </action>
   <action name="actionRigging_Animation">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="modelViewerResources.qrc">
      <normaloff>:/modelViewerGeneral/icons/rig_animation_toogle.png</normaloff>:/modelViewerGeneral/icons/rig_animation_toogle.png</iconset>
@@ -3097,6 +3101,21 @@ passes</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionCreateSkeletonTool">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="modelViewerResources.qrc">
+     <normaloff>:/modelViewerGeneral/icons/create_joints.png</normaloff>:/modelViewerGeneral/icons/create_joints.png</iconset>
+   </property>
+   <property name="text">
+    <string>crSkt</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Skeleton</string>
    </property>
   </action>
  </widget>
@@ -3123,7 +3142,6 @@ passes</string>
  <resources>
   <include location="modelViewerResources.qrc"/>
   <include location="modelViewerResources.qrc"/>
-  <include location="../../../../.designer/backup/modelViewerResources.qrc"/>
  </resources>
  <connections>
   <connection>

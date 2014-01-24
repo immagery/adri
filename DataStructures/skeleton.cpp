@@ -494,9 +494,11 @@ skeleton::~skeleton()
 
 void skeleton::drawFunc()
 {
-    if(dirtyFlag) update();
+    if(dirtyFlag) 
+		update();
 
-    root->drawFunc();
+	if(root)
+		root->drawFunc();
     // Aplicamos las rotaciones y traslaciones pertinentes
 }
 

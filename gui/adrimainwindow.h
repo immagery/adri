@@ -15,7 +15,7 @@ namespace Ui {
     class MainWindow;
 }
 
-enum toolmode{T_MOVETOOL, T_ROTATETOOL, T_SELECTTOOL};
+enum toolmode{T_MOVETOOL, T_ROTATETOOL, T_SELECTTOOL, T_CREATE_SKELETON_TOOL, T_ANIMATION_TOOL, T_RIGGING_TOOL, T_TESTING_TOOL};
 
 class AdriMainWindow : public QMainWindow
 {
@@ -64,7 +64,11 @@ public slots:
     void toogleMoveTool();
     void toogleRotateTool();
     void toogleSelectionTool();
-    void changeTool(toolmode newtool);
+    void toogleCreateSkeletonTool();
+	void toogleAnimationRiggingTool();
+
+	void changeTool(toolmode newtool);
+	
 
    // void updateSmoothSlidervalue(int);
 

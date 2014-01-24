@@ -10,26 +10,14 @@ bool shadingNode::update(object* obj)
     if(!obj->dirtyFlag)
         return true;
     else
-    {
-        /*
-		glMatrixMode(GL_MODELVIEW_MATRIX);
-        glPushMatrix();
-        glLoadIdentity();
-        glTranslated(obj->pos.X(), obj->pos.Y(), obj->pos.Z());
-
-		glRotated(obj->rot.Z(), 0, 0, 1);
-        glRotated(obj->rot.Y(), 0, 1, 0);
-        glRotated(obj->rot.X(), 1, 0, 0);
-
-		glGetDoublev(GL_MODELVIEW_MATRIX, obj->tMatrix);
-        glPopMatrix();
-        */
-		
+    {	
 		Eigen::Matrix3d rot = obj->qrot.toRotationMatrix();
 		obj->tMatrix << rot(0,0), rot(0,1), rot(0,2), obj->pos.x(),
 						rot(1,0), rot(1,1), rot(1,2), obj->pos.y(),
 						rot(2,0), rot(2,1), rot(2,2), obj->pos.z(),
 						0		, 0		  , 0		, 1;
+
+		obj->tMatrix.transposeInPlace();
 
 		obj->dirtyFlag = false;
     }

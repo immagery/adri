@@ -153,6 +153,12 @@ void DefGroupRender::drawFunc()
 	glPushMatrix();
 	useModelMatrix(g->transformation->rotation, g->transformation->translation);
 	
+	if(g->relatedGroups.size() == 0)
+	{
+		drawTriCircle(10, 1.0);
+		maxRelation = 1.0;
+	}
+
 	drawAxisHandle(maxRelation*scene::drawingNodeStdSize);
 
 	if(scene::drawDefNodes)

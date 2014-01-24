@@ -11,8 +11,58 @@
 
 #include <DataStructures/Geometry.h> 
 
+void GeometryRender::drawNamesFunc(object* obj)
+{
+    // transformaciones
+    beforeDraw(obj);
+
+	Geometry* geom = (Geometry*)obj;
+        
+    int size = colors.size();
+    if(size<=0) glColor4f(color[0], color[1], color[2],1);
+
+	for(int tr = 0; tr< geom->triangles.size(); tr++ )
+	{
+    	glPushName((GLuint)tr);
+		glBegin(GL_TRIANGLES);
+
+        for(int i = 0; i<3; i++)
+        {
+			int pIdx = geom->triangles[tr]->verts[i]->id;
+			glNormal3d(geom->faceNormals[tr].x(), geom->faceNormals[tr].y(), geom->faceNormals[tr].z());
+
+            if(size > 0 && pIdx < size)
+            {
+                if(colors[pIdx].size()== 3)
+				{
+				float r = colors[pIdx][0];
+				float g = colors[pIdx][1];
+				float b = colors[pIdx][2];
+
+                glColor4f(colors[pIdx][0], colors[pIdx][1], colors[pIdx][2],1);
+				}
+                else
+                glColor4f(color[0], color[1], color[2], 1.0);
+            }
+
+            glVertex(geom->nodes[pIdx]->position);
+        }
+
+		glEnd();
+		glPopName();
+	}
+
+    afterDraw(obj);
+}
+
 void GeometryRender::drawFunc(object* obj)
 {
+	if(shMode == SH_MODE_SELECTION)
+	{
+		drawNamesFunc(obj);
+		return;
+	}
+
     // transformaciones
     beforeDraw(obj);
 
@@ -37,12 +87,14 @@ void GeometryRender::drawFunc(object* obj)
 
 		for(int tr = 0; tr< geom->triangles.size(); tr++ )
 		{
-             //glNormal3dv(&(*fi).N()[0]);
+    		//if(shMode == SH_MODE_SELECTION) glPushName((GLuint)tr);
+
+			//glNormal3dv(&(*fi).N()[0]);
              for(int i = 0; i<3; i++)
              {
 				 int pIdx = geom->triangles[tr]->verts[i]->id;
 					
-				 if(shMode == SH_MODE_FLAT)
+				 if(shMode == SH_MODE_FLAT || shMode == SH_MODE_SELECTION)
 				 {
 					glNormal3d(geom->faceNormals[tr].x(), geom->faceNormals[tr].y(), geom->faceNormals[tr].z());
 				 }
@@ -68,6 +120,8 @@ void GeometryRender::drawFunc(object* obj)
 
                  glVertex(geom->nodes[pIdx]->position);
              }
+
+			 //if(shMode == SH_MODE_SELECTION) glPopName();
          }
         glEnd();
 

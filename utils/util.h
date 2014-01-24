@@ -14,6 +14,7 @@
 #include <map>
 
 using namespace std;
+using namespace Eigen;
 
 #define VERBOSE false
 
@@ -43,5 +44,22 @@ void toEulerAngles (const Eigen::Quaterniond& q, double& alpha, double& beta, do
 void getAxisRotationQuaternion(Eigen::Quaterniond& q, int axis, double angle);
 
 vector<string> &split(const string &s, char delim, vector<string> &elems);
+
+#define SMALL_NUM   0.00000001 // anything that avoids division overflow
+
+struct Ray{
+	Vector3d P0;
+	Vector3d P1;
+};
+
+struct TriangleAux{
+	Vector3d V0;
+	Vector3d V1;
+	Vector3d V2;
+};
+
+int intersect3D_RayTriangle( Ray R, TriangleAux T, Vector3d& I );
+int intersect3D_RayPlane( Ray R, Vector3d& origin, Vector3d& u, Vector3d& v, Vector3d& I );
+
 
 #endif // UTIL_H

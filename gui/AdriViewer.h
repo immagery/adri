@@ -176,16 +176,14 @@ public:
     AdriMainWindow *parent;
 protected:
     virtual void drawWithNames();
-//    virtual void postSelection(const QPoint& point);
     virtual void draw();
 
 //    void drawModel();
 //    void drawWithDistances();
 //    void drawWithCages();
 
-
-
-    virtual void endSelection(const QPoint&);
+	virtual void postSelection(const QPoint& point){}
+	virtual void endSelection(const QPoint&);
 
     // Mouse events functions
     virtual void mousePressEvent(QMouseEvent *e);
@@ -281,7 +279,8 @@ public slots:
     //void importSegmentation(QString fileName);
     //void updateColorLayersWithSegmentation(int maxIdx);
 
-    void setContextMode(contextMode ctx);
+	virtual void setContextMode(contextMode ctx){}
+	virtual void endContextMode(contextMode ctx){}
 
     //void loadSelectVertexCombo(MyMesh& cage);
     //void changeVertexSelection(int id);
@@ -312,4 +311,5 @@ private :
   QList<int> selection_;
 
 };
+
 #endif
