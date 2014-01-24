@@ -2528,7 +2528,7 @@ passes</string>
                  <widget class="QSlider" name="oscThresh1">
                   <property name="geometry">
                    <rect>
-                    <x>200</x>
+                    <x>160</x>
                     <y>190</y>
                     <width>151</width>
                     <height>22</height>
@@ -2621,14 +2621,14 @@ passes</string>
                  <widget class="QLabel" name="label_31">
                   <property name="geometry">
                    <rect>
-                    <x>360</x>
+                    <x>330</x>
                     <y>190</y>
-                    <width>21</width>
-                    <height>16</height>
+                    <width>51</width>
+                    <height>20</height>
                    </rect>
                   </property>
                   <property name="text">
-                   <string>T1</string>
+                   <string>alpha</string>
                   </property>
                  </widget>
                  <widget class="QLabel" name="label_32">
@@ -2723,6 +2723,147 @@ passes</string>
                    <string>Twist smoothing</string>
                   </property>
                  </widget>
+                 <widget class="QSlider" name="ksSlider">
+                  <property name="geometry">
+                   <rect>
+                    <x>20</x>
+                    <y>100</y>
+                    <width>160</width>
+                    <height>22</height>
+                   </rect>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                 <widget class="QSlider" name="kdSlider">
+                  <property name="geometry">
+                   <rect>
+                    <x>20</x>
+                    <y>130</y>
+                    <width>160</width>
+                    <height>22</height>
+                   </rect>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                 <widget class="QSlider" name="stiffSlider">
+                  <property name="geometry">
+                   <rect>
+                    <x>20</x>
+                    <y>160</y>
+                    <width>160</width>
+                    <height>22</height>
+                   </rect>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                 <widget class="QSlider" name="headX">
+                  <property name="geometry">
+                   <rect>
+                    <x>200</x>
+                    <y>170</y>
+                    <width>160</width>
+                    <height>22</height>
+                   </rect>
+                  </property>
+                  <property name="minimum">
+                   <number>-700</number>
+                  </property>
+                  <property name="maximum">
+                   <number>700</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                 <widget class="QSlider" name="headY">
+                  <property name="geometry">
+                   <rect>
+                    <x>200</x>
+                    <y>200</y>
+                    <width>160</width>
+                    <height>22</height>
+                   </rect>
+                  </property>
+                  <property name="minimum">
+                   <number>-700</number>
+                  </property>
+                  <property name="maximum">
+                   <number>700</number>
+                  </property>
+                  <property name="value">
+                   <number>480</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                 <widget class="QSlider" name="headZ">
+                  <property name="geometry">
+                   <rect>
+                    <x>200</x>
+                    <y>230</y>
+                    <width>160</width>
+                    <height>22</height>
+                   </rect>
+                  </property>
+                  <property name="minimum">
+                   <number>-700</number>
+                  </property>
+                  <property name="maximum">
+                   <number>700</number>
+                  </property>
+                  <property name="value">
+                   <number>0</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                 </widget>
+                 <widget class="QPushButton" name="buildAttackCurve">
+                  <property name="geometry">
+                   <rect>
+                    <x>50</x>
+                    <y>190</y>
+                    <width>93</width>
+                    <height>28</height>
+                   </rect>
+                  </property>
+                  <property name="text">
+                   <string>Start attack</string>
+                  </property>
+                 </widget>
+                 <widget class="QPushButton" name="moveButton">
+                  <property name="geometry">
+                   <rect>
+                    <x>50</x>
+                    <y>230</y>
+                    <width>93</width>
+                    <height>28</height>
+                   </rect>
+                  </property>
+                  <property name="text">
+                   <string>Toggle move</string>
+                  </property>
+                 </widget>
+                 <widget class="QPushButton" name="scaleButton">
+                  <property name="geometry">
+                   <rect>
+                    <x>32</x>
+                    <y>270</y>
+                    <width>131</width>
+                    <height>28</height>
+                   </rect>
+                  </property>
+                  <property name="text">
+                   <string>Scale curve once</string>
+                  </property>
+                 </widget>
                 </widget>
                </widget>
               </item>
@@ -2782,7 +2923,7 @@ passes</string>
      <x>0</x>
      <y>0</y>
      <width>1345</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFIle">
@@ -2875,7 +3016,6 @@ passes</string>
    <addaction name="separator"/>
    <addaction name="actionDoTests"/>
    <addaction name="separator"/>
-   <addaction name="actionCreateSkeletonTool"/>
    <addaction name="actionRigging_Animation"/>
   </widget>
   <action name="actionExit">
@@ -3077,9 +3217,6 @@ passes</string>
    </property>
   </action>
   <action name="actionRigging_Animation">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
     <iconset resource="modelViewerResources.qrc">
      <normaloff>:/modelViewerGeneral/icons/rig_animation_toogle.png</normaloff>:/modelViewerGeneral/icons/rig_animation_toogle.png</iconset>
@@ -3101,21 +3238,6 @@ passes</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
-   </property>
-  </action>
-  <action name="actionCreateSkeletonTool">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="icon">
-    <iconset resource="modelViewerResources.qrc">
-     <normaloff>:/modelViewerGeneral/icons/create_joints.png</normaloff>:/modelViewerGeneral/icons/create_joints.png</iconset>
-   </property>
-   <property name="text">
-    <string>crSkt</string>
-   </property>
-   <property name="toolTip">
-    <string>Create Skeleton</string>
    </property>
   </action>
  </widget>
@@ -3142,6 +3264,7 @@ passes</string>
  <resources>
   <include location="modelViewerResources.qrc"/>
   <include location="modelViewerResources.qrc"/>
+  <include location="../../../../.designer/backup/modelViewerResources.qrc"/>
  </resources>
  <connections>
   <connection>
