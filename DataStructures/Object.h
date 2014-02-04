@@ -31,11 +31,13 @@ public:
     // transformation functions
     void resetTransformation();
     virtual void addTranslation(double tx, double ty, double tz);
-	virtual void setTranslation(double tx, double ty, double tz);
+	virtual void setTranslation(double tx, double ty, double tz, bool local = true);
     virtual void addRotation(double rx, double ry, double rz);
 
 	virtual void setRotation(double rx, double ry, double rz, bool radians = true);
-	virtual void addRotation(Eigen::Quaternion<double> q);
+
+	virtual void addRotation(Eigen::Quaternion<double> q, bool local = true);
+	virtual void setRotation(Eigen::Quaternion<double> q, bool local = true);
 
     // node info propagation specification
     virtual bool update();

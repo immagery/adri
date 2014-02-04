@@ -1045,9 +1045,9 @@
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_5">
               <item>
-               <widget class="QTabWidget" name="solverParameters2">
+               <widget class="QTabWidget" name="globalTabs">
                 <property name="currentIndex">
-                 <number>2</number>
+                 <number>0</number>
                 </property>
                 <widget class="QWidget" name="render">
                  <attribute name="title">
@@ -2144,6 +2144,86 @@ passes</string>
                    </property>
                   </widget>
                  </widget>
+                 <widget class="QCheckBox" name="bulgeEffectActivation">
+                  <property name="geometry">
+                   <rect>
+                    <x>20</x>
+                    <y>290</y>
+                    <width>81</width>
+                    <height>17</height>
+                   </rect>
+                  </property>
+                  <property name="text">
+                   <string>BulgeEffect</string>
+                  </property>
+                  <property name="checked">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                 <widget class="QGroupBox" name="groupBox_2">
+                  <property name="geometry">
+                   <rect>
+                    <x>110</x>
+                    <y>280</y>
+                    <width>271</width>
+                    <height>41</height>
+                   </rect>
+                  </property>
+                  <property name="title">
+                   <string>Rigg Tool</string>
+                  </property>
+                  <widget class="QRadioButton" name="RiggingToolBtn">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="geometry">
+                    <rect>
+                     <x>40</x>
+                     <y>20</y>
+                     <width>82</width>
+                     <height>17</height>
+                    </rect>
+                   </property>
+                   <property name="text">
+                    <string>Rigging</string>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                  <widget class="QRadioButton" name="AnimToolBtn">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="geometry">
+                    <rect>
+                     <x>120</x>
+                     <y>20</y>
+                     <width>82</width>
+                     <height>17</height>
+                    </rect>
+                   </property>
+                   <property name="text">
+                    <string>Animation</string>
+                   </property>
+                  </widget>
+                  <widget class="QRadioButton" name="TestToolBtn">
+                   <property name="enabled">
+                    <bool>false</bool>
+                   </property>
+                   <property name="geometry">
+                    <rect>
+                     <x>210</x>
+                     <y>20</y>
+                     <width>82</width>
+                     <height>17</height>
+                    </rect>
+                   </property>
+                   <property name="text">
+                    <string>Test</string>
+                   </property>
+                  </widget>
+                 </widget>
                 </widget>
                 <widget class="QWidget" name="tab_4">
                  <attribute name="title">
@@ -3017,7 +3097,7 @@ passes</string>
      <x>0</x>
      <y>0</y>
      <width>1345</width>
-     <height>26</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFIle">
@@ -3087,6 +3167,127 @@ passes</string>
    <addaction name="separator"/>
   </widget>
   <widget class="QToolBar" name="toolBar">
+   <property name="palette">
+    <palette>
+     <active>
+      <colorrole role="Button">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>67</red>
+         <green>67</green>
+         <blue>67</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Base">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>67</red>
+         <green>67</green>
+         <blue>67</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Window">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>67</red>
+         <green>67</green>
+         <blue>67</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Highlight">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>51</red>
+         <green>153</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </active>
+     <inactive>
+      <colorrole role="Button">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>67</red>
+         <green>67</green>
+         <blue>67</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Base">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>67</red>
+         <green>67</green>
+         <blue>67</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Window">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>67</red>
+         <green>67</green>
+         <blue>67</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Highlight">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>204</red>
+         <green>204</green>
+         <blue>204</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </inactive>
+     <disabled>
+      <colorrole role="Button">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>67</red>
+         <green>67</green>
+         <blue>67</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Base">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>67</red>
+         <green>67</green>
+         <blue>67</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Window">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>67</red>
+         <green>67</green>
+         <blue>67</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Highlight">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>51</red>
+         <green>153</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </disabled>
+    </palette>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
    <property name="windowTitle">
     <string>toolBar</string>
    </property>
@@ -3104,6 +3305,7 @@ passes</string>
    <addaction name="actionSelection"/>
    <addaction name="actionMove"/>
    <addaction name="actionRotate"/>
+   <addaction name="actionScaleMode"/>
    <addaction name="separator"/>
    <addaction name="actionObject_Mode"/>
    <addaction name="actionSubObject_Mode"/>
@@ -3111,6 +3313,7 @@ passes</string>
    <addaction name="actionDoTests"/>
    <addaction name="separator"/>
    <addaction name="actionRigging_Animation"/>
+   <addaction name="actionCreateSkeletonTool"/>
   </widget>
   <action name="actionExit">
    <property name="text">
@@ -3311,6 +3514,9 @@ passes</string>
    </property>
   </action>
   <action name="actionRigging_Animation">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="icon">
     <iconset resource="modelViewerResources.qrc">
      <normaloff>:/modelViewerGeneral/icons/rig_animation_toogle.png</normaloff>:/modelViewerGeneral/icons/rig_animation_toogle.png</iconset>
@@ -3332,6 +3538,39 @@ passes</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+S</string>
+   </property>
+  </action>
+  <action name="actionCreateSkeletonTool">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="modelViewerResources.qrc">
+     <normaloff>:/modelViewerGeneral/icons/create_joints.png</normaloff>:/modelViewerGeneral/icons/create_joints.png</iconset>
+   </property>
+   <property name="text">
+    <string>Create Skeleton Tool</string>
+   </property>
+   <property name="toolTip">
+    <string>Create Skeleton Tool</string>
+   </property>
+   <property name="shortcut">
+    <string>C</string>
+   </property>
+  </action>
+  <action name="actionScaleMode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="modelViewerResources.qrc">
+     <normaloff>:/modelViewerGeneral/icons/scaleIcon.png</normaloff>:/modelViewerGeneral/icons/scaleIcon.png</iconset>
+   </property>
+   <property name="text">
+    <string>ScaleMode</string>
+   </property>
+   <property name="toolTip">
+    <string>Scale</string>
    </property>
   </action>
  </widget>
@@ -3356,6 +3595,7 @@ passes</string>
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="modelViewerResources.qrc"/>
   <include location="modelViewerResources.qrc"/>
   <include location="modelViewerResources.qrc"/>
   <include location="../../../../.designer/backup/modelViewerResources.qrc"/>

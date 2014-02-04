@@ -30,6 +30,8 @@ public:
 		m_bDrawPoints = false;
 		shMode = SH_MODE_SMOOTH;
 
+		highlight = false;
+
 
     }
 
@@ -50,11 +52,13 @@ public:
 		m_bDrawPoints = false;
 
 		shMode = SH_MODE_SMOOTH;
+		highlight = false;
 	}
 
     bool visible;
     bool selected;
     bool subObjectmode;
+	bool highlight;
 
     bool xray;
 

@@ -205,8 +205,8 @@ bool Modelo::select(bool bToogle, unsigned int id)
 
 	bool selected = false;
 
-    if(shading) shading->selected = ( id == nodeId);
-	selected = ( id == nodeId);
+    if(shading) shading->selected = ( id == nodeId) & bToogle;
+	selected = ( id == nodeId) & bToogle;
 
     if(modelCage && modelCage->shading != NULL)
     {
@@ -250,6 +250,10 @@ void BuildSurfaceGraphs(Modelo* m)
 	vector<GraphNode*>& nodes = m->nodes;
 	vector<GraphNodePolygon*>& triangles = m->triangles;
 
+	bool initMinBBox = false;
+	m->minBBox = Vector3d(0,0,0);
+	m->maxBBox = Vector3d(0,0,0);
+
 	// Buscamos componentes conexas a la vez que nos quedamos
 	// con los datos para luego crear los grafos.
 	int idDispatcher = -1;
@@ -260,6 +264,18 @@ void BuildSurfaceGraphs(Modelo* m)
 
 	for(unsigned int n = 0; n < nodes.size(); n++)
 	{
+		if(initMinBBox)
+			m->minBBox = Vector3d(min(m->minBBox.x(), nodes[n]->position.x()), min(m->minBBox.y(), nodes[n]->position.y()), min(m->minBBox.z(), nodes[n]->position.z()));
+		else
+		{
+			m->minBBox = nodes[n]->position;
+			m->maxBBox = nodes[n]->position;
+			initMinBBox = true;
+		}
+
+		m->maxBBox = Vector3d(max(m->maxBBox.x(), nodes[n]->position.x()), max(m->maxBBox.y(), nodes[n]->position.y()), max(m->maxBBox.z(), nodes[n]->position.z()));
+
+
 		// todavia no se ha trabajado, debe ser nuevo
 		if(connIds[n] < 0)
 		{

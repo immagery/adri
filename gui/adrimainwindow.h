@@ -15,7 +15,8 @@ namespace Ui {
     class MainWindow;
 }
 
-enum toolmode{T_MOVETOOL, T_ROTATETOOL, T_SELECTTOOL, T_CREATE_SKELETON_TOOL, T_ANIMATION_TOOL, T_RIGGING_TOOL, T_TESTING_TOOL};
+enum toolmode{T_MOVETOOL, T_SCALETOOL, T_ROTATETOOL, T_SELECTTOOL, T_CREATE_SKELETON_TOOL,T_TRANSFORMATION_TOOL, T_ANIMATION_TOOL, T_RIGGING_TOOL, T_TESTING_TOOL};
+enum toolmodeSpecific { BTN_RIGG = 0, BTN_ANIM, BTN_TEST};
 
 class AdriMainWindow : public QMainWindow
 {
@@ -65,7 +66,10 @@ public slots:
     void toogleRotateTool();
     void toogleSelectionTool();
     void toogleCreateSkeletonTool();
-	void toogleAnimationRiggingTool();
+
+	void setRiggingTool();
+	void setAnimTool();
+	void setTestTool();
 
 	void changeTool(toolmode newtool);
 	
@@ -110,6 +114,7 @@ public slots:
 
 	void changeTwistParameters();
 	void changeTwistParameters(int value);
+	void changeBulgeParameters();
 
 protected:
     virtual void keyPressEvent(QKeyEvent* event);

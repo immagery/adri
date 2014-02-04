@@ -138,23 +138,96 @@ void sktCreator::removeLastNode()
 	*/
 }
 
-void sktCreator::finishRig()
+
+void copyDefGroup(DefGroup* groupDest, DefGroup* groupOrig)
 {
-	// 1. Attach this rigg in the Air rig, as an appendix or new root.
-	if(parentNode)
+	for(int defIdx = 0; defIdx< groupOrig->deformers.size(); defIdx++)
 	{
-		//TODO
-		assert(false);
+		groupOrig->deformers[defIdx] = groupDest->deformers[defIdx];
+	}
+
+	if(groupOrig->transformation)
+		groupDest->transformation = new joint(*groupOrig->transformation);
+	else
+		groupDest->transformation = NULL;
+
+	if(groupOrig->rigTransform)
+		groupDest->rigTransform = new joint(*groupOrig->rigTransform);
+	else
+		groupDest->rigTransform = NULL;
+
+	groupDest->subdivisionRatio = groupDest->subdivisionRatio;
+	groupDest->expansion = groupDest->expansion;
+	groupDest->smoothingPasses = groupDest->smoothingPasses;
+	groupDest->smoothPropagationRatio = groupDest->smoothPropagationRatio;
+	groupDest->localSmooth = groupDest->localSmooth; 
+
+	groupDest->iniTwist = groupDest->iniTwist;
+	groupDest->finTwist = groupDest->finTwist;
+	groupDest->enableTwist = groupDest->enableTwist;
+	groupDest->smoothTwist = groupDest->smoothTwist;
+
+	groupDest->parentType = groupDest->parentType;
+	groupDest->bulgeEffect = groupDest->bulgeEffect;
+	groupDest->type = groupDest->type; 
+}
+
+void copyDefGroupsHierarchy(AirRig* strain, DefGroup* link, DefGroup* graft)
+{
+	DefGroup* sprout = NULL;
+	if(link == NULL)
+	{
+		strain->defRig.roots.push_back(new DefGroup(scene::getNewId()));
+		sprout = strain->defRig.roots.back();
 	}
 	else
 	{
-		// encolamos el principal
-		parentRig->defRig.roots.push_back(dynRig->defRig.roots[0]);
+		link->relatedGroups.push_back(new DefGroup(scene::getNewId()));
+		sprout = link->relatedGroups.back();
+	}
+
+	copyDefGroup(sprout, graft);
+
+	char name[20];
+	sprintf(name, "DefGroup%d", sprout->nodeId);
+	sprout->sName = name;
+
+	sprout->dependentGroups.push_back(link);
+	strain->defRig.defGroups.push_back(sprout);
+	strain->defRig.defGroupsRef[sprout->nodeId] = sprout;
+
+	// recorremos los hijos de manera recursiva.
+	for(int i = 0; i< graft->relatedGroups.size(); i++)
+	{
+		copyDefGroupsHierarchy(strain, sprout, graft->relatedGroups[i]);
+	}
+}
+
+void sktCreator::finishRig()
+{
+	printf("Finalizar la creacion del esqueleto\n");
+
+	// 1. Attach this rigg in the Air rig, as an appendix or new root.
+
+	int firstIndexToCopy = 0;
+
+	if(parentNode)
+	{
+		// tengo que cargarme el primer nodo porque lo había copiado.
+		copyDefGroupsHierarchy(parentRig, parentNode, dynRig->defRig.roots[0]->relatedGroups[0]);
+		ComputeWithWorldOrientedRotations(parentNode->transformation);
+		parentNode->select(true, parentNode->nodeId);
+	}
+	else
+	{
+		copyDefGroupsHierarchy(parentRig, parentNode, dynRig->defRig.roots[0]);
+		dynRig->defRig.roots[0]->select(true, dynRig->defRig.roots[0]->nodeId);
 	}
 
 	// 2. Clear the dyn rig
-	parentRig->defRig.roots.clear();
-	parentRig->defRig.defGroupsRef.clear();
+	dynRig->defRig.roots.clear();
+	dynRig->defRig.defGroupsRef.clear();
+	dynRig->defRig.defGroups.clear();
 
 	// 3. Setup the states for further creation
 	state = SKT_CR_IDDLE;

@@ -522,6 +522,7 @@ void AdriViewer::readSkeleton(string fileName)
 	 }
  }
 
+
  void AdriViewer::readModel(string fileName, string name, string path)
  {
 
@@ -749,80 +750,16 @@ void AdriViewer::ReBuildScene(){
 
  void AdriViewer::drawWithNames()
  {
-	 if(selMgr.ctx == CTX_CREATE_SKT)
-	 {
-		 if(selMgr.selection.size() == 0)
-		 {
-			 // New selection
+	for(unsigned int i = 0; i< escena->models.size(); i++)
+	{
+		if(!escena->models[i] || !escena->models[i]->shading->visible)
+			continue;
 
-		 }
-		 else if(selMgr.selection.size() == 1)
-		 {
-			 // Change selection
-		 }
-
-	 }
-	 // Pintar el modelo y asignar un id a cada triángulo.
-	 //for (int i=0; i<int(objects_.size()); i++)
-    //{
-     // glPushName(i);
-     // objects_.at(i)->draw();
-     // glPopName();
-    //}
-
-	 if(selMgr.ctx == CTX_MOVE || selMgr.ctx == CTX_ROTATION || selMgr.ctx == CTX_SCALE)
-	 {
-		 for(unsigned int i = 0; i< escena->models.size(); i++)
-		 {
-			 if(!escena->models[i] || !escena->models[i]->shading->visible)
-				 continue;
-
-			 glPushName(escena->models[i]->nodeId);
-			 ((Modelo*)escena->models[i])->shading->shMode = SH_MODE_SELECTION;
-			 ((Modelo*)escena->models[i])->drawFunc();
-			 glPopName();
-		 }
-	 }
-
-     //TODO
-     /*
-
-     //MyMesh *currentModelo;
-     MyMesh *currentCage;
-
-     currentCage = &m.dynCage;
-
-
-     //if(!showDeformedModel)
-     //    currentModelo = &m.modeloOriginal;
-     //else
-     //{
-     //    if(activeCoords == HARMONIC_COORDS)
-     //        currentModelo = &m.newModeloHC;
-     //    else
-     //        currentModelo = &m.newModeloGC;
-     //}
-
-
-     if(drawCage)
-     {
-         glPointSize(5);
-         glColor3f(0.1, 1.0, 0.1);
-         glDisable(GL_LIGHTING);
-         MyMesh::VertexIterator vi;
-         for(vi = currentCage->vert.begin(); vi!=currentCage->vert.end(); ++vi )
-         {
-             int id = vi->IMark();
-             glPushName(id);
-             glBegin(GL_POINTS);
-             glVertex3dv(&(*vi).P()[0]);
-             glEnd();
-             glPopName();
-         }
-         glEnd();
-         glEnable(GL_LIGHTING);
-     }
-     */
+		glPushName(escena->models[i]->nodeId);
+		((Modelo*)escena->models[i])->shading->shMode = SH_MODE_SELECTION;
+		((Modelo*)escena->models[i])->drawFunc();
+		glPopName();
+	}
  }
 
  // limpiamos variables de shading sobre los seleccionados

@@ -6,6 +6,7 @@
 #include <DataStructures/DataStructures.h>
 
 enum sktCrState { SKT_CR_IDDLE = 0, SKT_CR_SELECTED};
+enum sktToolMode { SKT_RIGG = 0, SKT_ANIM, SKT_TEST};
 
 class sktCreator
 {
@@ -18,10 +19,15 @@ public:
 	AirRig* parentRig; // Parent joint where the new skeleton will be attached
 
 	sktCrState state; // The state
+	sktToolMode mode; // The mode enabled to work
+
+	// Flags for control rigg creation
+	bool usrCreatedRigg;
 
 	sktCreator()
 	{
 		state = SKT_CR_IDDLE;
+		mode = SKT_RIGG;
 
 		dynRig = NULL; 
 		last = NULL;
@@ -29,6 +35,8 @@ public:
 		parentRig = NULL;
 
 		dynRig = new AirRig(scene::getNewId());
+
+		usrCreatedRigg = false;
 
 	}
 

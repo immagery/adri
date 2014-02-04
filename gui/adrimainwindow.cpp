@@ -94,7 +94,10 @@ void AdriMainWindow::connectSignals() {
     connect(ui->actionRotate, SIGNAL(triggered()), this, SLOT(toogleRotateTool()));
 
 	connect(ui->actionCreateSkeletonTool, SIGNAL(triggered()), this, SLOT(toogleCreateSkeletonTool()));
-	connect(ui->actionRigging_Animation, SIGNAL(triggered()), this, SLOT(toogleAnimationRiggingTool()));
+
+	connect(ui->RiggingToolBtn, SIGNAL(released()), this, SLOT(setRiggingTool()));
+	connect(ui->AnimToolBtn, SIGNAL(released()), this, SLOT(setAnimTool()));
+	connect(ui->TestToolBtn, SIGNAL(released()), this, SLOT(setTestTool()));
 
     connect(ui->visibility_btn, SIGNAL(stateChanged(int)), this, SLOT(toogleVisibility(int)));
 	connect(ui->drawSupportInfo, SIGNAL(stateChanged(int)), this, SLOT(toogleVisibility(int)));
@@ -151,6 +154,9 @@ void AdriMainWindow::connectSignals() {
 	connect(ui->twist_fin_slider, SIGNAL(sliderMoved(int)), this, SLOT(changeTwistParameters(int)));
 	connect(ui->twist_ini_slider, SIGNAL(sliderMoved(int)), this, SLOT(changeTwistParameters(int)));
 
+	// Bulge control
+	connect(ui->bulgeEffectActivation, SIGNAL(clicked()), this, SLOT(changeBulgeParameters()));
+
 	// Transform 
 	connect(ui->translationAmountX, SIGNAL(valueChanged(int)), this, SLOT(changeTransformTranslateAmountX(int)));
     connect(ui->translationAmountY, SIGNAL(valueChanged(int)), this, SLOT(changeTransformTranslateAmountY(int)));
@@ -184,6 +190,11 @@ void AdriMainWindow::changeTwistParameters()
 void AdriMainWindow::changeTwistParameters(int value)
 {
 	changeTwistParameters();
+}
+
+void AdriMainWindow::changeBulgeParameters()
+{
+	ui->glCustomWidget->setBulgeParams(ui->bulgeEffectActivation->isChecked());
 }
 
 AdriMainWindow::AdriMainWindow(QWidget *parent) :
@@ -480,7 +491,6 @@ void AdriMainWindow::toogleSelectionTool()
     ui->actionMove->setChecked(false);
     ui->actionRotate->setChecked(false);
 
-
     changeTool(T_SELECTTOOL);
 }
 
@@ -491,22 +501,43 @@ void AdriMainWindow::toogleCreateSkeletonTool()
     ui->actionRotate->setChecked(false);
 
 	if(ui->actionCreateSkeletonTool->isChecked())
+	{
 		changeTool(T_CREATE_SKELETON_TOOL);
+		setRiggingTool();
+		ui->RiggingToolBtn->setEnabled(true);
+		ui->AnimToolBtn->setEnabled(true);
+		ui->TestToolBtn->setEnabled(true);
+	}
 	else
-		changeTool(T_RIGGING_TOOL);
+	{
+		changeTool(T_TRANSFORMATION_TOOL);
+		
+		ui->RiggingToolBtn->setEnabled(false);
+		ui->AnimToolBtn->setEnabled(false);
+		ui->TestToolBtn->setEnabled(false);
+	}
 }
 
-void AdriMainWindow::toogleAnimationRiggingTool()
+void AdriMainWindow::setRiggingTool()
 {
+	changeTool(T_RIGGING_TOOL);
+	ui->RiggingToolBtn->setChecked(true);
+	ui->AnimToolBtn->setChecked(false);
+	ui->TestToolBtn->setChecked(false);
+}
 
-	ui->actionSelection->setChecked(false);
-    ui->actionMove->setChecked(false);
-    ui->actionRotate->setChecked(false);
+void AdriMainWindow::setAnimTool()
+{
+	changeTool(T_ANIMATION_TOOL);
+	ui->RiggingToolBtn->setChecked(false);
+	ui->TestToolBtn->setChecked(false);
+}
 
-	if(ui->actionRigging_Animation->isChecked())
-		changeTool(T_ANIMATION_TOOL);
-	else
-		changeTool(T_RIGGING_TOOL);
+void AdriMainWindow::setTestTool()
+{
+	changeTool(T_TESTING_TOOL);
+	ui->RiggingToolBtn->setChecked(false);
+	ui->AnimToolBtn->setChecked(false);
 }
 
 void AdriMainWindow::changeTool(toolmode newtool)
@@ -522,19 +553,26 @@ void AdriMainWindow::changeTool(toolmode newtool)
     case T_ROTATETOOL:
         ui->glCustomWidget->setContextMode(CTX_ROTATION);
         break;
+	case T_SCALETOOL:
+        ui->glCustomWidget->setContextMode(CTX_SCALE);
+        break;
 
-    case T_CREATE_SKELETON_TOOL:
-        ui->glCustomWidget->setContextMode(CTX_CREATE_SKT);
+	case T_TRANSFORMATION_TOOL:
+		ui->glCustomWidget->setTool(CTX_TRANSFORMATION);
+        break;
+
+	case T_CREATE_SKELETON_TOOL:
+		ui->glCustomWidget->setTool(CTX_CREATE_SKT);
         break;
 
     case T_ANIMATION_TOOL:
-        ui->glCustomWidget->setContextMode(CTX_ANIM);
+		ui->glCustomWidget->setToolCrtMode(BTN_ANIM);
         break;
     case T_RIGGING_TOOL:
-        ui->glCustomWidget->setContextMode(CTX_RIGG);
+        ui->glCustomWidget->setToolCrtMode(BTN_RIGG);
         break;
     case T_TESTING_TOOL:
-        ui->glCustomWidget->setContextMode(CTX_TEST);
+        ui->glCustomWidget->setToolCrtMode(BTN_TEST);
         break;
 
 	default:

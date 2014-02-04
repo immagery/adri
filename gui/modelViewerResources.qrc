@@ -18,5 +18,6 @@
         <file>icons/rig_animation_toogle.png</file>
         <file>icons/save_compact.png</file>
         <file>icons/create_joints.png</file>
+        <file>icons/scaleIcon.png</file>
     </qresource>
 </RCC>

@@ -49,6 +49,28 @@ static void drawCircle(int res, double r)
 
 }
 
+static void drawSphere(int res, double r)
+{
+    glDisable(GL_LIGHTING);
+    glPushMatrix();
+
+    //glColor3f(1.0,0,0);
+    drawCircle(res, r);
+
+    glRotatef(90, 0,1,0); // rotar en y
+    //glColor3f(0,1.0,0);
+    drawCircle(res,r);
+    glPopMatrix();
+
+    glPushMatrix();
+    //glColor3f(0,0,1.0); // rotar en x
+    glRotatef(90, 1,0,0);
+    drawCircle(res, r);
+    glPopMatrix();
+    glEnable(GL_LIGHTING);
+}
+
+
 static void drawTriCircle(int res, double r)
 {
     glDisable(GL_LIGHTING);

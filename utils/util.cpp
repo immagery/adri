@@ -281,9 +281,6 @@ int intersect3D_RayPlane( Vector3d& rayOrigin, Vector3d& rayDir, Vector3d& plane
     double       r, a, b;              // params to calc ray-plane intersect
 
     // get triangle edge vectors and plane normal
-    
-	//u = T.V1 - T.V0;
-    //v = T.V2 - T.V0;
 	
 	n = (u.cross(v)).normalized();									  // cross product
 	if (n.squaredNorm() < 0.00000001)             // triangle is degenerate
@@ -292,7 +289,7 @@ int intersect3D_RayPlane( Vector3d& rayOrigin, Vector3d& rayDir, Vector3d& plane
 	dir = rayDir.normalized();    // ray direction vector
 
     w0 = rayOrigin - planeOrigin;
-	a = fabs(n.dot(w0));
+	a = -n.dot(w0);
 
     b = n.dot(dir);
     
@@ -302,10 +299,9 @@ int intersect3D_RayPlane( Vector3d& rayOrigin, Vector3d& rayDir, Vector3d& plane
         else return 0;              // ray disjoint from plane
     }
 
-    // get intersect point of ray with triangle plane
-    //r = a / b;
+	// Compute intersection
+	I = dir * (a/b) + rayOrigin;
 
-    I = rayOrigin + a * dir;            // intersect point of ray and plane
     return 1;                       // I is in T
 }
 
@@ -440,4 +436,10 @@ int intersect3D_RayTriangle( Ray R, TriangleAux T, Vector3d& I )
 
 	
     return 1;                       // I is in T
+}
+
+
+double fRand(double fMin, double fMax) {
+	double f = (double)rand() / RAND_MAX;
+	return fMin + f * (fMax - fMin);
 }

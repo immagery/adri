@@ -82,7 +82,7 @@ void object::resetTransformation()
     dirtyFlag = true;
 }
 
-void object::setTranslation(double tx, double ty, double tz)
+void object::setTranslation(double tx, double ty, double tz, bool local)
 {
     // Aplicar la rotación, creo que hay que hacerlo con una multiplicacion.
     pos = Vector3d(tx, ty, tz);
@@ -230,11 +230,40 @@ void object::addRotation(double rx, double ry, double rz)
 
 }
 
-void object::addRotation(Eigen::Quaternion<double> q) {
-	q.normalize();
-	qrot = qrot * q;
-	qrot.normalize();
-	dirtyFlag = true;
+void object::addRotation(Eigen::Quaternion<double> q, bool local) 
+{
+	if(local)
+	{
+		q.normalize();
+		qrot = qrot * q;
+		qrot.normalize();
+		dirtyFlag = true;
+	}
+	else
+	{
+		// TODO
+		assert(false);
+	}
+}
+
+
+void object::setRotation(Eigen::Quaternion<double> q, bool local) 
+{
+	if(local)
+	{
+		q.normalize();
+		qrot = q;
+		qrot.normalize();
+		dirtyFlag = true;
+	}
+	else
+	{
+		// TODO
+		q.normalize();
+		qrot = q;
+		qrot.normalize();
+		dirtyFlag = true;
+	}
 }
 
 bool object::propagateDirtyness()

@@ -45,6 +45,34 @@ void useModelMatrix(Quaterniond rot, Vector3d pos)
 	//glPopMatrix();
 }
 
+void drawOpaqueStickDefGroup(float length)
+{
+	float relation = length*0.2;
+	float midRelation = relation/2.0;
+	Vector3d pts[4];
+	pts[0] = Vector3d( midRelation,  -midRelation,  -midRelation);
+	pts[1] = Vector3d( midRelation,  midRelation,  -midRelation);
+	pts[2] = Vector3d( midRelation,  midRelation,  midRelation);
+	pts[3] = Vector3d( midRelation,  -midRelation,  midRelation);
+	
+	glDisable(GL_LIGHTING);
+    glBegin(GL_TRIANGLES);
+
+	for(int pt = 0; pt < 4; pt++)
+	{
+		glVertex3d(0,0,0);
+		glVertex3d(pts[(pt+1)%4].x(),pts[(pt+1)%4].y(),pts[(pt+1)%4].z());
+		glVertex3d(pts[pt].x(),pts[pt].y(),pts[pt].z());
+		
+		glVertex3d(length,0,0);
+		glVertex3d(pts[pt].x(),pts[pt].y(),pts[pt].z());
+		glVertex3d(pts[(pt+1)%4].x(),pts[(pt+1)%4].y(),pts[(pt+1)%4].z());
+	}
+
+    glEnd();
+    glEnable(GL_LIGHTING);
+}
+
 void drawStickDefGroup(float length)
 {
 	float relation = length*0.2;
@@ -128,7 +156,44 @@ void drawBoneStick(float radius, Eigen::Vector3d& pos)
 }
 */
 
-//JOINT
+void DefGroupRender::drawWithNames()
+{
+	DefGroup* g = group;
+
+	double maxRelation = 0;
+
+	// Render the bone shape
+	glColor3f(1.0,1.0,1.0);
+	for(int groupIdx = 0; groupIdx < g->relatedGroups.size(); groupIdx++)
+	{
+		DefGroup* child = g->relatedGroups[groupIdx];
+		glPushMatrix();
+		useModelMatrix(child->transformation->parentRot, g->transformation->translation);
+		Vector3d line = child->transformation->translation - g->transformation->translation;
+		
+		//glPushName(g->relatedGroups[groupIdx]->nodeId);
+		drawOpaqueStickDefGroup(line.norm());
+		//glPopName();
+
+		maxRelation = max(line.norm()*0.2, maxRelation);
+		glPopMatrix();
+	}
+
+	glMatrixMode(GL_MODELVIEW);
+
+	glPushMatrix();
+	useModelMatrix(g->transformation->rotation, g->transformation->translation);
+	
+	if(g->relatedGroups.size() == 0)
+	{
+		drawSphere(10, 1.0);
+		maxRelation = 1.0;
+	}
+
+	glPopMatrix();
+}
+
+//DEFGROUP_RENDERING
 void DefGroupRender::drawFunc()
 {   
 	DefGroup* g = group;
@@ -136,7 +201,13 @@ void DefGroupRender::drawFunc()
 	double maxRelation = 0;
 
 	// Render the bone shape
-	glColor3f(1.0,1.0,1.0);
+	if(selected)
+		glColor3f(0.5,0.25,0.5);
+	else if(highlight)
+		glColor3f(0.0,1.0,1.0);
+	else
+		glColor3f(1.0,1.0,1.0);
+
 	for(int groupIdx = 0; groupIdx < g->relatedGroups.size(); groupIdx++)
 	{
 		DefGroup* child = g->relatedGroups[groupIdx];
@@ -169,31 +240,3 @@ void DefGroupRender::drawFunc()
 
 	glPopMatrix();
 }
-
-/*
-void DefGroupRender::computeRestPos(joint* jt) {
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	computeRestPosRec(jt);
-	glPopMatrix();
-}
-
-void DefGroupRender::computeRestPosRec(joint* jt, joint* father)
-{
-}
-
-void DefGroupRender::computeWorldPos(joint* jt) {
-	glMatrixMode(GL_MODELVIEW);
-	glPushMatrix();
-	glLoadIdentity();
-	computeWorldPosRec(jt, NULL);
-	glPopMatrix();
-}
-
-void DefGroupRender::computeWorldPosRec(joint* jt, joint* father)
-{
-
-
-}
-*/

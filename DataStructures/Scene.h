@@ -193,6 +193,9 @@ class scene
 	map<int, joint*> deformerRef; // A reference to all the joints from id.
 	vector< skeleton* > skeletons;
 
+	// Relation of Ids for best searching
+	map<int,  object*> IDSRelation;
+
 	// AirRig
 	Rig* rig;
 	vector<Rig*> rigsArray;

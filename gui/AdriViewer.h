@@ -97,6 +97,7 @@ public:
 
 	virtual void setSmoothPasses(int , int ) {}
 	virtual void setTwistParams(double , double , bool, bool ){}
+	virtual void setBulgeParams( bool ){}
 
 //    void changeVisualizationMode(int);
 //	void updateGridVisualization();
@@ -281,6 +282,9 @@ public slots:
 
 	virtual void setContextMode(contextMode ctx){}
 	virtual void endContextMode(contextMode ctx){}
+
+	virtual void setToolCrtMode(int ctx){}
+	virtual void setTool(ToolType ctx){}
 
     //void loadSelectVertexCombo(MyMesh& cage);
     //void changeVertexSelection(int id);

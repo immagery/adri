@@ -8,7 +8,7 @@
 #include <DataStructures\AirRig.h>
 
 // render size
-#define DEFAULT_SIZE 0.1
+#define DEFAULT_SIZE 0.05
 
 using namespace std;
 
@@ -28,6 +28,8 @@ class DefGroupRender : public shadingNode
 		DefGroup* group;
 
         void drawFunc();
+		void drawWithNames();
+
 		//void computeWorldPos(joint* jt);
 		//void computeWorldPosRec(joint* jt, joint* father);
 		//void computeRestPos(joint* jt);

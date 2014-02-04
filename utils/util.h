@@ -62,5 +62,6 @@ int intersect3D_RayTriangle( Ray R, TriangleAux T, Vector3d& I );
 int intersect3D_RayPlane( Ray R, Vector3d& origin, Vector3d& u, Vector3d& v, Vector3d& I );
 int intersect3D_RayPlane( Vector3d& rayOrigin, Vector3d& rayDir, Vector3d& planeOrigin, Vector3d& u, Vector3d& v, Vector3d& I );
 
+double fRand(double fMin, double fMax);
 
 #endif // UTIL_H
