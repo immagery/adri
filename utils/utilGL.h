@@ -91,6 +91,37 @@ static void drawTriCircle(int res, double r)
     glEnable(GL_LIGHTING);
 }
 
+static void drawPointLocator(Eigen::Vector3d pt, float size, int type)
+{
+    glDisable(GL_LIGHTING);
+    switch(type)
+    {
+	case 1:
+        glColor3f((GLfloat)8.0, (GLfloat)0.1, (GLfloat)0.1);
+		break;
+	case 2:
+        glColor3f((GLfloat)0.1, (GLfloat)0.8, (GLfloat)0.1);
+		break;
+	default:
+        glColor3f((GLfloat)0.1, (GLfloat)0.1, (GLfloat)0.8);
+		break;
+    }
+
+    glBegin(GL_LINES);
+    // queda reconstruir el cubo y ver si se pinta bien y se ha calculado correctamente.
+    glVertex3f(pt.x()+size, pt.y(), pt.z());
+    glVertex3f(pt.x()-size, pt.y(), pt.z());
+
+    glVertex3f(pt.x(), pt.y()+size, pt.z());
+    glVertex3f(pt.x(), pt.y()-size, pt.z());
+
+    glVertex3f(pt.x(), pt.y(), pt.z()+size);
+    glVertex3f(pt.x(), pt.y(), pt.z()-size);
+
+    glEnd();
+    glEnable(GL_LIGHTING);
+}
+
 static void drawPointLocator(Eigen::Vector3d pt, float size, bool spot)
 {
     glDisable(GL_LIGHTING);

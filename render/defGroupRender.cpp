@@ -226,7 +226,7 @@ void DefGroupRender::drawFunc()
 	
 	if(g->relatedGroups.size() == 0)
 	{
-		drawTriCircle(10, 1.0);
+		drawTriCircle(10, 0.35);
 		maxRelation = 1.0;
 	}
 
@@ -235,7 +235,13 @@ void DefGroupRender::drawFunc()
 	if(scene::drawDefNodes)
 	{
 		for(int defIdx = 0; defIdx < group->deformers.size(); defIdx++)
-			drawPointLocator(group->deformers[defIdx].relPos, maxRelation*0.25, false);
+		{
+			int type = 0;
+			if(group->deformers[defIdx].dirtyFlag) type = 1;
+			else if(group->deformers[defIdx].segmentationDirtyFlag) type = 2;
+
+			drawPointLocator(group->deformers[defIdx].relPos, maxRelation*0.25,type);
+		}
 	}
 
 	glPopMatrix();

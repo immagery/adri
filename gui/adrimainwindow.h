@@ -15,8 +15,8 @@ namespace Ui {
     class MainWindow;
 }
 
-enum toolmode{T_MOVETOOL, T_SCALETOOL, T_ROTATETOOL, T_SELECTTOOL, T_CREATE_SKELETON_TOOL,T_TRANSFORMATION_TOOL, T_ANIMATION_TOOL, T_RIGGING_TOOL, T_TESTING_TOOL};
-enum toolmodeSpecific { BTN_RIGG = 0, BTN_ANIM, BTN_TEST};
+enum toolmode{T_MOVETOOL, T_SCALETOOL, T_ROTATETOOL, T_SELECTTOOL, T_CREATE_SKELETON_TOOL,T_TRANSFORMATION_TOOL, T_ANIMATION_TOOL, T_RIGGING_TOOL, T_TESTING_TOOL, T_CREATION_TOOL};
+enum toolmodeSpecific { BTN_CREATE = 0, BTN_RIGG, BTN_ANIM, BTN_TEST};
 
 class AdriMainWindow : public QMainWindow
 {
@@ -67,9 +67,15 @@ public slots:
     void toogleSelectionTool();
     void toogleCreateSkeletonTool();
 
+	void setCreateTool();
 	void setRiggingTool();
 	void setAnimTool();
 	void setTestTool();
+
+	void setCreateToolUI();
+	void setRiggingToolUI();
+	void setAnimToolUI();
+	void setTestToolUI();
 
 	void changeTool(toolmode newtool);
 	

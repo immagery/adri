@@ -298,6 +298,11 @@ signals:
 	void jointTransformationValues(float, float,float,float,float,float);
     void changedFrame(int);
 
+	void setCreateToolUI();
+	void setRiggingToolUI();
+	void setAnimToolUI();
+	void setTestToolUI();
+
 private :
   void startManipulation();
   void drawSelectionRectangle() const;

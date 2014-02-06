@@ -1121,7 +1121,7 @@ void AdriViewer::drawSelectionRectangle() const
 
  void AdriViewer::mousePressEvent(QMouseEvent* e)
  {
-
+	/*
    selection_.clear();
 
    // Start selection. Mode is ADD with Shift key and TOGGLE with Alt key.
@@ -1143,11 +1143,15 @@ void AdriViewer::drawSelectionRectangle() const
 
             QGLViewer::mousePressEvent(e);
        }
+	   */
+
+	QGLViewer::mousePressEvent(e);
 
  }
 
  void AdriViewer::mouseMoveEvent(QMouseEvent* e)
  {
+   /*
    if (selectionMode_ != NONE)
      {
        // Updates rectangle_ coordinates and redraws rectangle
@@ -1155,7 +1159,9 @@ void AdriViewer::drawSelectionRectangle() const
        updateGL();
      }
    else
-     QGLViewer::mouseMoveEvent(e);
+   */
+
+   QGLViewer::mouseMoveEvent(e);
  }
 
  void AdriViewer::mouseReleaseEvent(QMouseEvent* e)

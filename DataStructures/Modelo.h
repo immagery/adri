@@ -25,6 +25,8 @@ public:
 	binding* bind;
 	bool computedBindings;
 
+	bool rigBinded;
+
 	// Temp triangles
 	vector<TriangleData> virtualTriangles;
 

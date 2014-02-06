@@ -6,7 +6,7 @@
 #include <DataStructures/DataStructures.h>
 
 enum sktCrState { SKT_CR_IDDLE = 0, SKT_CR_SELECTED};
-enum sktToolMode { SKT_RIGG = 0, SKT_ANIM, SKT_TEST};
+enum sktToolMode { SKT_CREATE = 0, SKT_RIGG, SKT_ANIM, SKT_TEST};
 
 class sktCreator
 {

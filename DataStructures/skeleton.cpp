@@ -302,6 +302,11 @@ void joint::setJointOrientation(double ojX,double  ojY,double  ojZ, bool radians
 	restOrient = qOrient;
 }
 
+void joint::setRotation(Quaterniond _q) 
+{
+	qrot = _q;
+}
+
 void joint::setRotation(double rx, double ry, double rz, bool radians) {
 	Eigen::Quaterniond q[3];
 	double angles[3];

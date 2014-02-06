@@ -188,11 +188,18 @@ void copyDefGroupsHierarchy(AirRig* strain, DefGroup* link, DefGroup* graft)
 
 	copyDefGroup(sprout, graft);
 
+	// Setting dirty flags triggers computation
+	sprout->dirtyCreation = true;
+	sprout->dirtyTransformation = true;
+	sprout->dirtySegmentation = true;
+
 	char name[20];
 	sprintf(name, "DefGroup%d", sprout->nodeId);
 	sprout->sName = name;
 
-	sprout->dependentGroups.push_back(link);
+	if(link != NULL)
+		sprout->dependentGroups.push_back(link);
+
 	strain->defRig.defGroups.push_back(sprout);
 	strain->defRig.defGroupsRef[sprout->nodeId] = sprout;
 
@@ -214,9 +221,13 @@ void sktCreator::finishRig()
 	if(parentNode)
 	{
 		// tengo que cargarme el primer nodo porque lo había copiado.
-		copyDefGroupsHierarchy(parentRig, parentNode, dynRig->defRig.roots[0]->relatedGroups[0]);
-		ComputeWithWorldOrientedRotations(parentNode->transformation);
-		parentNode->select(true, parentNode->nodeId);
+		if(dynRig->defRig.defGroups.size() > 1)
+		{
+			// Solo copiamos si hay mas de uno, porque sino solo tenemos la base... estariamos duplicando.
+			copyDefGroupsHierarchy(parentRig, parentNode, dynRig->defRig.roots[0]->relatedGroups[0]);
+			ComputeWithWorldOrientedRotations(parentNode->transformation);
+			parentNode->select(true, parentNode->nodeId);
+		}
 	}
 	else
 	{

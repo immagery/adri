@@ -84,7 +84,9 @@ class joint : public object
                                  double  ojY,
                                  double  ojZ,
 								 bool radians = false);
+
 		virtual void setRotation(double rx, double ry, double rz, bool radians = true);
+		virtual void setRotation(Quaterniond _q) ;
 
         void setWorldPosition(Eigen::Vector3d pos);
         Eigen::Vector3d getJointOrientation();

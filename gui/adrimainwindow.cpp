@@ -95,9 +95,15 @@ void AdriMainWindow::connectSignals() {
 
 	connect(ui->actionCreateSkeletonTool, SIGNAL(triggered()), this, SLOT(toogleCreateSkeletonTool()));
 
+	connect(ui->CreateToolBtn, SIGNAL(released()), this, SLOT(setCreateTool()));
 	connect(ui->RiggingToolBtn, SIGNAL(released()), this, SLOT(setRiggingTool()));
 	connect(ui->AnimToolBtn, SIGNAL(released()), this, SLOT(setAnimTool()));
 	connect(ui->TestToolBtn, SIGNAL(released()), this, SLOT(setTestTool()));
+
+	connect(ui->glCustomWidget, SIGNAL(setCreateToolUI()), this, SLOT(setCreateToolUI()));
+	connect(ui->glCustomWidget, SIGNAL(setRiggingToolUI()), this, SLOT(setRiggingToolUI()));
+	connect(ui->glCustomWidget, SIGNAL(setAnimToolUI()), this, SLOT(setAnimToolUI()));
+	connect(ui->glCustomWidget, SIGNAL(setTestToolUI()), this, SLOT(setTestToolUI()));
 
     connect(ui->visibility_btn, SIGNAL(stateChanged(int)), this, SLOT(toogleVisibility(int)));
 	connect(ui->drawSupportInfo, SIGNAL(stateChanged(int)), this, SLOT(toogleVisibility(int)));
@@ -504,6 +510,7 @@ void AdriMainWindow::toogleCreateSkeletonTool()
 	{
 		changeTool(T_CREATE_SKELETON_TOOL);
 		setRiggingTool();
+		ui->RiggingToolBtn->setEnabled(false);
 		ui->RiggingToolBtn->setEnabled(true);
 		ui->AnimToolBtn->setEnabled(true);
 		ui->TestToolBtn->setEnabled(true);
@@ -511,11 +518,53 @@ void AdriMainWindow::toogleCreateSkeletonTool()
 	else
 	{
 		changeTool(T_TRANSFORMATION_TOOL);
-		
+
+		ui->CreateToolBtn->setEnabled(false);		
 		ui->RiggingToolBtn->setEnabled(false);
 		ui->AnimToolBtn->setEnabled(false);
 		ui->TestToolBtn->setEnabled(false);
 	}
+}
+
+void AdriMainWindow::setCreateToolUI()
+{
+	ui->CreateToolBtn->setChecked(true);
+	ui->RiggingToolBtn->setChecked(false);
+	ui->AnimToolBtn->setChecked(false);
+	ui->TestToolBtn->setChecked(false);
+}
+
+void AdriMainWindow::setRiggingToolUI()
+{
+	ui->CreateToolBtn->setChecked(false);
+	ui->RiggingToolBtn->setChecked(true);
+	ui->AnimToolBtn->setChecked(false);
+	ui->TestToolBtn->setChecked(false);
+}
+
+void AdriMainWindow::setAnimToolUI()
+{
+	ui->CreateToolBtn->setChecked(false);
+	ui->RiggingToolBtn->setChecked(false);
+	ui->AnimToolBtn->setChecked(true);
+	ui->TestToolBtn->setChecked(false);
+}
+
+void AdriMainWindow::setTestToolUI()
+{
+	ui->CreateToolBtn->setChecked(false);
+	ui->RiggingToolBtn->setChecked(false);
+	ui->AnimToolBtn->setChecked(false);
+	ui->TestToolBtn->setChecked(true);
+}
+
+void AdriMainWindow::setCreateTool()
+{
+	changeTool(T_CREATION_TOOL);
+	ui->CreateToolBtn->setChecked(true);
+	ui->RiggingToolBtn->setChecked(false);
+	ui->AnimToolBtn->setChecked(false);
+	ui->TestToolBtn->setChecked(false);
 }
 
 void AdriMainWindow::setRiggingTool()
@@ -524,20 +573,25 @@ void AdriMainWindow::setRiggingTool()
 	ui->RiggingToolBtn->setChecked(true);
 	ui->AnimToolBtn->setChecked(false);
 	ui->TestToolBtn->setChecked(false);
+	ui->CreateToolBtn->setChecked(false);
 }
 
 void AdriMainWindow::setAnimTool()
 {
 	changeTool(T_ANIMATION_TOOL);
+	ui->AnimToolBtn->setChecked(true);
 	ui->RiggingToolBtn->setChecked(false);
 	ui->TestToolBtn->setChecked(false);
+	ui->CreateToolBtn->setChecked(false);
 }
 
 void AdriMainWindow::setTestTool()
 {
 	changeTool(T_TESTING_TOOL);
+	ui->TestToolBtn->setChecked(true);
 	ui->RiggingToolBtn->setChecked(false);
 	ui->AnimToolBtn->setChecked(false);
+	ui->CreateToolBtn->setChecked(false);
 }
 
 void AdriMainWindow::changeTool(toolmode newtool)
@@ -564,7 +618,9 @@ void AdriMainWindow::changeTool(toolmode newtool)
 	case T_CREATE_SKELETON_TOOL:
 		ui->glCustomWidget->setTool(CTX_CREATE_SKT);
         break;
-
+    case T_CREATION_TOOL:
+        ui->glCustomWidget->setToolCrtMode(BTN_CREATE);
+        break;
     case T_ANIMATION_TOOL:
 		ui->glCustomWidget->setToolCrtMode(BTN_ANIM);
         break;

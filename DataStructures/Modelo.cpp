@@ -79,6 +79,7 @@ Modelo::Modelo() : Geometry()
 
 	bind = new binding();
 	computedBindings = false;
+	rigBinded = false;
 
 	delete shading;
 	shading = new ModeloRender(this);
@@ -99,6 +100,7 @@ Modelo::Modelo(unsigned int nodeId) : Geometry(nodeId)
 
 	bind = new binding();
 	computedBindings = false;
+	rigBinded = false;
 
 	delete shading;
 	shading = new ModeloRender(this);
