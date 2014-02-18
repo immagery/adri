@@ -183,6 +183,8 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
 	// Define 'Control+Q' as the new exit shortcut (default was 'Escape')
 	setShortcut(EXIT_VIEWER, Qt::CTRL+Qt::Key_Q);
 
+	setBackgroundColor(QColor(Qt::black));
+
     //testScene();
  }
 
@@ -215,6 +217,8 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
      ++frame;
      if (frame == 150) aniManager.animationEnabled = false;
      emit changedFrame(frame);
+
+
  }
 
 

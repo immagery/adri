@@ -16,6 +16,11 @@
 using namespace std;
 using namespace Eigen;
 
+// FLAGS FOR FASTER PROBLEM SEARCH
+#define ONLY_ONE_A_MATRIX true
+
+
+// Flag for verbose data in debig mode
 #define VERBOSE false
 
 string   getCurrentTime();
@@ -63,5 +68,11 @@ int intersect3D_RayPlane( Ray R, Vector3d& origin, Vector3d& u, Vector3d& v, Vec
 int intersect3D_RayPlane( Vector3d& rayOrigin, Vector3d& rayDir, Vector3d& planeOrigin, Vector3d& u, Vector3d& v, Vector3d& I );
 
 double fRand(double fMin, double fMax);
+
+float kernelFunction(float partDistance,
+                     float baseDistance,
+                     bool invert,
+                     double K = 100,
+                     double alpha = 10);
 
 #endif // UTIL_H

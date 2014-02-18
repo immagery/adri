@@ -443,3 +443,29 @@ double fRand(double fMin, double fMax) {
 	double f = (double)rand() / RAND_MAX;
 	return fMin + f * (fMax - fMin);
 }
+
+float kernelFunction(float partDistance,
+                     float baseDistance,
+                     bool invert,
+                     double K,
+                     double alpha)
+{
+    double S = 1;
+
+	// obtenemos lo que buscamos a partir de la distancia base.
+    double t = (partDistance/baseDistance);
+    if(invert)
+        t = 1-t;
+
+	float minV = S/(1.0+K*exp(-1.0*alpha*0));
+	float maxV = S/(1.0+K*exp(-1.0*alpha*1.0));
+
+    // Formula de kernel
+    float weight = S/(1.0+K*exp(-1.0*alpha*t));
+
+	// reescalado porque no se ajusta ni a 0, ni a 1. 
+	// Es un problema de precision numerica de la maquina y la funcion.
+	weight = (weight-minV)/(maxV-minV);
+
+    return weight;
+}
