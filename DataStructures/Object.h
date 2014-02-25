@@ -3,15 +3,12 @@
 
 #include <render/shadingNode.h>
 #include "Node.h"
+
 #include <Eigen\Core>
 #include <Eigen\Geometry>
-
-//#include <vcg/complex/complex.h>
-
 #include <Eigen\Dense>
 
 using namespace std;
-//using namespace vcg;
 
 // Each element of the scene
 // Contains data of the transformation
