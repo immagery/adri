@@ -414,6 +414,7 @@ void AdriViewer::readSkeleton(string fileName)
 
  void AdriViewer::readScene(string fileName, string name, string path)
  {
+
      QFile modelDefFile(fileName.c_str());
      if(modelDefFile.exists())
      {

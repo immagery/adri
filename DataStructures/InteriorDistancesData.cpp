@@ -111,7 +111,7 @@ double BiharmonicDistanceP2P_HC(vector<weight>& weights, int pointIdx, binding* 
 {
     assert(ext != 0);
 
-	symMatrix& A = bd->BihDistances[0];
+	symMatrixLight& A = bd->BihDistances[0];
     
 	double qAp = 0;
 	for(unsigned int i = 0; i< weights.size(); i++)
@@ -127,7 +127,7 @@ double BiharmonicDistanceP2P_sorted(vector<double>& weights, vector<int>& weight
 {
     assert(ext != 0);
 
-	symMatrix& A = bd->BihDistances[0];
+	symMatrixLight& A = bd->BihDistances[0];
     
 	double qAp = 0;
 	for(unsigned int i = 0; i< weightsSort.size(); i++)
@@ -146,7 +146,7 @@ double BiharmonicDistanceP2P_block(vector<double>& weights, int pointIdx, bindin
 {
     assert(ext != 0);
 
-	symMatrix& A = bd->BihDistances[0];
+	symMatrixLight& A = bd->BihDistances[0];
     
 	double qAp = 0;
 	int MatrixRow = 0;
@@ -164,7 +164,7 @@ double BiharmonicDistanceP2P(vector<double>& weights, int pointIdx, binding* bd,
 {
     assert(ext != 0);
 
-	symMatrix& A = bd->BihDistances[0];
+	symMatrixLight& A = bd->BihDistances[0];
     
 	double qAp = 0;
 	for(int i = 0; i< A.size; i++)
@@ -179,7 +179,7 @@ double BiharmonicDistanceP2P(vector<double>& weights, int pointIdx, binding* bd,
 	float ext = node.expansion;
     assert(ext != 0);
 
-	symMatrix& A = bd->BihDistances[0];
+	symMatrixLight& A = bd->BihDistances[0];
     
 	double qAp = 0;
 	for(int i = 0; i< A.size; i++)

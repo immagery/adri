@@ -111,7 +111,7 @@ void toEulerAngles(const Eigen::Quaterniond& q, double& alpha, double& beta, dou
 }
 
 // devuelve el signo del valor de entrada.
-double sign(double v)
+float sign(float v)
 {
     if(v >= 0)
         return 1;
@@ -119,7 +119,7 @@ double sign(double v)
         return -1;
 }
 
-double det(Eigen::Vector3d u1, Eigen::Vector3d u2, Eigen::Vector3d u3)
+float det(Eigen::Vector3f u1, Eigen::Vector3f u2, Eigen::Vector3f u3)
 {
     return u1[0]*u2[1]*u3[2] + u2[0]*u1[2]*u3[1] + u3[0]*u1[1]*u2[2]
             - u1[2]*u2[1]*u3[0] - u2[0]*u1[1]*u3[2] - u3[1]*u1[0]*u2[2] ;
@@ -133,7 +133,7 @@ double round(double x)
 double timelapse(clock_t clock1,clock_t clock2)
 {
 	double diffticks=clock2-clock1;
-    double diffms=diffticks/CLOCKS_PER_SEC;
+    double diffms=diffticks/(double)CLOCKS_PER_SEC;
     return diffms;
 }
 

@@ -2,7 +2,7 @@
 #ifndef SKELETON_RENDER_H
 #define SKELETON_RENDER_H
 
-#define DEBUG false
+#define DEBUG_FLAG false
 
 #include "..\render\shadingNode.h"
 #include "..\DataStructures\skeleton.h"

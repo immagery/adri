@@ -2,7 +2,7 @@
 #ifndef DEFGROUP_RENDER_H
 #define DEFGROUP_RENDER_H
 
-#define DEBUG false
+#define DEBUG_FLAG false
 
 #include <render\shadingNode.h>
 #include <DataStructures\AirRig.h>

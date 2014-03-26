@@ -289,7 +289,7 @@ void AdriMainWindow::ClearScene()
 
 void AdriMainWindow::OpenNewScene()
 {
-    QFileDialog inFileDialog(0, "Selecciona un fichero", ui->glCustomWidget->sPathGlobal, "*.txt");
+    QFileDialog inFileDialog(0, "Selecciona un fichero", ui->glCustomWidget->sPathGlobal, "*.txt, *.snk");
     inFileDialog.setFileMode(QFileDialog::ExistingFile);
     QStringList fileNames;
      if (inFileDialog.exec())

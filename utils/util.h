@@ -36,9 +36,9 @@ int indexOf(vector<int>& labels, int label);
 
 double round(double x);
 
-double sign(double v);
+float sign(float v);
 
-double det(Eigen::Vector3d u1, Eigen::Vector3d u2, Eigen::Vector3d u3);
+float det(Eigen::Vector3f u1, Eigen::Vector3f u2, Eigen::Vector3f u3);
 
 double Deg2Rad(double deg);
 

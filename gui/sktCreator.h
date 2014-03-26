@@ -62,4 +62,7 @@ public:
 
 };
 
+void ComputeWithWorldOrientedRotations(joint* jt);
+void ComputeWithBoneOrientedRotations(joint* jt);
+
 #endif
