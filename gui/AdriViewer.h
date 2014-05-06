@@ -35,6 +35,8 @@ using namespace Eigen;
 
 enum viewingModes { DynCage_Mode = 0, Cages_Mode, BHD_Mode, SimpleModel_Mode};
 
+enum shaderIdx {SHD_BASIC = 0, SHD_XRAY, SHD_VERTEX_COLORS, SHD_NO_SHADE, SHD_LENGTH};
+
 class AdriMainWindow;
 class MainWindow;
 class Particles;
@@ -94,7 +96,7 @@ public:
     void toogleModelToLines();
     void toogleVisibility(bool toogle);
 
-
+	virtual void setShaderConfiguration( shaderIdx type){}
 	virtual void setSmoothPasses(int , int ) {}
 	virtual void setTwistParams(double , double , bool, bool ){}
 	virtual void setBulgeParams( bool ){}

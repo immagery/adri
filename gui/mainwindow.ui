@@ -156,7 +156,7 @@
              </size>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>1</number>
             </property>
             <widget class="QWidget" name="tab_10">
              <attribute name="title">
@@ -1053,7 +1053,7 @@
               <item>
                <widget class="QTabWidget" name="globalTabs">
                 <property name="currentIndex">
-                 <number>1</number>
+                 <number>0</number>
                 </property>
                 <widget class="QWidget" name="render">
                  <attribute name="title">
@@ -1479,7 +1479,7 @@
                  <widget class="QCheckBox" name="drawSupportInfo">
                   <property name="geometry">
                    <rect>
-                    <x>70</x>
+                    <x>30</x>
                     <y>150</y>
                     <width>111</width>
                     <height>17</height>
@@ -1525,6 +1525,22 @@
                   </property>
                   <property name="text">
                    <string>SIZE</string>
+                  </property>
+                 </widget>
+                 <widget class="QCheckBox" name="vertex_colors_btn">
+                  <property name="geometry">
+                   <rect>
+                    <x>150</x>
+                    <y>150</y>
+                    <width>70</width>
+                    <height>17</height>
+                   </rect>
+                  </property>
+                  <property name="text">
+                   <string>vtx colors</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
                   </property>
                  </widget>
                 </widget>

@@ -9,7 +9,16 @@
 #include "rig.h"
 
 // reservamos unos cuantos números para elementos especiales
-#define FIRST_NODE_ID 100
+#define FIRST_OBJECT_ID		100000
+#define FIRST_DEFNODE_ID	200000
+#define FIRST_DEFGROUP_ID	300000
+#define FIRST_POINTDATA_ID	400000
+#define FIRST_BONE_ID		500000
+#define FIRST_GNRAL_ID		600000
+
+// it's important the concordance from the prior defines to this enum, because
+// the object type is equal to CONTANT%100000
+enum nodeType{T_OBJECT = 1, T_DEFNODE, T_DEFGROUP, T_POINTDATA, T_BONE, T_GNRAL};
 
 enum procState{CREATED = 0, RIGG, ANIMATION, INTERACTIVE};
 
@@ -89,7 +98,6 @@ class scene
     scene()
     {
 		//skinner = new Skinning();
-        scene::sceneIds = FIRST_NODE_ID;
 		modelLoaded = false;
 		skeletonLoaded = false;
 		embeddingLoaded = false;
@@ -130,7 +138,30 @@ class scene
         shaders.clear();
     }
 
-    static unsigned int getNewId(){scene::sceneIds++; return scene::sceneIds-1;}
+    static unsigned int getNewId(nodeType type = T_GNRAL)
+	{
+		switch(type)
+		{
+			case T_DEFNODE:
+				scene::defNodeIds++; 
+				return scene::defNodeIds-1;
+			case T_OBJECT:
+				scene::objectIds++; 
+				return scene::objectIds-1;
+			case T_DEFGROUP:
+				scene::defGroupIds++; 
+				return scene::defGroupIds-1;
+			case T_BONE:
+				scene::boneIds++; 
+				return scene::boneIds-1;
+			case T_POINTDATA:
+				scene::pointDataIds++; 
+				return scene::pointDataIds-1;
+			default:
+				scene::generalIds++; 
+				return scene::generalIds-1;
+		}
+	}
 
 
 	void setSceneScale( float sceneScale);
@@ -185,7 +216,13 @@ class scene
     vector< shadingNode* > shaders;
 
 	// Scene management
-    static unsigned int sceneIds; // ids que va repartiendo
+	static unsigned int objectIds;
+	static unsigned int defNodeIds;
+	static unsigned int defGroupIds;
+	static unsigned int pointDataIds;
+	static unsigned int boneIds;
+	static unsigned int generalIds;
+
 	map<int, int> defIds; // tranlation for change IDs
 	shadingNode* currentSelection;
 

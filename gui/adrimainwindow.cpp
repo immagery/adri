@@ -109,6 +109,8 @@ void AdriMainWindow::connectSignals() {
 	connect(ui->drawSupportInfo, SIGNAL(stateChanged(int)), this, SLOT(toogleVisibility(int)));
 	connect(ui->defNodesSize, SIGNAL(valueChanged(int)), this, SLOT(toogleVisibility(int)));
 
+	connect(ui->vertex_colors_btn, SIGNAL(stateChanged(int)), this, SLOT(toogleVisibility(int)));
+
 	connect(ui->actionDoTests, SIGNAL(triggered()), this, SLOT(LaunchTests()));
 
     connect(ui->segmentation_btn, SIGNAL(toggled(bool)), this, SLOT(toogleToShowSegmentation(bool)));
@@ -675,6 +677,12 @@ void AdriMainWindow::toogleVisibility(int)
 
 	scene::drawDefNodes = ui->drawSupportInfo->isChecked();
 	scene::drawingNodeStdSize = ui->defNodesSize->value()/1000.0;
+
+	/*if(ui->vertex_colors_btn->isChecked())
+		ui->glCustomWidget->preferredType = SHD_VERTEX_COLORS);
+	else
+		ui->glCustomWidget->setShaderConfiguration(SHD_BASIC);
+*/
 }
 
 void AdriMainWindow::DataVisualizationChange(int mode)

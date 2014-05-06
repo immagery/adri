@@ -354,8 +354,8 @@ void cleanZeroInfluences(binding* bd)
 			weightsSum /=count;
 		else
 		{
-			printf("No tiene pesos\n"); 
-			fflush(0);
+			//printf("No tiene pesos\n"); 
+			//fflush(0);
 		}
 
         pd->influences.clear();

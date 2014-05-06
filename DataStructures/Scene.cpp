@@ -3,7 +3,12 @@
 
 //#include <DataStructures\AirRig.h>
 
-unsigned int scene::sceneIds = FIRST_NODE_ID;
+unsigned int scene::objectIds = FIRST_OBJECT_ID;
+unsigned int scene::defNodeIds = FIRST_DEFNODE_ID;
+unsigned int scene::defGroupIds = FIRST_DEFGROUP_ID;
+unsigned int scene::pointDataIds = FIRST_POINTDATA_ID;
+unsigned int scene::boneIds = FIRST_BONE_ID;
+unsigned int scene::generalIds = FIRST_GNRAL_ID;
 
 // Global Drawing scene flags
 bool scene::drawDefNodes = true;

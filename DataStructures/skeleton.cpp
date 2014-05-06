@@ -465,7 +465,7 @@ void joint::select(bool bToogle, int id)
 
      for(int i = 0; i< num1; i++)
      {
-         joint* jt = new joint(root, scene::getNewId());
+         joint* jt = new joint(root, scene::getNewId(T_BONE));
          root->pushChild(jt);
 
          //printf("anadimos el joint: %s %f %f %f con %d hijos\n",str, posX, posY-pos.Y(), posZ-pos.Z(),num1);
@@ -570,7 +570,7 @@ void readSkeletons(string fileName, vector<skeleton*>& skts)
          skt->sName = "skeleton" + i;
 
          //Root joint Creation
-         skt->root = new joint(scene::getNewId());
+         skt->root = new joint(scene::getNewId(T_BONE));
 
          readBone(fin, skt, skt->root);
 
@@ -624,7 +624,7 @@ int subdivideBone(joint* parent, joint* child,
 		Vector3d newPos = newOrigen+(dir*newSubdivLength*i);
 		nodePoints.push_back(DefNode(newPos,boneId));
 		nodePoints.back().relPos = newPos-origen;
-		nodePoints.back().nodeId = scene::getNewId();
+		nodePoints.back().nodeId = scene::getNewId(T_DEFNODE);
 		nodePoints.back().ratio = (float)i/(float)numDivisions;
 		nodePoints.back().childBoneId = child->nodeId;
 
@@ -668,7 +668,7 @@ void addNodes(joint* jt, vector< DefNode >& nodePoints, vector<int>& idx,
 	// We add a node in the joint pos.
 	idx.push_back(nodePoints.size());
 	nodePoints.push_back(DefNode(jt->getWorldPosition(), jt->nodeId));
-	nodePoints.back().nodeId = scene::getNewId();
+	nodePoints.back().nodeId = scene::getNewId(T_DEFNODE);
 	nodePoints.back().ratio = 0.0;
 	nodePoints.back().expansion = jt->expansion;
 

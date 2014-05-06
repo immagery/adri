@@ -45,8 +45,8 @@ void sktCreator::addNewNode(Vector3d point)
 	if(last != NULL)
 	{
 		// creation
-		DefGroup* df = new DefGroup(scene::getNewId());
-		df->transformation = new joint(scene::getNewId());
+		DefGroup* df = new DefGroup(scene::getNewId(T_DEFNODE));
+		df->transformation = new joint(scene::getNewId(T_BONE));
 		joint* newJoint = df->transformation;
 
 		// position
@@ -79,8 +79,8 @@ void sktCreator::addNewNode(Vector3d point)
 	else
 	{
 		// creation
-		DefGroup* df = new DefGroup(scene::getNewId());
-		df->transformation = new joint(scene::getNewId());
+		DefGroup* df = new DefGroup(scene::getNewId(T_DEFNODE));
+		df->transformation = new joint(scene::getNewId(T_BONE));
 		joint* newJoint = df->transformation;
 
 		// position
@@ -177,12 +177,12 @@ void copyDefGroupsHierarchy(AirRig* strain, DefGroup* link, DefGroup* graft)
 	DefGroup* sprout = NULL;
 	if(link == NULL)
 	{
-		strain->defRig.roots.push_back(new DefGroup(scene::getNewId()));
+		strain->defRig.roots.push_back(new DefGroup(scene::getNewId(T_DEFGROUP)));
 		sprout = strain->defRig.roots.back();
 	}
 	else
 	{
-		link->relatedGroups.push_back(new DefGroup(scene::getNewId()));
+		link->relatedGroups.push_back(new DefGroup(scene::getNewId(T_DEFGROUP)));
 		sprout = link->relatedGroups.back();
 	}
 

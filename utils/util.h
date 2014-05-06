@@ -19,6 +19,7 @@ using namespace Eigen;
 // FLAGS FOR FASTER PROBLEM SEARCH
 #define ONLY_ONE_A_MATRIX true
 
+#define CROP_NODE_ID 100000
 
 // Flag for verbose data in debig mode
 #define VERBOSE false

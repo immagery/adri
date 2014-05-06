@@ -142,6 +142,37 @@ double BiharmonicDistanceP2P_sorted(vector<double>& weights, vector<int>& weight
     return distance/ext;
 }
 
+double BiharmonicDistanceP2P_sorted_analisis(vector<double>& weights, vector<int>& weightsSort, int pointIdx, binding* bd, float ext, float precomputedDistance, int& time1, int& time2, int& times, double threshold)
+{
+    assert(ext != 0);
+
+	symMatrixLight& A = bd->BihDistances[0];
+    
+	clock_t ini1 = clock();
+	double qAp = 0;
+	for(unsigned int i = 0; i< weightsSort.size(); i++)
+	{
+		if(weights[weightsSort[i]] < threshold)
+			break;
+
+		qAp += weights[weightsSort[i]]*A.get(pointIdx,weightsSort[i]);
+	}
+	clock_t fin1 = clock();
+
+	time1 += fin1 - ini1;
+
+	clock_t ini2 = clock();
+	double distance = precomputedDistance - (2*qAp);
+	double value = distance/ext;
+	clock_t fin2 = clock();
+
+	time2 += fin2 - ini2;
+
+	times++;
+
+    return value;
+}
+
 double BiharmonicDistanceP2P_block(vector<double>& weights, int pointIdx, binding* bd, float ext, float precomputedDistance, int iniIdx, int finIdx)
 {
     assert(ext != 0);

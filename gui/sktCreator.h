@@ -34,7 +34,7 @@ public:
 		parentNode = NULL;
 		parentRig = NULL;
 
-		dynRig = new AirRig(scene::getNewId());
+		dynRig = new AirRig(scene::getNewId(T_GNRAL));
 
 		usrCreatedRigg = false;
 

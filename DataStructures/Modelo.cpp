@@ -95,7 +95,7 @@ Modelo::Modelo(unsigned int nodeId) : Geometry(nodeId)
     dynCage = NULL;
     currentCage = NULL;
 
-	originalModel = new Geometry(scene::getNewId());
+	originalModel = new Geometry(scene::getNewId(T_OBJECT));
 	originalModelLoaded = false;
 
 	bind = new binding();

@@ -540,7 +540,7 @@ void AdriViewer::readSkeleton(string fileName)
 
      if(ext == QString("off") || ext == QString("obj")) // cargar modelo simple
      {
-         escena->models.push_back((object*)new Modelo(escena->getNewId()));
+         escena->models.push_back((object*)new Modelo(escena->getNewId(T_OBJECT)));
          ((Modelo*)escena->models.back())->loadModel(fileName, name, ext.toStdString(), path);
      }
      else if(ext == QString("txt")) // Cargamos una configuracion
@@ -564,7 +564,7 @@ void AdriViewer::readSkeleton(string fileName)
 
              sPath = absPath+sPath;
 
-             escena->models.push_back((object*)new Modelo(escena->getNewId()));
+             escena->models.push_back((object*)new Modelo(escena->getNewId(T_OBJECT)));
              Modelo* m = (Modelo*)escena->models.back();
 
              QString ext2 = modelFileName.right(3);
