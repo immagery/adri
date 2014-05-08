@@ -355,6 +355,9 @@ public:
 
 	//Biharmonic distances
 	vector<symMatrixLight> BihDistances;
+
+	// Biharmonic distances for computation
+	vector<MatrixXf> A;
 };
 
 
