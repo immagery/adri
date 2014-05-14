@@ -184,9 +184,22 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
 	setShortcut(EXIT_VIEWER, Qt::CTRL+Qt::Key_Q);
 
 	setBackgroundColor(QColor(Qt::black));
+	setFPSIsDisplayed(true);
 
     //testScene();
  }
+
+void AdriViewer::showInfo(string str)
+{
+	QString texto(str.c_str());
+	parent->ui->infoBar->setText(QString(INFO_STRING).arg(texto));
+}
+void AdriViewer::showBarProgress(int value)
+{
+	if(value < 0 ) value = 0;
+	if(value > 100) value = 100;
+	parent->ui->progressBar->setValue(value);
+}
 
  void AdriViewer::animate()
  {

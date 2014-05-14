@@ -59,12 +59,7 @@ public:
     void readModel(string fileName, string name, string path);
     virtual void readScene(string fileName, string name, string path);
 	virtual void saveScene(string fileName, string name, string path, bool compactMode = false){}
-//    void readDistances(QString fileName);
     void readSkeleton(string fileName);
-
-    //float calculateDistancesForISOLines(grid3d* grid, vector<double>&  embeddedPoint);
-
-    //void readCage(QString fileName, Modelo& m_);
 
     // DRAWING FUNCTIONS
     void ReBuildScene();
@@ -74,9 +69,7 @@ public:
 
     //SELECTION
     virtual void selectElements(vector<unsigned int > lst);
-
     void testScene();
-
     void drawColored(QVector<QColor> colors);
 
     // VARIABLES
@@ -101,14 +94,6 @@ public:
 	virtual void setTwistParams(double , double , bool, bool ){}
 	virtual void setBulgeParams( bool ){}
 
-//    void changeVisualizationMode(int);
-//	void updateGridVisualization();
-//    void toogleToShowSegmentation(bool toogle);
-
-//    void changeSmoothPropagationDistanceRatio(float smoothRatioValue);
-//	void cleanWeights(gridRenderer* grRend);
-//    void changeExpansionFromSelectedJoint(float expValue);
-
     // State flags
     bool loadedModel;
     bool loadedCages;
@@ -127,11 +112,6 @@ public:
     bool bMVCComputed;
 
 	Eigen::Vector3d interiorPoint;
-
-    // Primitives
-    //MyMesh simpleCube;
-    //MyMesh littleCube;
-
 	int valueAux;
 
     // Transform
@@ -140,7 +120,6 @@ public:
     int frame;
 	Particles* particles;
 
-    //vector< object*> modelos; // Todos los objetos que tendremos en la escena
     scene* escena; // Escena con jerarquía
 
     selectionManager selMgr;
@@ -160,7 +139,6 @@ public:
     Eigen::Vector2f maxMinMVC;
 
     vector< vector<QColor> > vertexColorLayers;
-
     vector<QColor> vertexColors;
 
     vector< vector<double> > BHD_distancias;
@@ -171,7 +149,6 @@ public:
 
 	vector<joint*> CurrentProcessJoints;
 
-
     QString sPathGlobal;
 
     bool updateInfo();
@@ -180,10 +157,6 @@ public:
 protected:
     virtual void drawWithNames();
     virtual void draw();
-
-//    void drawModel();
-//    void drawWithDistances();
-//    void drawWithCages();
 
 	virtual void postSelection(const QPoint& point){}
 	virtual void endSelection(const QPoint&);
@@ -200,7 +173,6 @@ public slots:
 	void UpdateVertexSource(int id);
 	void ChangeStillCage(int id);
 	void loadSelectableVertex(Cage* cage);
-	//void loadSelectVertexCombo(MyMesh& cage);
 	void changeVertexSelection(int id);
 
 	void paintGrid(gridRenderer* grRend);
@@ -208,79 +180,17 @@ public slots:
 	void doTests(string fileName, string name, string path);
 	float calculateDistancesForISOLines(grid3d* grid, vector<double>&  embeddedPoint);
 
-    // GENERAL
-    //void ChangeSliceXZ(int slice);
-    //void ChangeSliceXY(int slice);
-//protected:
 	virtual void paintModelWithData();
-
-
     void paintModelWithGrid();
-    //void paintPlaneWithData(bool compute = false);
-	//void setPlaneData(bool drawPlane, int pointPos, int mode, float sliderPos, int orient);
-
     bool readNodes(vector< string >& nodeNames, vector< Eigen::Vector3d >& nodePoints, QString sFile);
     bool readPoints(vector< Eigen::Vector3d >& points, QString sFile);
-
-    //void exportWeightsToMaya();
-
-    //void computeProcess();
-    //void doTests(string fileName, string name, string path);
-//	void getStatisticsFromData(string fileName, string name, string path);
-
-    //void VoxelizeModel(Modelo* m, bool onlyBorders = true);
 
 	void setPlanePosition(float x, float y, float z)
 	{
 	
 	}
 
-//	void setThreshold(double value);
-
-    //void ComputeSkining(Modelo* m, gridRenderer* grRend);
-    //void updateSkinning(gridRenderer* grRend);
-
-    //void updateSkinningWithHierarchy(gridRenderer* grRend);
-
-//	void nextProcessStep();
-//	void allNextProcessSteps();
-
-	//void PropagateFromSegment(gridRenderer* grRend, int frontId);
-	//void initDomainForId(gridRenderer* grRend, int fatherId); // Duplicated -> TODELETE
-	//void initGridForHierarchicalskinning(gridRenderer* grRend, int domainId_init);
-	//void NormalizeWeights(gridRenderer* grRend, vector<int>& frontIds);
-
-	//void computeHierarchicalSkinning(gridRenderer* grRend); // first Step
-    //void computeHierarchicalSkinning(gridRenderer* grRend, joint* jt); // recursive computation.
-
-    //void createTraductionTable(joint* jt, map<int, int> &traductionTable, int idNode);
-
-//    void PropFunctionConf();
-	
-//    void paintGrid(gridRenderer* grRend);
-
-//    void ChangeViewingMode(int);
-
-    // CAGES
-//    bool processGreenCoordinates();
-//    bool processHarmonicCoordinates();
-//    bool processMeanValueCoordinates();
-//    bool processAllCoords();
-//    bool deformMesh();
-//    void loadSelectableVertex(Cage* cage /* MyMesh& cage*/);
-//    void showDeformedModelSlot();
-//    void showHCoordinatesSlot();
-//    void active_GC_vs_HC(int tab);
-//    void ChangeSt illCage(int id);
-
-//    void updateGridRender();
-
 	void updateGridRender();
-
-    // Biharmonic Distances
-    //void UpdateVertexSource(int id); // Updates the source for harmonic distances testing
-    //void importSegmentation(QString fileName);
-    //void updateColorLayersWithSegmentation(int maxIdx);
 
 	virtual void setContextMode(contextMode ctx){}
 	virtual void endContextMode(contextMode ctx){}
@@ -288,10 +198,9 @@ public slots:
 	virtual void setToolCrtMode(int ctx){}
 	virtual void setTool(ToolType ctx){}
 
-    //void loadSelectVertexCombo(MyMesh& cage);
-    //void changeVertexSelection(int id);
-
-    // Transform
+	// UI INFO INTERFACE
+	void showInfo(string str);
+	void showBarProgress(int value);
 
 signals:
     void updateSceneView();

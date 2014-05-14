@@ -122,6 +122,8 @@ public:
 		dirtyFlag = true;
 		segmentationDirtyFlag = true;
 
+		addedToComputations = false;
+
 	}
 
 	DefNode() : node() 
@@ -195,6 +197,7 @@ public:
 	double cuttingThreshold;
 
 	bool segmentationDirtyFlag;
+	bool addedToComputations;
 
 	// Serialization
 	bool saveToFile(FILE* fout)

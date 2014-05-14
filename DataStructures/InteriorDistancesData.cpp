@@ -127,15 +127,17 @@ double BiharmonicDistanceP2P_sorted(vector<double>& weights, vector<int>& weight
 {
     assert(ext != 0);
 
-	symMatrixLight& A = bd->BihDistances[0];
+	//symMatrixLight& A = bd->BihDistances[0];
     
+	MatrixXf& A = bd->A[0];
+
 	double qAp = 0;
 	for(unsigned int i = 0; i< weightsSort.size(); i++)
 	{
 		if(weights[weightsSort[i]] < threshold)
 			break;
 
-		qAp += weights[weightsSort[i]]*A.get(pointIdx,weightsSort[i]);
+		qAp += weights[weightsSort[i]]*A(pointIdx,weightsSort[i]);
 	}
 
 	double distance = precomputedDistance - (2*qAp);

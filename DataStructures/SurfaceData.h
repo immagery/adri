@@ -354,6 +354,7 @@ public:
 	unsigned int ntriangles;
 
 	//Biharmonic distances
+	//TODO: remove this structure for A 
 	vector<symMatrixLight> BihDistances;
 
 	// Biharmonic distances for computation
