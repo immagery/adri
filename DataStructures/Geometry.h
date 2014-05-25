@@ -22,6 +22,8 @@ class Geometry : public object , public SurfaceGraph
         void saveModel(string fileName, string name, string ext, string path);
         bool cleanModel();
 
+		void copyFrom(Geometry* geom);
+
         virtual void drawFunc();
 
         virtual void freezeTransformations();
@@ -33,7 +35,7 @@ class Geometry : public object , public SurfaceGraph
 		Eigen::Vector3d maxBBox;
 
 		void computeFaceNormals();
-		void computeVertNormals();
+		void computeVertNormals(bool faceNormalsComputed = true);
 		void computeNormals();
 
 		vector<Eigen::Vector3d> faceNormals;

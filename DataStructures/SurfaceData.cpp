@@ -70,11 +70,6 @@ bool BuildSurfaceFromOFFFile(SurfaceGraph& graph, string& sFileName)
 		}
 	}
 
-	//// De momento no leemos mas que vertices y caras.
-	//for(int i = 0; i< num3; i++)
-	//{
-	//}
-
 	 return true;
 }
 
@@ -507,17 +502,25 @@ void loadBinding(binding* bd, string fileName, vector<skeleton*> skts)
 
 		bd->pointData[in_nodeId].influences.resize((elems.size()-1)/2);
 
+		int realSize = 0;
+
 		for(int infl = 0; infl< bd->pointData[pt].influences.size(); infl++)
 		{
 			string nodeName = elems[infl*2+1];
 			float weightValue = atof(elems[(infl+1)*2].c_str());
 
-			bd->pointData[in_nodeId].influences[infl].label = jointsMap[nodeName];
-			bd->pointData[in_nodeId].influences[infl].weightValue = weightValue;
+			if(weightValue > 0)
+			{
+				bd->pointData[in_nodeId].influences[realSize].label = jointsMap[nodeName];
+				bd->pointData[in_nodeId].influences[realSize].weightValue = weightValue;
+				realSize++;
+			}
 
-			int idInfl = bd->pointData[pt].influences[infl].label;
-			float inflValue = bd->pointData[pt].influences[infl].weightValue;
+			//int idInfl = bd->pointData[pt].influences[infl].label;
+			//float inflValue = bd->pointData[pt].influences[infl].weightValue;
 		}
+
+		bd->pointData[in_nodeId].influences.resize(realSize);
 
 		getline(file , line);
 		/*

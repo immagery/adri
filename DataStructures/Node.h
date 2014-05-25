@@ -54,6 +54,12 @@ class node
         iam = NODE;
     }
 
+	void copyFrom(node* obj)
+	{
+		dirtyFlag = obj->dirtyFlag;
+		iam = obj->iam;
+	}
+
     virtual bool propagateDirtyness()
     {
         dirtyFlag = false;

@@ -119,6 +119,7 @@ void AdriMainWindow::connectSignals() {
     connect(ui->exportWeights_btn, SIGNAL(released()), ui->glCustomWidget, SLOT(exportWeightsToMaya()));
 
     connect(ui->expansionSlider, SIGNAL(valueChanged(int)), this, SLOT(updateExpansionSlidervalue(int)));
+	//connect(ui->expansionSlider, SIGNAL(valueChanged(int)), this, SLOT(updateExpansionSlidervalue(int)));
 
 	connect(ui->thresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(updateThresholdSlidervalue(int)));
 	connect(ui->threshold_enable, SIGNAL(toggled(bool)), this, SLOT(enableThreshold(bool)));

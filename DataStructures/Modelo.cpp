@@ -60,6 +60,31 @@ void Modelo::setSpotVertex(int i)
 	//	}
 }
 
+void Modelo::copyFrom(Modelo& orig_model)
+{
+	// TODEBUG
+	assert(false);
+
+	if(orig_model.originalModelLoaded)
+	{
+		originalModel = new Geometry();
+		originalModel->copyFrom(orig_model.originalModel);
+		originalModelLoaded = orig_model.originalModel;
+	}
+
+	
+	// Bind
+	if(bind)
+	{
+		bind->copyFrom(orig_model.bind);
+		computedBindings = orig_model.bind;
+	}
+	
+	rigBinded = orig_model.rigBinded;
+	sModelPath = orig_model.sModelPath;
+	sModelPrefix = orig_model.sModelPrefix;
+}
+
 Modelo::Modelo() : Geometry()
 {
     // Modelo original que cargamos en memoria.

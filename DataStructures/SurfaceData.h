@@ -29,6 +29,13 @@ public:
 		visited = false;
 	}
 
+	void copyFrom(GraphNode* gr)
+	{
+		id = gr->id;
+		visited = gr->visited;
+		connections.clear();
+	}
+
 	~GraphNode()
 	{
 		connections.clear();
@@ -62,6 +69,13 @@ public:
 		visited = false;
 	}
 
+	void copyFrom(GraphNodePolygon* gnp)
+	{
+		visited = gnp->visited;
+		id = gnp->id;
+		isClosed = gnp->isClosed;
+	}
+
 	bool visited;
 	bool isClosed;
 	int id;
@@ -76,6 +90,50 @@ public:
 	{
 		nodes.clear();
 		triangles.clear();
+	}
+
+	~SurfaceGraph()
+	{
+		// De-allocate model memory
+		for(int i = 0; i< nodes.size(); i++)
+			delete nodes[i];
+
+		for(int i = 0; i< triangles.size(); i++)
+			delete triangles[i];
+
+		nodes.clear();
+		triangles.clear();
+	}
+
+	void copyFrom(SurfaceGraph* sg)
+	{
+		// Allocate model memory
+		nodes.resize(sg->nodes.size());
+		triangles.resize(sg->triangles.size());
+
+		for(int i = 0; i< nodes.size(); i++)
+		{
+			nodes[i] = new GraphNode();
+			nodes[i]->copyFrom(sg->nodes[i]);
+
+			for(int ndIdx = 0; ndIdx < sg->nodes[i]->connections.size(); ndIdx++)
+			{
+				int idxNeigbour = sg->nodes[i]->connections[ndIdx]->id;
+				nodes[i]->connections.push_back(nodes[idxNeigbour]);
+			}
+		}
+
+		for(int i = 0; i< triangles.size(); i++)
+		{
+			triangles[i] = new GraphNodePolygon();
+			triangles[i]->copyFrom(sg->triangles[i]);
+
+			for(int ndIdx = 0; ndIdx < sg->triangles[i]->verts.size(); ndIdx++)
+			{
+				int idxVert = sg->triangles[i]->verts[ndIdx]->id;
+				triangles[i]->verts.push_back(nodes[idxVert]);
+			}
+		}
 	}
 
 	vector<GraphNode*> nodes;
@@ -239,6 +297,66 @@ public:
 		cutThreshold.clear();
 		weightsFiltered.clear();
     }
+
+	void copyFrom(binding* bd)
+	{
+	    // Parameters
+		smoothPropagationRatio = bd->smoothPropagationRatio;
+		worldScale = bd->worldScale;
+		minConfidenceLevel = bd->minConfidenceLevel;
+		smoothingPasses = bd->smoothingPasses;
+		minTriangleArea = bd->minTriangleArea;
+		bindId = bd->bindId;
+		weightsCutThreshold = bd->weightsCutThreshold;
+
+		// TODO
+		assert(false);
+
+		// Hay que definir bien lo que se usa y no se usa de un binding
+
+		/*
+		// BINDED SKELETONS... get references
+
+		// binded skeletons
+		vector<skeleton*> bindedSkeletons;
+
+		// Node definition data
+		vector< DefNode > intPoints;
+		map< int, DefNode*> nodeIds;
+		vector< int > traductionTable;
+		vector<vector<double> > embeddedPoints;
+		vector<int> globalIndirection;
+
+		vector< vector<weight> > weightsFiltered;
+
+		// Weights sorted to be used as a calculus stoper.
+		vector<vector<int> > weightsSort;
+		vector<vector<bool> >weightsRepresentative;
+
+		vector<double> cutThreshold;
+
+		/// Info for each point of the geometry
+		vector<PointData> pointData;
+		vector<TriangleData> virtualTriangles;
+
+		/// Data structure for process faster the geometry
+		SurfaceGraph* mainSurface;
+		vector<SurfaceGraph> surfaces;
+		vector<bool> enabledSurfaces;
+
+		//SurfaceGraph surface;
+		unsigned int ntriangles;
+
+		//Biharmonic distances
+		//TODO: remove this structure for A 
+		vector<symMatrixLight> BihDistances;
+
+		// Biharmonic distances for computation
+		vector<MatrixXf> A;		
+
+		*/
+
+	}
 
 	~binding()
     {

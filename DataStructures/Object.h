@@ -22,6 +22,15 @@ public:
     object(unsigned int id);
     object(Eigen::Vector3d _pos);
 
+	void copyFrom(object* obj)
+	{
+		node::copyFrom((node*) obj);
+
+		pos = obj->pos;
+		qrot = obj->qrot;
+		tMatrix = obj->tMatrix;
+	}
+
 	object(Eigen::Vector3d _pos, Eigen::Quaternion<double> _qrot);
     //object( Eigen::Vector3d _pos,  Eigen::Vector3d _rot);
 

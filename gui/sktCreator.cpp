@@ -139,6 +139,21 @@ void sktCreator::removeLastNode()
 }
 
 
+//Esta establece la posición de descanso con la posición y rot actual
+void resetRestPose(DefGroup* groupDest)
+{
+	joint* jt = groupDest->transformation;
+
+	jt->rTranslation = jt->translation;
+	jt->rRotation = jt->rotation;
+	jt->rTwist = jt->twist;
+
+	jt->restRot = jt->qrot;
+	jt->restPos = jt->pos;
+	jt->qOrient = jt->qOrient;
+}
+
+
 void copyDefGroup(DefGroup* groupDest, DefGroup* groupOrig)
 {
 	for(int defIdx = 0; defIdx< groupOrig->deformers.size(); defIdx++)
@@ -188,6 +203,8 @@ void copyDefGroupsHierarchy(AirRig* strain, DefGroup* link, DefGroup* graft)
 
 	copyDefGroup(sprout, graft);
 
+	resetRestPose(sprout);
+
 	// Setting dirty flags triggers computation
 	sprout->dirtyCreation = true;
 	sprout->dirtyTransformation = true;
@@ -218,7 +235,7 @@ void sktCreator::finishRig()
 
 	int firstIndexToCopy = 0;
 
-	if(parentNode)
+	if(parentNode != NULL)
 	{
 		// tengo que cargarme el primer nodo porque lo había copiado.
 		if(dynRig->defRig.defGroups.size() > 1)
@@ -232,6 +249,7 @@ void sktCreator::finishRig()
 	else
 	{
 		copyDefGroupsHierarchy(parentRig, parentNode, dynRig->defRig.roots[0]);
+		//parentRig->defRig.roots[0]->select(true, parentRig->defRig.roots[0]->nodeId);
 		dynRig->defRig.roots[0]->select(true, dynRig->defRig.roots[0]->nodeId);
 	}
 

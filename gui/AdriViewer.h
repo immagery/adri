@@ -55,6 +55,8 @@ public:
     virtual void init();
     virtual void animate();
 
+    virtual void initViewer(){}
+
     // LOADING
     void readModel(string fileName, string name, string path);
     virtual void readScene(string fileName, string name, string path);

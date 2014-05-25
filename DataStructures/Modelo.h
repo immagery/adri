@@ -15,6 +15,8 @@ public:
     Modelo(unsigned int id);
     ~Modelo();
 
+	void copyFrom(Modelo& orig_model);
+
     virtual void Clear();
 
 	// Original geometry for compute deformations

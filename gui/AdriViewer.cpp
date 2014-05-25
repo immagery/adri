@@ -61,7 +61,6 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
     m_sceneMax[1] = m_sceneRadius;
     m_sceneMax[2] = m_sceneRadius;
 
-    //initScene();
 
     // State flags
     loadedModel = false;
@@ -73,30 +72,10 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
     // Transform
 //    this->setAnimationPeriod(0);
 
-    // Drawing flags.
-//    drawCage = true;
-//    shadeCoordInfluence = true;
-//    bGCcomputed = false;
-//    bHComputed = false;
-
-//    //m_bHCGrid = false;
-
-//    bGCcomputed = false;
-//    bHComputed = false;
-//    bMVCComputed = false;
-
-//    influenceDrawingIdx = 0;
-
-//    //activeCoords = HARMONIC_COORDS;
-//    //m.sModelPath = "";
-
-//    stillCageAbled = false;
-//    stillCageSelected = -1;
-
     viewingMode = SimpleModel_Mode;
     ShadingModeFlag = SH_MODE_SMOOTH; //smooth
 
-    // Guardamos un directorio de trabajo para ir m�s r�pido
+    // Guardamos un directorio de trabajo para ir mas rapido
     QFile file(QDir::currentPath()+"/WorkDir.txt");
     file.open(QFile::ReadOnly);
     if(file.exists())
@@ -132,17 +111,13 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
 
 	interiorPoint = Eigen::Vector3d(0,0,0);
 
-    //ctxMode = CTX_SELECTION;
-
     frame = 0;
 	aniManager.simulationEnabled = false;
 	aniManager.animationEnabled = false;
 	particles = new Particles();
-	//particles->bake(1500, 1/24.0);
 
 	setSceneCenter(Vec(0,0,0));
     setSceneRadius(400);
-	//ReBuildScene();
 }
 
  AdriViewer::~AdriViewer()
@@ -213,6 +188,7 @@ void AdriViewer::showBarProgress(int value)
 
      */
 
+	 /*
 	 if (!aniManager.animationEnabled) return;
 
      for (unsigned int i = 0; i < escena->skeletons.size(); ++i) {
@@ -230,7 +206,7 @@ void AdriViewer::showBarProgress(int value)
      ++frame;
      if (frame == 150) aniManager.animationEnabled = false;
      emit changedFrame(frame);
-
+	 */
 
  }
 
@@ -337,7 +313,8 @@ void AdriViewer::selectElements(vector<unsigned int > lst)
      //ReBuildScene();
      updateInfo();
      emit updateSceneView();
-     */}
+     */
+}
 
  // Lee una lista de puntos.
 
@@ -662,10 +639,15 @@ void AdriViewer::readSkeleton(string fileName)
  }
 
 // This function inits the scene using the general viewing parameters.
- void AdriViewer::initScene(){
+ void AdriViewer::initScene()
+ {
+
      setGridIsDrawn(false);
-     setAxisIsDrawn(true);
+     //setAxisIsDrawn(true);
      setFPSIsDisplayed(true);
+
+	 setBackgroundColor(QColor(Qt::darkGray));
+
 
      // Restore previous viewer state.
      //restoreStateFromFile();
@@ -673,6 +655,8 @@ void AdriViewer::readSkeleton(string fileName)
 
  // Inicializates the scene taking in account all the models of the scene.
 void AdriViewer::ReBuildScene(){
+
+	printf("Rebuild scene\n");
 
      double minX = 0, minY = 0, minZ = 0, maxX = 0, maxY = 0, maxZ = 0;
      bool init_ = false;

@@ -17,6 +17,32 @@ Geometry::~Geometry()
 	delete shading;
 }
 
+void Geometry::copyFrom(Geometry* geom)
+{
+	SurfaceGraph::copyFrom((SurfaceGraph*) geom);
+	object::copyFrom((object*) geom);
+
+	shading = new GeometryRender(this);	
+
+	minBBox = geom->minBBox;
+	maxBBox = geom->maxBBox;
+
+	// allocate memory
+	faceNormals.resize(geom->faceNormals.size());
+	vertNormals.resize(geom->vertNormals.size());
+	edges.resize(geom->edges.size());
+
+	// Copy elements
+	for(int i = 0; i < faceNormals.size(); i++)
+		faceNormals[i] = geom->faceNormals[i];
+
+	for(int i = 0; i < vertNormals.size(); i++)
+		vertNormals[i] = geom->vertNormals[i];
+
+	for(int i = 0; i < edges.size(); i++)
+		edges[i] = geom->edges[i];
+}
+
 void Geometry::drawFunc()
 {
     // transformaciones
@@ -172,7 +198,9 @@ void Geometry::computeFaceNormals()
 {
 	int trianglesSize = triangles.size();
 	faceNormals.resize(trianglesSize);
-	for(unsigned int i = 0; i < triangles.size(); i++)
+
+	#pragma omp parallel for
+	for(int i = 0; i < triangles.size(); i++)
 	{
 		Eigen::Vector3d v1 = triangles[i]->verts[1]->position - triangles[i]->verts[0]->position;
 		Eigen::Vector3d v2 = triangles[i]->verts[2]->position - triangles[i]->verts[0]->position;
@@ -180,9 +208,9 @@ void Geometry::computeFaceNormals()
 	}
 }
 
-void Geometry::computeVertNormals()
+void Geometry::computeVertNormals(bool faceNormalsComputed)
 {
-	if(triangles.size() != faceNormals.size())
+	if(triangles.size() != faceNormals.size() && !faceNormalsComputed)
 		computeFaceNormals();
 
 	vertNormals.resize(nodes.size());
@@ -191,7 +219,8 @@ void Geometry::computeVertNormals()
 	vector<int> vertTriCounter;
 	vertTriCounter.resize(nodes.size(),0);
 
-	for(unsigned int i = 0; i < nodes.size();i++)
+	#pragma omp parallel for
+	for(int i = 0; i < nodes.size();i++)
 		vertNormals[i] = Eigen::Vector3d(0,0,0);
 
 	for(unsigned int i = 0; i < triangles.size(); i++)
@@ -203,7 +232,8 @@ void Geometry::computeVertNormals()
 		}
 	}
 
-	for(unsigned int i = 0; i < nodes.size();i++)
+	#pragma omp parallel for
+	for(int i = 0; i < nodes.size();i++)
 		vertNormals[i] = (vertNormals[i]/vertTriCounter[i]).normalized();
 
 	//faceNormals.clear();
@@ -212,7 +242,7 @@ void Geometry::computeVertNormals()
 void Geometry::computeNormals()
 {
 	computeFaceNormals();
-	computeVertNormals();
+	computeVertNormals(false);
 }
 
 Eigen::Vector3d Geometry::getSelCenter()
@@ -230,7 +260,7 @@ Eigen::Vector3d Geometry::getSelCenter()
         }
 
         if(shading->selectedIds.size() > 0)
-            center = center/shading->selectedIds.size();
+            center = center/(double)shading->selectedIds.size();
 
         return center;
     }
