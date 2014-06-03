@@ -46,6 +46,7 @@ void sktCreator::addNewNode(Vector3d point)
 	{
 		// creation
 		DefGroup* df = new DefGroup(scene::getNewId(T_DEFNODE));
+		df->references = &(dynRig->defRig.defGroupsRef);
 		df->transformation = new joint(scene::getNewId(T_BONE));
 		joint* newJoint = df->transformation;
 
@@ -80,6 +81,7 @@ void sktCreator::addNewNode(Vector3d point)
 	{
 		// creation
 		DefGroup* df = new DefGroup(scene::getNewId(T_DEFNODE));
+		df->references = &(dynRig->defRig.defGroupsRef);
 		df->transformation = new joint(scene::getNewId(T_BONE));
 		joint* newJoint = df->transformation;
 
@@ -193,11 +195,13 @@ void copyDefGroupsHierarchy(AirRig* strain, DefGroup* link, DefGroup* graft)
 	if(link == NULL)
 	{
 		strain->defRig.roots.push_back(new DefGroup(scene::getNewId(T_DEFGROUP)));
+		strain->defRig.roots.back()->references = &(strain->defRig.defGroupsRef);
 		sprout = strain->defRig.roots.back();
 	}
 	else
 	{
 		link->relatedGroups.push_back(new DefGroup(scene::getNewId(T_DEFGROUP)));
+		link->relatedGroups.back()->references = &(strain->defRig.defGroupsRef);
 		sprout = link->relatedGroups.back();
 	}
 

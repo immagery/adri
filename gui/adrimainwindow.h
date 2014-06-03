@@ -61,6 +61,7 @@ public slots:
     virtual void updateSceneView();
     void updateSceneView(TreeItem* treeitem, treeNode* treenode);
     void selectObject(QModelIndex idx);
+	void unSelectObject(QModelIndex idx);
 
     void toogleMoveTool();
     void toogleRotateTool();
@@ -86,6 +87,8 @@ public slots:
     void updateExpansionSlidervalue(int);
     void jointDataUpdate(float fvalue, int id);
 	void NodeDataUpdate(float iniTw, float finTw, bool enableTw, bool smoothTw, int smooth);
+	void defGroupValueUpdate(float ,bool , bool ,int ,float ,float);
+	void labelsFromSelectedUpdate(int nodeId, string sName);
 	void jointTransformUpdate(float x,float y,float z,float alpha,float beta,float gamma);
 	
 	virtual void changeAuxValueInt(int value);

@@ -124,6 +124,8 @@ public:
 
 		addedToComputations = false;
 
+		freeNode = true;
+
 	}
 
 	DefNode() : node() 
@@ -160,6 +162,26 @@ public:
 		pos = def_orig.pos;
 		relPos = def_orig.relPos;
 		precomputedDistances = def_orig.precomputedDistances;
+
+		segmentationDirtyFlag = def_orig.segmentationDirtyFlag;
+		freeNode = def_orig.freeNode;
+		addedToComputations = def_orig.addedToComputations;
+
+
+	}
+
+	void copyKeyInfoFrom(const DefNode& def_orig)
+	{
+		boneId = def_orig.boneId;
+		rootBoneId = def_orig.rootBoneId;
+		childBoneId = def_orig.childBoneId;
+
+		ratio = def_orig.ratio;
+		expansion = def_orig.expansion;
+
+		pos = def_orig.pos;
+		relPos = def_orig.relPos;
+		precomputedDistances = def_orig.precomputedDistances;		
 	}
 
 	virtual bool propagateDirtyness()
@@ -198,6 +220,10 @@ public:
 
 	bool segmentationDirtyFlag;
 	bool addedToComputations;
+
+	bool creationDirtyFlag;
+
+	bool freeNode;
 
 	// Serialization
 	bool saveToFile(FILE* fout)

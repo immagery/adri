@@ -41,6 +41,15 @@ public:
 	virtual bool bindModel(Modelo* m);
 	virtual bool bindSkeletons(vector<skeleton*>& skts);
 
+	virtual void getNodeData(int nodeId, string& sName){}
+
+	virtual void getDataFromDefGroup(int element, float& expansion, bool& twistEnabled,
+									 bool& bulgeEnabled,int& localSmoothPases,
+									 float& twistIni,float& twistFin){}
+
+	virtual void select(bool bSelect, int element) {}
+	virtual bool isSelectable(int element){ return true; }
+
 };
 
 #endif // RIG_H

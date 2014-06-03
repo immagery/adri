@@ -16,6 +16,8 @@
 // render size
 #define DEFAULT_SIZE 0.05
 
+#define DRAW_TWIST_VECTOR false
+
 #include <DataStructures/Skeleton.h>
 
 float JointRender::jointSize = DEFAULT_SIZE;
@@ -150,20 +152,23 @@ void JointRender::drawFunc(joint* jt)
     //drawAxisHandle(jointSize*25);
 
 	// Draw twist vector
-	if(jt->childs.size() == 1)
+	if(DRAW_TWIST_VECTOR)
 	{
-		glDisable(GL_LIGHTING);
+		if(jt->childs.size() == 1)
+		{
+			glDisable(GL_LIGHTING);
 		
-		glLineWidth(5);
-		glBegin(GL_LINES);
+			glLineWidth(5);
+			glBegin(GL_LINES);
 
-		glColor3f(1.0,1.0,1.0);
-		glVertex3d(0,0,0);
-		glVertex3d(jt->childs[0]->twist.x()*10,jt->childs[0]->twist.y()*10,jt->childs[0]->twist.z()*10);
+			glColor3f(1.0,1.0,1.0);
+			glVertex3d(0,0,0);
+			glVertex3d(jt->childs[0]->twist.x()*10,jt->childs[0]->twist.y()*10,jt->childs[0]->twist.z()*10);
 
-		glEnd();
-		glLineWidth(1);
-		glEnable(GL_LIGHTING);
+			glEnd();
+			glLineWidth(1);
+			glEnable(GL_LIGHTING);
+		}
 	}
 
     // Pintamos la pelota de expansion

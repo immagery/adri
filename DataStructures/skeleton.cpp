@@ -627,6 +627,7 @@ int subdivideBone(joint* parent, joint* child,
 		nodePoints.back().nodeId = scene::getNewId(T_DEFNODE);
 		nodePoints.back().ratio = (float)i/(float)numDivisions;
 		nodePoints.back().childBoneId = child->nodeId;
+		nodePoints.back().freeNode = false;
 
 		// Expansion propagation
 		float expValue = parent->expansion;
@@ -671,6 +672,7 @@ void addNodes(joint* jt, vector< DefNode >& nodePoints, vector<int>& idx,
 	nodePoints.back().nodeId = scene::getNewId(T_DEFNODE);
 	nodePoints.back().ratio = 0.0;
 	nodePoints.back().expansion = jt->expansion;
+	nodePoints.back().freeNode = false;
 
 	// We link all the child nodes to this node.
 	for(int i = 0; i < jt->getChildCount(); i++)

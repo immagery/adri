@@ -14,6 +14,12 @@ void pConstraintAngle::solve(vector< Vector3d >& estimation, int nIterations)
 	int idx3 = elems[2]->nodeId;
     int idx4 = elems[3]->nodeId;
 
+	float sumWeights = 0;
+	for(int i = 0; i< elems.size(); i++)
+		sumWeights += elems[0]->weight;
+
+	if(sumWeights == 0) return; // Todos los elementos están bloqueados
+
 	Vector3d pt00 = estimation[idx1];
 	Vector3d pt01 = estimation[idx2];
 	Vector3d pt10 = estimation[idx3];
@@ -60,6 +66,7 @@ void pConstraintAngle::solve(vector< Vector3d >& estimation, int nIterations)
 					 elems[1]->weight*pow(q1.norm(),2) + 
 					 elems[2]->weight*pow(q2.norm(),2) + 
 					 elems[3]->weight*pow(q3.norm(),2) ;
+
 
 	float s = constraint / (jac_sum);
 

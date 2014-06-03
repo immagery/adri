@@ -111,6 +111,8 @@ class scene
 		iVisMode = 0;
 		desiredVertex = 0;
 
+		sceneScale = 1;
+
 		rig = NULL;
 		rigsArray = vector<Rig*>();
     }
@@ -176,6 +178,8 @@ class scene
 
             for(unsigned int i = 0; i< skeletons.size(); i++)
                 ((skeleton*)(skeletons[i]))->select(false, lst[j]);
+
+			rig->select(false, -1);
         }
     }
 
@@ -186,6 +190,8 @@ class scene
 
         for(unsigned int i = 0; i< skeletons.size(); i++)
             ((skeleton*)(skeletons[i]))->select(false, -1);
+
+		rig->select(false, -1);
     }
 
 	int findIdByName(string name) {
@@ -244,6 +250,9 @@ class scene
 	bool skeletonLoaded;
 	bool embeddingLoaded;
 	bool weightsUpdated;
+
+	// Global scene scale, for unifying all the processes
+	float sceneScale;
 
 	// Scene draw flags
 	static bool drawDefNodes;

@@ -131,10 +131,18 @@ void AdriMainWindow::connectSignals() {
 
 	//connect(ui->auxValueInt, SIGNAL(valueChanged(int)), this, SLOT(changeAuxValueInt(int)));
 
-	connect(ui->glCustomWidget, SIGNAL(defGroupData(float, float, bool, bool, int)), SLOT(NodeDataUpdate(float, float, bool, bool, int)));
+	connect(ui->glCustomWidget, SIGNAL(defGroupData(float, float, bool, bool, int)), this,
+							    SLOT(NodeDataUpdate(float, float, bool, bool, int)));
 
-    connect(ui->glCustomWidget, SIGNAL(jointDataShow(float, int)), this , SLOT(jointDataUpdate(float,int)));
-	connect(ui->glCustomWidget, SIGNAL(jointTransformationValues(float,float,float,float,float,float)), this , SLOT(jointTransformUpdate(float,float,float,float,float,float)));
+	connect(ui->glCustomWidget, SIGNAL(defGroupValueUpdate(float ,bool , bool ,int ,float ,float )), this,
+								  SLOT(defGroupValueUpdate(float ,bool , bool ,int ,float ,float )));
+
+	connect(ui->glCustomWidget, SIGNAL(labelsFromSelectedUpdate(int ,string )), this,
+								  SLOT(labelsFromSelectedUpdate(int ,string )));
+
+    //connect(ui->glCustomWidget, SIGNAL(jointDataShow(float, int)), this , SLOT(jointDataUpdate(float,int)));
+	connect(ui->glCustomWidget, SIGNAL(jointTransformationValues(float,float,float,float,float,float)), this , 
+								SLOT(jointTransformUpdate(float,float,float,float,float,float)));
 
 	connect(ui->ip_axisX, SIGNAL(valueChanged(int)), this, SLOT(changeInteriorPointPosition()));
 	connect(ui->ip_axisY, SIGNAL(valueChanged(int)), this, SLOT(changeInteriorPointPosition()));
@@ -415,6 +423,29 @@ void AdriMainWindow::jointTransformUpdate(float x,float y,float z,float alpha,fl
 	rotationZ = Deg2Rad(gamma);
 }
 
+void AdriMainWindow::labelsFromSelectedUpdate(int nodeId, string sName)
+{
+	ui->def_group_id->setText(QString("%1").arg(nodeId));
+	ui->def_groupName->setText(QString("%1").arg(sName.c_str()));
+}
+
+void AdriMainWindow::defGroupValueUpdate(float expansion, bool twistEnabled, bool bulgeEnabled, 
+							int localSmoothPases, float twistIni, float twistFin)
+{
+	ui->twistEnableCheck->setChecked(twistEnabled);
+
+	ui->expansionValueEdit->setText(QString("%1").arg(expansion));
+	ui->expansionSlider->setValue(expansion*1000);
+
+	ui->bulgeEffectActivation->setChecked(bulgeEnabled);
+
+	ui->twist_ini_slider->setValue((int)(twistIni*1000));
+	ui->twist_fin_slider->setValue((int)(twistFin*1000));
+
+	ui->localSmoothingPasses->setValue(localSmoothPases);
+
+}
+
 void AdriMainWindow::NodeDataUpdate(float iniTw, float finTw, bool enableTw, bool smoothTw, int smooth)
 {
 	ui->twistEnableCheck->setChecked(enableTw);
@@ -505,6 +536,8 @@ void AdriMainWindow::toogleSelectionTool()
 
 void AdriMainWindow::toogleCreateSkeletonTool()
 {
+	ui->actionCreateSkeletonTool->setChecked(true);
+
 	ui->actionSelection->setChecked(false);
     ui->actionMove->setChecked(false);
     ui->actionRotate->setChecked(false);
@@ -640,7 +673,7 @@ void AdriMainWindow::changeTool(toolmode newtool)
         break;
     }
 
-    printf("ha habido un cambio\n"); fflush(0);
+    //printf("ha habido un cambio\n"); fflush(0);
 
 }
 
@@ -749,6 +782,11 @@ void AdriMainWindow::UpdateScene()
 
 }
 
+void AdriMainWindow::unSelectObject(QModelIndex idx)
+{
+
+}
+
 void AdriMainWindow::selectObject(QModelIndex idx)
 {
     //TreeModel* model = (TreeModel*)ui->outlinerView->model();
@@ -767,6 +805,9 @@ void AdriMainWindow::selectObject(QModelIndex idx)
     vector<unsigned int > lst;
     lst.push_back(item->item_id);
     ui->glCustomWidget->selectElements(lst);
+
+	ui->def_group_id->setText(QString("%1").arg(item->item_id));
+	ui->def_groupName->setText(QString("%1").arg(item->sName.c_str()));
 
 	//ui->glCustomWidget->updateGridVisualization();
 

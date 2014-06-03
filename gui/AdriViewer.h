@@ -204,6 +204,8 @@ public slots:
 	void showInfo(string str);
 	void showBarProgress(int value);
 
+	virtual void setSceneScale(float scale){}
+
 signals:
     void updateSceneView();
     void jointDataShow(float, int);
@@ -215,6 +217,9 @@ signals:
 	void setRiggingToolUI();
 	void setAnimToolUI();
 	void setTestToolUI();
+
+	void defGroupValueUpdate(float ,bool , bool ,int ,float ,float );
+	void labelsFromSelectedUpdate(int, string);
 
 private :
   void startManipulation();

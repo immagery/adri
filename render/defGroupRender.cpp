@@ -84,6 +84,7 @@ void drawStickDefGroup(float length)
 	pts[3] = Vector3d( midRelation,  -midRelation,  midRelation);
 	
 	glDisable(GL_LIGHTING);
+
     glBegin(GL_LINES);
 
 	for(int pt = 0; pt < 4; pt++)
@@ -200,6 +201,8 @@ void DefGroupRender::drawFunc()
 
 	double maxRelation = 0;
 
+	glLineWidth(1);
+
 	// Render the bone shape
 	if(selected)
 		glColor3f(0.5,0.25,0.5);
@@ -226,7 +229,7 @@ void DefGroupRender::drawFunc()
 	
 	if(g->relatedGroups.size() == 0)
 	{
-		drawTriCircle(10, 0.35);
+		drawTriCircle(20, scene::drawingNodeStdSize*0.5);
 		maxRelation = 1.0;
 	}
 
@@ -236,9 +239,14 @@ void DefGroupRender::drawFunc()
 	{
 		for(int defIdx = 0; defIdx < group->deformers.size(); defIdx++)
 		{
+			if(group->deformers[defIdx].freeNode) continue;
+
 			int type = 0;
-			if(group->deformers[defIdx].dirtyFlag) type = 1;
-			else if(group->deformers[defIdx].segmentationDirtyFlag) type = 2;
+			if(group->deformers[defIdx].dirtyFlag) 
+			{	type = 1;
+				if(group->deformers[defIdx].segmentationDirtyFlag) 
+					type = 2;
+			}
 
 			drawPointLocator(group->deformers[defIdx].relPos, maxRelation*0.25,type);
 		}

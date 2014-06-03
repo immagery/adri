@@ -14,8 +14,11 @@ unsigned int scene::generalIds = FIRST_GNRAL_ID;
 bool scene::drawDefNodes = true;
 float scene::drawingNodeStdSize = 1.0;
 
-void scene::setSceneScale( float sceneScale)
+void scene::setSceneScale( float _sceneScale)
 {
+	sceneScale = _sceneScale;
+	scene::drawingNodeStdSize = sceneScale;
+
 	for(int model = 0; model < models.size(); model++)
 	{
 		//for(int bd = 0; bd < ((Modelo*)models[model])->bindings.size(); bd++)

@@ -9,8 +9,6 @@
 //#include <vcg\math\quaternion.h>
 #include <map>
 
-class DefNode;
-
 
 // SKELETON
 class joint : public object
@@ -21,8 +19,8 @@ class joint : public object
         vector< joint* > childs;
         vector< DefNode* > nodes;
 
-		Eigen::Quaternion<double> qOrient;
-		Eigen::Quaternion<double> restOrient;
+		Eigen::Quaterniond qOrient;
+		Eigen::Quaterniond restOrient;
 
 		int deformerId;
 
@@ -31,17 +29,17 @@ class joint : public object
 
 		// Modelling
 		Eigen::Vector3d translation;
-		Eigen::Quaternion<double> rotation;
+		Eigen::Quaterniond rotation;
 
 		// Rest modelling
 		Eigen::Vector3d rTranslation;
-		Eigen::Quaternion<double> rRotation;
+		Eigen::Quaterniond rRotation;
 
 		// Rest modelling
 		Eigen::Vector3d restPos;
-		Eigen::Quaternion<double> restRot;
+		Eigen::Quaterniond restRot;
 
-		Eigen::Quaternion<double> parentRot;
+		Eigen::Quaterniond parentRot;
 
 		Eigen::Quaterniond twist;
 		Eigen::Quaterniond rTwist;
