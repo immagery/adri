@@ -19,8 +19,8 @@ class joint : public object
         vector< joint* > childs;
         vector< DefNode* > nodes;
 
-		Eigen::Quaterniond qOrient;
-		Eigen::Quaterniond restOrient;
+		Quaterniond qOrient;
+		Quaterniond restOrient;
 
 		int deformerId;
 
@@ -28,33 +28,38 @@ class joint : public object
 		vector< vector< double > > childVector;
 
 		// Modelling
-		Eigen::Vector3d translation;
-		Eigen::Quaterniond rotation;
+		Vector3d translation;
+		Quaterniond rotation;
+
+		Quaterniond AuxRotation;
 
 		// Rest modelling
-		Eigen::Vector3d rTranslation;
-		Eigen::Quaterniond rRotation;
+		Vector3d rTranslation;
+		Quaterniond rRotation;
 
 		// Rest modelling
-		Eigen::Vector3d restPos;
-		Eigen::Quaterniond restRot;
+		Vector3d restPos;
+		Quaterniond restRot;
 
-		Eigen::Quaterniond parentRot;
+		Quaterniond parentRot;
 
-		Eigen::Quaterniond twist;
-		Eigen::Quaterniond rTwist;
+		Quaterniond twist;
+		Quaterniond rTwist;
 
-		Eigen::Matrix4f iT;
-		Eigen::Matrix4f W;
-		Eigen::Matrix4f world;
+		Quaterniond nonRollRot;
+		Quaterniond boneAxisRot;
 
-		vector<Eigen::Quaterniond> rots;
+		Matrix4f iT;
+		Matrix4f W;
+		Matrix4f world;
+
+		vector<Quaterniond> rots;
 
         float expansion;
 		float smoothness;
 
         // For precomputation
-        Eigen::Vector3d worldPosition;
+        Vector3d worldPosition;
 
 		bool enableWeightsComputation;
 

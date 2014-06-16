@@ -291,8 +291,13 @@ void BuildSurfaceGraphs(Modelo* m)
 
 	for(unsigned int n = 0; n < nodes.size(); n++)
 	{
+		// A. BoundingBox computation
 		if(initMinBBox)
-			m->minBBox = Vector3d(min(m->minBBox.x(), nodes[n]->position.x()), min(m->minBBox.y(), nodes[n]->position.y()), min(m->minBBox.z(), nodes[n]->position.z()));
+		{
+			m->minBBox = Vector3d(min(m->minBBox.x(), nodes[n]->position.x()), 
+								  min(m->minBBox.y(), nodes[n]->position.y()), 
+								  min(m->minBBox.z(), nodes[n]->position.z()));
+		}
 		else
 		{
 			m->minBBox = nodes[n]->position;
@@ -300,17 +305,19 @@ void BuildSurfaceGraphs(Modelo* m)
 			initMinBBox = true;
 		}
 
-		m->maxBBox = Vector3d(max(m->maxBBox.x(), nodes[n]->position.x()), max(m->maxBBox.y(), nodes[n]->position.y()), max(m->maxBBox.z(), nodes[n]->position.z()));
+		m->maxBBox = Vector3d(max(m->maxBBox.x(), nodes[n]->position.x()), 
+							  max(m->maxBBox.y(), nodes[n]->position.y()), 
+							  max(m->maxBBox.z(), nodes[n]->position.z()));
 
 
-		// todavia no se ha trabajado, debe ser nuevo
-		if(connIds[n] < 0)
+		// B. Connectivity segmentation of the model
+		if(connIds[n] < 0) // Not processed
 		{
-			// Asignamos ID nuevo
+			// We assign a new ID
 			idDispatcher++;
 			connIds[n] = idDispatcher;
 
-			// Iniciamos variables de recorrido
+			// Initialization of variables for running
 			for(unsigned int v = 0; v < visIds.size(); v++)
 				visIds[v] = false;
 
@@ -328,6 +335,7 @@ void BuildSurfaceGraphs(Modelo* m)
 
 	printf("Count of connex components: %d\n", idDispatcher+1);
 
+	// Recopilation of dispatched ID's
 	vector<bool> founded;
 	founded.resize(idDispatcher+1, false);
 	for(int conId = 0; conId < connIds.size(); conId++)
@@ -345,6 +353,7 @@ void BuildSurfaceGraphs(Modelo* m)
 			break;
 	}
 
+	// Reorder the ID's
 	int relateId = 0;
 	map<int, int> relateGraphId;
 	for(int f = 0; f < founded.size(); f++)
@@ -356,9 +365,9 @@ void BuildSurfaceGraphs(Modelo* m)
 		}
 	}
 
+	// Apply the new ID and count the concidences
 	vector<int> graphNodesCounter;
 	graphNodesCounter.resize(relateId);
-
 	for(int i = 0; i< connIds.size(); i++)
 	{
 		connIds[i] = relateGraphId[connIds[i]];

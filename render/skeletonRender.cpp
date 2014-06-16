@@ -221,21 +221,46 @@ void JointRender::computeRestPosRec(joint* jt, joint* father)
 		axis.normalize();
 
 		Vector3d tempRestRot = father->rRotation._transformVector(axis);
+
+		Vector3d xAxis(1,0,0);
+		xAxis = father->rRotation._transformVector(xAxis);
+		Quaterniond qxAxis;
+		qxAxis.setFromTwoVectors(xAxis, tempRestRot);
+
+		Quaterniond toAxisRotation = father->rRotation*qxAxis;
+
+		//Vector3d tempRestRot = (father->rRotation._transformVector(axis);
+		//Vector3d tempRestRot = (father->rRotation*jt->restOrient)._transformVector(axis);
+
+		// Rotation for the this joint, from parent to this.
 		Quaterniond localRotationChild =  jt->qOrient * jt->qrot;
-		Quaterniond localRotationChildRest =  jt->restRot;
-		Vector3d referenceRest = localRotationChildRest._transformVector(tempRestRot);
-		Vector3d referenceCurr = localRotationChild._transformVector(tempRestRot);
+		Quaterniond localRotationChildRest =  jt->restOrient * jt->restRot;
+
+		// To review how to compute rest and current toAxisRotation
+		Vector3d referenceRest = (toAxisRotation.inverse()*localRotationChildRest)._transformVector(tempRestRot);
+		Vector3d referenceCurr = (toAxisRotation.inverse()*localRotationChild)._transformVector(tempRestRot);
+
 
 		Quaterniond nonRollrotation;
 		nonRollrotation.setFromTwoVectors(referenceRest, referenceCurr);
 		
 		// Ejes Locales
-		jt->rTwist = localRotationChild*localRotationChildRest.inverse()*nonRollrotation.inverse();
+		jt->rTwist = (localRotationChild*localRotationChildRest.inverse()*nonRollrotation.inverse())*toAxisRotation.inverse();
+
+		Vector3d quatAxis(jt->rTwist.x(),jt->rTwist.y(),jt->rTwist.z());
+		//quatAxis = (localRotationChild).inverse()._transformVector(quatAxis);
+	
+		jt->rTwist.x() = quatAxis.x();
+		jt->rTwist.y() = quatAxis.y();
+		jt->rTwist.z() = quatAxis.z();
+
 	}
 
-	jt->restPos = jt->pos;
-	jt->restRot = jt->qOrient * jt->qrot;
+	// Ojo este punto... esto estaba junto.... o cosas parecidas...
 
+	jt->restPos = jt->pos;
+	jt->restRot = jt->qrot;
+	jt->restOrient = jt->qOrient;
 
 	//Eigen::Matrix3d rotationMatrix;
 	//rotationMatrix = jt->rRotation.toRotationMatrix();
@@ -405,7 +430,7 @@ void JointRender::computeWorldPosRec(joint* jt, joint* father)
 		axis.normalize();
 
 		Quaterniond localRotationChild =  jt->qOrient * jt->qrot;
-		Quaterniond localRotationChildRest =  jt->restRot;
+		Quaterniond localRotationChildRest =  jt->restOrient * jt->restRot;
 
 		Vector3d tempRestRot = father->rRotation.inverse()._transformVector(axis);
 

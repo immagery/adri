@@ -11,6 +11,27 @@
 
 void glVertex(Vector3d v) { glVertex3d(v.x(), v.y(), v.z()); }
 
+void drawOpaqueCircle(int res, double r)
+{
+
+    if (res < 4)
+        res = 4;
+
+    double passAngle = (2*M_PI )/ res;
+
+    glBegin(GL_TRIANGLES);
+
+    for(int i = 0; i< res; i++)
+	{
+        glVertex3d(0,cos(passAngle*i)*r,sin(passAngle*i)*r);
+		glVertex3d(0,cos(passAngle*(1+i))*r,sin(passAngle*(1+i))*r);
+		glVertex3d(0,0,0);
+	}
+
+    glEnd();
+
+}
+
 void drawCircle(int res, double r)
 {
 
@@ -29,6 +50,27 @@ void drawCircle(int res, double r)
 
     glEnd();
 
+}
+
+void drawOpaqueSphere(int res, double r)
+{
+    glDisable(GL_LIGHTING);
+    glPushMatrix();
+
+    //glColor3f(1.0,0,0);
+    drawOpaqueCircle(res, r);
+
+    glRotatef(90, 0,1,0); // rotar en y
+    //glColor3f(0,1.0,0);
+    drawOpaqueCircle(res,r);
+    glPopMatrix();
+
+    glPushMatrix();
+    //glColor3f(0,0,1.0); // rotar en x
+    glRotatef(90, 1,0,0);
+    drawOpaqueCircle(res, r);
+    glPopMatrix();
+    glEnable(GL_LIGHTING);
 }
 
 void drawSphere(int res, double r)

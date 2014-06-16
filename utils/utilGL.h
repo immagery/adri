@@ -23,7 +23,9 @@
 
 void glVertex(Vector3d v);
 void drawCircle(int res, double r);
+void drawOpaqueCircle(int res, double r);
 void drawSphere(int res, double r);
+void drawOpaqueSphere(int res, double r);
 void drawTriCircle(int res, double r);
 
 void drawPointLocator(Vector3d pt, float size, int type);
