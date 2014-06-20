@@ -7,6 +7,172 @@
 #include <utils\util.h>
 
 
+bool SaveOFFFromSurface(SurfaceGraph& graph, string& sFileName)
+{
+	FILE* fout;
+    fout = fopen(sFileName.c_str(), "w");
+
+	if(!fout) return false;
+
+	fprintf(fout, "OFF\n");
+	fprintf(fout, "%d %d %d\n", graph.nodes.size(), graph.triangles.size(), 0);
+
+	for(int i = 0; i< graph.nodes.size(); i++)
+	{
+		fprintf(fout, "%f %f %f\n", graph.nodes[i]->position.x(), graph.nodes[i]->position.y(), graph.nodes[i]->position.z() );
+	}
+
+	for(int i = 0; i< graph.triangles.size(); i++)
+	{
+		assert( graph.triangles[i]->verts[0]->pieceId  < graph.nodes.size());
+		assert( graph.triangles[i]->verts[1]->pieceId  < graph.nodes.size());
+		assert( graph.triangles[i]->verts[2]->pieceId  < graph.nodes.size());
+
+		fprintf(fout, "3 %d %d %d\n", graph.triangles[i]->verts[0]->pieceId, 
+									  graph.triangles[i]->verts[1]->pieceId, 
+									  graph.triangles[i]->verts[2]->pieceId);
+	}
+
+	fclose(fout);
+
+	 return true;
+}
+
+
+bool MergeMeshes(vector<string> sFileList, string result)
+{
+	int globalCountTriangles = 0;
+	int globalCountVertexes = 0;
+	vector<SurfaceGraph> graphs;
+	graphs.resize(sFileList.size());
+
+	for(int fidx = 0; fidx< sFileList.size(); fidx++)
+	{
+		string sFileName = sFileList[fidx];
+		SurfaceGraph& graph = graphs[fidx];
+
+		ifstream file;
+		file.open(sFileName.c_str(),  ios::in );
+
+		string line;
+		getline(file,line); // Format flag
+
+		if(line.compare("OFF") != 0) return false;
+		getline(file , line);
+		getline(file , line);
+
+		vector <string> elems;
+		getline(file , line);
+		split(line, ' ', elems);
+
+		int num1 = atoi(elems[0].c_str());
+		int num2 = atoi(elems[1].c_str());
+		int num3 = atoi(elems[2].c_str());
+
+		globalCountVertexes += num1;
+		globalCountTriangles += num2;
+
+		//Leemos los vertices
+		graph.nodes.resize(num1);
+		float value1, value2, value3;
+		for(int i = 0; i< num1; i++)
+		{
+			getline(file , line);
+			split(line, ' ', elems);
+			value1 = atof(elems[0].c_str());
+			value2 = atof(elems[1].c_str());
+			value3 = atof(elems[2].c_str());
+
+			graph.nodes[i] = new GraphNode(i);
+			graph.nodes[i]->position = Eigen::Vector3d(value1,value2,value3);
+		}
+
+		// Leemos las caras.
+		graph.triangles.resize(num2);
+		int polygonCount = 0;
+		int vertIdx = 0;
+		for(int i = 0; i< num2; i++)
+		{
+			getline(file , line);
+			split(line, ' ', elems);
+			polygonCount = atoi(elems[0].c_str());
+
+			graph.triangles[i] = new GraphNodePolygon(i);
+			graph.triangles[i]->verts.resize(polygonCount);
+
+			vector<int> indexes;
+			for(int j = 0; j< polygonCount; j++)
+			{
+				vertIdx = atoi(elems[j+1].c_str());
+				graph.triangles[i]->verts[j] = graph.nodes[vertIdx];
+				indexes.push_back(vertIdx);
+			}
+
+			for(int j = 0; j< polygonCount; j++)
+			{
+				int connNodeId = graph.nodes[indexes[(j+1)%polygonCount]]->id;
+				int founded = -1;
+				int conSize = graph.nodes[indexes[j]]->connections.size();
+				for(int conIdx = 0; conIdx < conSize && founded < 0; conIdx++)
+					if(graph.nodes[indexes[j]]->connections[conIdx]->id == connNodeId)
+						founded = conIdx;
+			
+				if(founded < 0)
+				{
+					graph.nodes[indexes[j]]->connections.push_back(graph.nodes[indexes[(j+1)%polygonCount]]);
+					graph.nodes[indexes[(j+1)%polygonCount]]->connections.push_back(graph.nodes[indexes[j]]);
+				}
+			}
+		}
+
+		file.close();
+	}
+
+	FILE* fout;
+    fout = fopen(result.c_str(), "w");
+
+	if(!fout) return false;
+
+	fprintf(fout, "OFF\n");
+	fprintf(fout, "%d %d %d\n", globalCountVertexes, globalCountTriangles, 0);
+
+	vector<int> startingIdx(graphs.size());
+	startingIdx[0] = 0;
+	 
+	// Primero todos los vertices
+	for(int igIdx = 0; igIdx< graphs.size(); igIdx++)
+	{
+		if(igIdx > 0) 
+		{
+			startingIdx[igIdx] = startingIdx[igIdx-1] + graphs[igIdx-1].nodes.size();
+		}
+
+		SurfaceGraph& graph = graphs[igIdx];
+		for(int i = 0; i< graph.nodes.size(); i++)
+		{
+			fprintf(fout, "%f %f %f\n", graph.nodes[i]->position.x(), 
+										graph.nodes[i]->position.y(), 
+										graph.nodes[i]->position.z() );
+		}
+	}
+
+	// Despues todos los triangulos
+	for(int igIdx = 0; igIdx< graphs.size(); igIdx++)
+	{
+		SurfaceGraph& graph = graphs[igIdx];
+		for(int i = 0; i< graph.triangles.size(); i++)
+		{
+			fprintf(fout, "3 %d %d %d\n", graph.triangles[i]->verts[0]->id + startingIdx[igIdx], 
+										  graph.triangles[i]->verts[1]->id + startingIdx[igIdx], 
+										  graph.triangles[i]->verts[2]->id + startingIdx[igIdx]);
+		}
+	}
+
+	fclose(fout);
+
+	return true;
+}
+
 bool BuildSurfaceFromOFFFile(SurfaceGraph& graph, string& sFileName)
 {
 	FILE* fin;

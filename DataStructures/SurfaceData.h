@@ -21,12 +21,14 @@ public:
 		connections.clear();
 		id = _id;
 		visited = false;
+		pieceId = -1;
 	}
 
 	GraphNode()
 	{
 		connections.clear();
 		visited = false;
+		pieceId= -1;
 	}
 
 	void copyFrom(GraphNode* gr)
@@ -34,6 +36,7 @@ public:
 		id = gr->id;
 		visited = gr->visited;
 		connections.clear();
+		pieceId = gr->pieceId;
 	}
 
 	~GraphNode()
@@ -42,6 +45,7 @@ public:
 	}
 
 	unsigned int id;
+	unsigned int pieceId;
 	vector<GraphNode* > connections;
 
 	Vector3d position;
@@ -143,6 +147,10 @@ public:
 // Builds the Sruface Graph form an OFF file
 // The file needs to be in a correct OFF format.
 bool BuildSurfaceFromOFFFile(SurfaceGraph& graph, string& sFileName);
+
+bool SaveOFFFromSurface(SurfaceGraph& graph, string& sFileName);
+
+bool MergeMeshes(vector<string> sFileList, string result);
 
 /////////////////////////////////////////
 /// \brief The PointData class

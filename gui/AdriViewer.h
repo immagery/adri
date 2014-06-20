@@ -179,7 +179,7 @@ public slots:
 
 	void paintGrid(gridRenderer* grRend);
 
-	void doTests(string fileName, string name, string path);
+	virtual void doTests(string fileName, string name, string path);
 	float calculateDistancesForISOLines(grid3d* grid, vector<double>&  embeddedPoint);
 
 	virtual void paintModelWithData();

@@ -86,6 +86,7 @@ void outliner::getSceneTree(Modelo* m,treeNode* root)
     root->nodeId = m->nodeId;
     root->type = NODETYPE_MODEL;
 
+	/*
     if(m->modelCage)
     {
         treeNode* modelCage = new treeNode();
@@ -112,5 +113,6 @@ void outliner::getSceneTree(Modelo* m,treeNode* root)
         stcage->type = NODETYPE_CAGE;
         root->childs.push_back(stcage);
     }
+	*/
 
 }

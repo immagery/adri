@@ -38,7 +38,7 @@ public slots:
 	void SaveSceneCompact();
 	void ClearScene();
 
-	void LaunchTests();
+	virtual void LaunchTests();
     void ImportNewModel();
     void CloseApplication();
     void enableStillCage(bool);

@@ -8,6 +8,8 @@
 //#include "HarmonicCoords.h"
 //#include "MeanValueCoords.h"
 
+#define DEBUG_OPS true
+
 #include <iostream>
 #include <fstream>
 
@@ -91,17 +93,6 @@ Modelo::Modelo() : Geometry()
     sModelPath = "";
     sModelPrefix = "";
 
-    modelCage = NULL;
-    dynCage = NULL;
-
-    currentCage = NULL;
-    //currentRender = this;
-
-    //embedding.clear();
-	//modelVertexDataPoint.clear();
-	//modelVertexBind.clear();
-	//bindings.clear();
-
 	bind = new binding();
 	computedBindings = false;
 	rigBinded = false;
@@ -116,10 +107,6 @@ Modelo::Modelo(unsigned int nodeId) : Geometry(nodeId)
     sModelPath = "";
     sModelPrefix = "";
 
-    modelCage = NULL;
-    dynCage = NULL;
-    currentCage = NULL;
-
 	originalModel = new Geometry(scene::getNewId(T_OBJECT));
 	originalModelLoaded = false;
 
@@ -133,17 +120,6 @@ Modelo::Modelo(unsigned int nodeId) : Geometry(nodeId)
 
 Modelo::~Modelo()
 {
-    delete modelCage;
-    delete dynCage;
-
-    for(unsigned int i = 0; i< stillCages.size(); i++)
-        delete stillCages[i];
-
-    stillCages.clear();
-
-    modelCage = NULL;
-    dynCage = NULL;
-    currentCage = NULL;
     //currentRender = NULL;
 
 	//modelVertexDataPoint.clear();
@@ -207,20 +183,13 @@ void Modelo::Clear()
 void Modelo::drawFunc()
 {
     // Pintamos este modelo
-	//Geometry::drawFunc();
 	((ModeloRender*)shading)->drawFunc(this);
-
-    // Pintamos la caja que toque.
-    if(!currentCage)
-    {
-        if(modelCage)
-             currentCage = modelCage;
-    }
 
     shading->beforeDraw(this); // Las cajas y demás se moverán solidarias.
 
-    if(currentCage)
-        currentCage->drawFunc();
+	// Objects associated
+    //if(currentCage)
+    //    currentCage->drawFunc();
 
     shading->afterDraw(this);
 }
@@ -235,6 +204,7 @@ bool Modelo::select(bool bToogle, unsigned int id)
     if(shading) shading->selected = ( id == nodeId) & bToogle;
 	selected = ( id == nodeId) & bToogle;
 
+	/*
     if(modelCage && modelCage->shading != NULL)
     {
         bool sel = id == modelCage->nodeId;
@@ -266,6 +236,7 @@ bool Modelo::select(bool bToogle, unsigned int id)
                 currentCage = stillCages[i];
         }
     }
+	*/
 
 	return selected;
 }
@@ -288,6 +259,7 @@ void BuildSurfaceGraphs(Modelo* m)
 	vector<bool> visIds;
 	visIds.resize(m->nodes.size(),false);
 	connIds.resize(m->nodes.size(), -1);
+	vector<int> harvestIds;
 
 	for(unsigned int n = 0; n < nodes.size(); n++)
 	{
@@ -318,146 +290,147 @@ void BuildSurfaceGraphs(Modelo* m)
 			connIds[n] = idDispatcher;
 
 			// Initialization of variables for running
-			for(unsigned int v = 0; v < visIds.size(); v++)
-				visIds[v] = false;
+			for(unsigned int v = 0; v < visIds.size(); v++) visIds[v] = false;
 
+			// Visited
 			visIds[n] = true;
 
-			vector<int> frontIds; 
-			
+			// Add the neighbours
+			vector<int> frontIds; 			
 			for(int neigh = 0; neigh < nodes[n]->connections.size(); neigh++)
 				frontIds.push_back(nodes[n]->connections[neigh]->id);
 
-			vector<int> harvestIds; harvestIds.push_back(idDispatcher);
-			propagateIdFromNode(idDispatcher, frontIds, harvestIds, visIds, connIds, nodes);
+			harvestIds.push_back(idDispatcher);
+			propagateIdFromNode(idDispatcher, frontIds, visIds, connIds, nodes);
 		}
 	}
 
 	printf("Count of connex components: %d\n", idDispatcher+1);
 
-	// Recopilation of dispatched ID's
-	vector<bool> founded;
-	founded.resize(idDispatcher+1, false);
-	for(int conId = 0; conId < connIds.size(); conId++)
+	if(DEBUG_OPS)
 	{
-		bool foundAll = true;
-		for(int i = 0; i<= idDispatcher; i++)
+		// Check if all the vertices are assigned
+		printf("Checking connexions...\n");
+		for(unsigned int n = 0; n < nodes.size(); n++)
 		{
-			foundAll &= founded[i];
-			if(!founded[i]) 
-			{ 
-				founded[i] = connIds[conId] == i;
-			}
+			if(connIds[n] < 0)
+			{
+				printf("Aqui hay un problema con las conexiones, nodo %d\n", n);
+			}		
 		}
-		if(foundAll) 
-			break;
+
+		printf("Posibles ids:\n");
+		for(int r = 0; r < harvestIds.size(); r++)
+		{
+			printf("%d ", harvestIds[r]);
+		}
+		printf("\n");
 	}
 
-	// Reorder the ID's
-	int relateId = 0;
-	map<int, int> relateGraphId;
-	for(int f = 0; f < founded.size(); f++)
+	map<int, int> idsDispatched;
+
+	// Recopilation of dispatched ID's and reassignement
+	vector<bool> founded;
+	founded.resize(idDispatcher+1, false);
+	int newIdCount = 0;
+	for(int conId = 0; conId < connIds.size(); conId++)
 	{
-		if(founded[f])
+		map<int, int>::iterator it = idsDispatched.find(connIds[conId]);
+		if(it == idsDispatched.end())
 		{
-			relateGraphId[f] = relateId;
-			relateId++;
+			idsDispatched[connIds[conId]] = newIdCount;
+			newIdCount++;
 		}
 	}
 
 	// Apply the new ID and count the concidences
 	vector<int> graphNodesCounter;
-	graphNodesCounter.resize(relateId);
+	graphNodesCounter.resize(idsDispatched.size());
 	for(int i = 0; i< connIds.size(); i++)
 	{
-		connIds[i] = relateGraphId[connIds[i]];
+		connIds[i] = idsDispatched[connIds[i]];
 		graphNodesCounter[connIds[i]]++;
 	}
 
-	for(int i = 0; i < graphNodesCounter.size(); i++) 
+	if(DEBUG_OPS)
 	{
-		printf("[Connected part %d]-> %d# nodes\n", i, graphNodesCounter[i]);
+		map<int, int>::iterator it = idsDispatched.begin();
+		for(; it != idsDispatched.end(); it++) 
+		{
+			printf("[Connected part %d, %d]-> %d# nodes\n", it->first, 
+														    it->second, 
+															graphNodesCounter[it->second]);
+
+			if(graphNodesCounter[it->second] < 2 )
+				printf("   >>>   Hay un grupo degenerado   <<<   \n");
+
+		}
 	}
 
 	m->bind->resize(nodes.size());
 	binding* bd = m->bind;
 	bd->surfaces.resize(graphNodesCounter.size());
+
+	// Quiero probar que explota para que poder corregirlo.
 	if(graphNodesCounter.size() > 0)
-		bd->mainSurface = &bd->surfaces[0];
-	
-	//m->modelVertexDataPoint.resize(nodes.size());
-	//m->modelVertexBind.resize(nodes.size());
+		bd->mainSurface = NULL;//&bd->surfaces[0];
 
 	int globalCount = 0;
-
 	for(int bbIdx = 0; bbIdx < bd->surfaces.size(); bbIdx++)
 	{
 		SurfaceGraph* subGraph = &bd->surfaces[bbIdx];
-		//bindings[bbIdx] = new binding(graphNodesCounter[bbIdx]);
-		//bindings[bbIdx]->bindId = bbIdx;
-
 		subGraph->nodes.resize(graphNodesCounter[bbIdx]);
 
-		//for(int i = 0; i< bindings[bbIdx]->surface.nodes.size(); i++)
-		//	bindings[bbIdx]->surface.nodes[i] = new GraphNode(i);
-
-		//vector<GraphNode*> subGraph;
-		//subGraph.resize(nodes.size(), NULL);
 		int count = 0;
 		for(int i = 0; i< nodes.size(); i++)
 		{
 			if(connIds[i] == bbIdx)
 			{
-				bd->surfaces[bbIdx].nodes[count] = nodes[i];
-				bd->pointData[globalCount].node = nodes[i];
-				bd->pointData[globalCount].component = bbIdx;
-				//m.modelVertexBind[nodes[i]->id] = bbIdx;
-				//m.modelVertexDataPoint[nodes[i]->id] = count;
-				count++;
-			}
+				nodes[i] -> pieceId = count;
 
-			globalCount++;
+				bd->surfaces[bbIdx].nodes[count] = nodes[i];
+				bd->pointData[nodes[i]->id].node = nodes[i];
+				
+				bd->pointData[nodes[i]->id].component = bbIdx;
+
+				count++;
+				globalCount++;
+			}
 		}
 
 		assert(count == graphNodesCounter[bbIdx]);
+	}
 
-		subGraph->triangles.resize(triangles.size());
-		count = 0;
+	assert(globalCount == nodes.size());
+
+	for(int bbIdx = 0; bbIdx < bd->surfaces.size(); bbIdx++)
+	{
+		SurfaceGraph* subGraph = &bd->surfaces[bbIdx];
+
+		// Count triangle coincidences
+		vector<int> triangleIds;
 		for(int i = 0; i< triangles.size(); i++)
 		{
-			bool found = true;
 			for(int trTemp = 0; trTemp < triangles[i]->verts.size(); trTemp++)
 			{
-				int vertId = triangles[i]->verts[trTemp]->id;
-				found &= (bd->pointData[vertId].component == bbIdx);
-			}
-
-			if(found)
-			{
-				subGraph->triangles[count] = triangles[i];
-				count++;
+				int vertId =  triangles[i]->verts[trTemp]->id;
+				int pieceId = triangles[i]->verts[trTemp]->pieceId;
+				// If any of the vertices are from this piece
+				if(bd->pointData[vertId].component == bbIdx)
+				{
+					triangleIds.push_back(i);
+					break;
+				}
 			}
 		}
 
-		subGraph->triangles.resize(count);
-		
-	}
-
-	// Guardamos una indirección para tener ordenados los pesos... esto podría variar
-	// para optimizar los cálculos.
-	/*
-	int counter = 0;
-	m.globalIndirection.resize(m.vn());
-	for(int i = 0; i< bindings.size(); i++)
-	{
-		for(int j = 0; j< bindings[i]->pointData.size(); j++)
+		// Copy the pointers
+		subGraph->triangles.resize(triangleIds.size());
+		for(int i = 0; i< triangleIds.size(); i++)
 		{
-			bindings[i]->globalIndirection[j] = counter;
-			m.globalIndirection[bindings[i]->pointData[j].node->id] = counter;
-			counter++;
+			subGraph->triangles[i] = triangles[triangleIds[i]];
 		}
 	}
-	*/
 
 	// Construimos una matriz de adyacencia que tambien
 	// recoge si una arista es borde(1) o no (2)
@@ -490,38 +463,49 @@ void BuildSurfaceGraphs(Modelo* m)
 			bd->pointData[conected].isBorder |= count < 2;
 		}
 	}
+
 }
 
-void propagateIdFromNode(int id, vector<int>& frontIds,vector<int>& harvestIds,vector<bool>& visIds,vector<int>& connIds,vector<GraphNode*> nodes)
+void propagateIdFromNode(int id, 
+						 vector<int>& frontIds,
+						 vector<bool>& visIds,
+						 vector<int>& connIds,
+						 vector<GraphNode*> nodes)
 {
 	while(frontIds.size() > 0)
 	{
 		int newId = frontIds.back();
 		frontIds.pop_back();
 
-		// Si ya ha sido visitado en este pase seguimos.
+		// Visited
 		if(visIds[newId]) continue;
 
 		int connId = connIds[newId];
-
-		if(connId < 0)
+		if(connId < 0) // Not assigned
 		{
 			connIds[newId] = id;
 			visIds[newId] = true;
 			for(unsigned int neigh = 0; neigh < nodes[newId]->connections.size(); neigh++)
+			{
+				if(!visIds[nodes[newId]->connections[neigh]->id])
 					frontIds.push_back(nodes[newId]->connections[neigh]->id);
+			}
 		}
 		else if(connId != id)
 		{
+			// Change the id for all the piece found
 			for(unsigned int i = 0; i< connIds.size(); i++)
+			{
 				if(connIds[i] == connId) 
 				{
 					connIds[i] = id;
-					visIds[newId] = true;
 				}
+			}
 
-			harvestIds.push_back(newId);
+			//harvestIds.push_back(newId);
 		}
+
+	
 	}
 }
 

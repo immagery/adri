@@ -3746,7 +3746,7 @@
   <action name="actionDoTests">
    <property name="icon">
     <iconset resource="modelViewerResources.qrc">
-     <normaloff>:/modelViewerGeneral/icons/folder-icon.png</normaloff>:/modelViewerGeneral/icons/folder-icon.png</iconset>
+     <normaloff>:/modelViewerGeneral/icons/Files-New-File-icon.png</normaloff>:/modelViewerGeneral/icons/Files-New-File-icon.png</iconset>
    </property>
    <property name="text">
     <string>doTests</string>
