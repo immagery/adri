@@ -97,6 +97,8 @@ Modelo::Modelo() : Geometry()
 	computedBindings = false;
 	rigBinded = false;
 
+	grid = NULL;
+
 	delete shading;
 	shading = new ModeloRender(this);
 }

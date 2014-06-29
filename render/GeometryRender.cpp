@@ -1,14 +1,6 @@
 #include <utils/utilGL.h>
 #include "GeometryRender.h"
 
-//#include <vcg/complex/allocate.h>
-//#include <vcg/complex/algorithms/update/normal.h>
-//#include <vcg/complex/algorithms/update/bounding.h>
-
-//#include <wrap/io_trimesh/import.h>
-//#include <wrap/io_trimesh/export.h>
-//#include "wrap/gl/trimesh.h"
-
 #include <DataStructures/Geometry.h> 
 
 void GeometryRender::drawNamesFunc(object* obj)
@@ -57,11 +49,14 @@ void GeometryRender::drawNamesFunc(object* obj)
 
 void GeometryRender::drawFunc(object* obj)
 {
+	// Selection disabled
+	/*
 	if(shMode == SH_MODE_SELECTION)
 	{
 		drawNamesFunc(obj);
 		return;
 	}
+	*/
 
     // transformaciones
     beforeDraw(obj);
@@ -87,16 +82,15 @@ void GeometryRender::drawFunc(object* obj)
 
 		for(int tr = 0; tr< geom->triangles.size(); tr++ )
 		{
-    		//if(shMode == SH_MODE_SELECTION) glPushName((GLuint)tr);
-
-			//glNormal3dv(&(*fi).N()[0]);
              for(int i = 0; i<3; i++)
              {
 				 int pIdx = geom->triangles[tr]->verts[i]->id;
 					
 				 if(shMode == SH_MODE_FLAT || shMode == SH_MODE_SELECTION)
 				 {
-					glNormal3d(geom->faceNormals[tr].x(), geom->faceNormals[tr].y(), geom->faceNormals[tr].z());
+					glNormal3d(geom->faceNormals[tr].x(), 
+							   geom->faceNormals[tr].y(), 
+							   geom->faceNormals[tr].z());
 				 }
 
                  if(size > 0 && pIdx < size)

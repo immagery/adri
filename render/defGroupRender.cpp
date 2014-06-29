@@ -35,10 +35,14 @@ void useModelMatrix(Quaterniond rot, Vector3d pos)
 
 	transformMatrix.transposeInPlace();
 
-	GLdouble multiplyingMatrix[16] = {transformMatrix(0,0), transformMatrix(0,1), transformMatrix(0,2), transformMatrix(0,3),
-									  transformMatrix(1,0), transformMatrix(1,1), transformMatrix(1,2), transformMatrix(1,3),
-									  transformMatrix(2,0), transformMatrix(2,1), transformMatrix(2,2), transformMatrix(2,3),
-								      transformMatrix(3,0), transformMatrix(3,1), transformMatrix(3,2), transformMatrix(3,3)
+	GLdouble multiplyingMatrix[16] = {transformMatrix(0,0), transformMatrix(0,1), 
+									  transformMatrix(0,2), transformMatrix(0,3),
+									  transformMatrix(1,0), transformMatrix(1,1), 
+									  transformMatrix(1,2), transformMatrix(1,3),
+									  transformMatrix(2,0), transformMatrix(2,1), 
+									  transformMatrix(2,2), transformMatrix(2,3),
+								      transformMatrix(3,0), transformMatrix(3,1), 
+									  transformMatrix(3,2), transformMatrix(3,3)
 									};
 
 	glMultMatrixd(multiplyingMatrix);
@@ -47,6 +51,9 @@ void useModelMatrix(Quaterniond rot, Vector3d pos)
 
 void drawOpaqueStickDefGroup(float length)
 {
+	if(length == 0)
+		return;
+
 	float relation = length*0.2;
 	float midRelation = relation/2.0;
 	Vector3d pts[4];
@@ -55,9 +62,7 @@ void drawOpaqueStickDefGroup(float length)
 	pts[2] = Vector3d( midRelation,  midRelation,  midRelation);
 	pts[3] = Vector3d( midRelation,  -midRelation,  midRelation);
 	
-	glDisable(GL_LIGHTING);
     glBegin(GL_TRIANGLES);
-
 	for(int pt = 0; pt < 4; pt++)
 	{
 		glVertex3d(0,0,0);
@@ -70,7 +75,6 @@ void drawOpaqueStickDefGroup(float length)
 	}
 
     glEnd();
-    glEnable(GL_LIGHTING);
 }
 
 void drawStickDefGroup(float length)
@@ -103,60 +107,6 @@ void drawStickDefGroup(float length)
     glEnable(GL_LIGHTING);
 }
 
-/*
-void drawLine(double x, double y, double z)
-{
-    glDisable(GL_LIGHTING);
-    glBegin(GL_LINES);
-
-    glVertex3d(0,0,0);
-    glVertex3d(x,y,z);
-
-    glEnd();
-    glEnable(GL_LIGHTING);
-}
-
-void drawBone(double l, double r)
-{
-
-    glDisable(GL_LIGHTING);
-    glBegin(GL_LINE_LOOP);
-
-    glVertex3d(r,r,r);
-    glVertex3d(r,-r,r);
-    glVertex3d(r,-r,-r);
-    glVertex3d(r,r,-r);
-    glVertex3d(r,r,r);  // repetimos el punto inicial para cerrar el círculo.
-
-    glEnd();
-
-    glBegin(GL_LINES);
-
-    glVertex3d(r,r,r);
-    glVertex3d(l,0,0);
-
-    glVertex3d(r,-r,r);
-    glVertex3d(l,0,0);
-
-    glVertex3d(r,-r,-r);
-    glVertex3d(l,0,0);
-
-    glVertex3d(r,r,-r);
-    glVertex3d(l,0,0);
-
-    glEnd();
-    glEnable(GL_LIGHTING);
-
-}
-
-void drawBoneStick(float radius, Eigen::Vector3d& pos)
-{
-	drawLine(0,0,0, pos.x(), pos.y(), pos.z());
-	//drawLine(1,0,0, pos.X(), pos.Y(), pos.Z());
-	//drawLine(1,0,0, pos.X(), pos.Y(), pos.Z());
-}
-*/
-
 void DefGroupRender::drawWithNames()
 {
 	DefGroup* g = group;
@@ -171,10 +121,8 @@ void DefGroupRender::drawWithNames()
 		glPushMatrix();
 		useModelMatrix(child->transformation->parentRot, g->transformation->translation);
 		Vector3d line = child->transformation->translation - g->transformation->translation;
-		
-		//glPushName(g->relatedGroups[groupIdx]->nodeId);
+
 		drawOpaqueStickDefGroup(line.norm());
-		//glPopName();
 
 		maxRelation = max(line.norm()*0.2, maxRelation);
 		glPopMatrix();
@@ -207,7 +155,10 @@ void DefGroupRender::drawFunc()
 	if(selected)
 		glColor3f(0.5,0.25,0.5);
 	else if(highlight)
+	{
+		//printf("highlight bone: %d - %s\n", g->nodeId, g->sName.c_str());
 		glColor3f(0.0,1.0,1.0);
+	}
 	else
 		glColor3f(1.0,1.0,1.0);
 

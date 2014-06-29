@@ -488,7 +488,7 @@ public:
 };
 
 
-void normalizeWeightsByDomain(binding *bd);
+void normalizeWeightsByDomain(binding *bd, int surfIdx);
 void cleanZeroInfluences(binding* bd);
 
 void loadBinding(binding* bd, string fileName, vector<skeleton*> skts);

@@ -46,26 +46,26 @@ bool SkeletonRender::updateSkeleton(skeleton* skt)
 
 void drawLine(double x1, double y1, double z1, double x2, double y2, double z2)
 {
-    glDisable(GL_LIGHTING);
+    //glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
 
     glVertex3d(x1,y1,z1);
     glVertex3d(x2,y2,z2);
 
     glEnd();
-    glEnable(GL_LIGHTING);
+    //glEnable(GL_LIGHTING);
 }
 
 void drawLine(double x, double y, double z)
 {
-    glDisable(GL_LIGHTING);
+    //glDisable(GL_LIGHTING);
     glBegin(GL_LINES);
 
     glVertex3d(0,0,0);
     glVertex3d(x,y,z);
 
     glEnd();
-    glEnable(GL_LIGHTING);
+    //glEnable(GL_LIGHTING);
 }
 
 void drawBone(double l, double r)
@@ -156,7 +156,7 @@ void JointRender::drawFunc(joint* jt)
 	{
 		if(jt->childs.size() == 1)
 		{
-			glDisable(GL_LIGHTING);
+			//glDisable(GL_LIGHTING);
 		
 			glLineWidth(5);
 			glBegin(GL_LINES);
@@ -167,7 +167,7 @@ void JointRender::drawFunc(joint* jt)
 
 			glEnd();
 			glLineWidth(1);
-			glEnable(GL_LIGHTING);
+			//glEnable(GL_LIGHTING);
 		}
 	}
 

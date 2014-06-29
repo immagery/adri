@@ -857,7 +857,8 @@ void AdriViewer::ReBuildScene(){
          ((gridRenderer*)escena->visualizers[i])->drawFunc(NULL);
      }
 
-
+	 shaderIdx curr = m_currentype;
+	 setShaderConfiguration(SHD_NO_SHADE);
      for(unsigned int i = 0; i< escena->skeletons.size(); i++)
      {
          if(!escena->skeletons[i] || !escena->skeletons[i]->shading->visible)
@@ -865,6 +866,8 @@ void AdriViewer::ReBuildScene(){
 
 		 ((skeleton*)escena->skeletons[i])->drawFunc();
      }
+	 setShaderConfiguration(curr);
+	 
 
      for(unsigned int i = 0; i< escena->models.size(); i++)
      {

@@ -739,88 +739,13 @@ void binding::saveCompactBinding(string fileName, map<int, string>& deformersRel
 	fclose(fout);
 }
 
-void normalizeWeightsByDomain(binding *bd)
+void normalizeWeightsByDomain(binding *bd, int surfIdx)
 {
-    for(int i = 0; i< bd->pointData.size(); i++)
+	int length = bd->surfaces[surfIdx].nodes.size();
+
+    for(int i = 0; i< length; i++)
     {
-        PointData* pd = &(bd->pointData[i]);
-		
-		/*
-		// TODELETE
-		if(pd->auxInfluences.size() == 0)
-		{
-			printf("No hay pesos que debatir\n");
-			continue;
-		}
-
-		if(pd->auxInfluences.size() == 1)
-		{
-			if(pd->domainId < 0)
-			{
-				pd->influences.push_back(pd->auxInfluences[0]);
-				pd->auxInfluences.clear();
-			}
-			else
-				assert(pd->domainId == pd->auxInfluences[0].label);
-			continue;
-		}
-		
-		float posibleGain = pd->auxInfluences.size();
-		if(posibleGain == 0)
-			continue;
-
-		// Obtener la influencia del padre y quitar lo que tocaria.
-        int fatherId = findWeight(pd->influences, pd->domainId);
-		float fatherWeightValue = 0;
-		bool fatherInfluenceInvolved = fatherId >= 0;
-		
-		if(fatherInfluenceInvolved)
-        {
-			fatherWeightValue = pd->influences[fatherId].weightValue;
-			assert(fatherWeightValue == pd->domain);
-        }
-
-		int fatherAuxId = findWeight(pd->auxInfluences, pd->domainId);
-		if(fatherAuxId < 0)
-		{
-			// No debería pasar.
-			assert(false);
-			continue;
-		}
-
-		float sumasigned = 0;
-        for(int infl = 0; infl< pd->auxInfluences.size(); infl++)
-        {
-            int l = pd->auxInfluences[infl].label;
-            if(l != pd->ownerLabel)
-			{
-				sumasigned+= pd->auxInfluences[infl].weightValue;
-				float w = pd->auxInfluences[infl].weightValue/posibleGain*pd->domain;
-				if(w > 0)
-				{
-					int inflId = findWeight(pd->influences,l);
-					if(inflId < 0)
-						pd->influences.push_back(weight(l,w));
-					else
-						pd->influences[inflId] = weight(l,w);
-				}
-			}
-        }
-
-
-		float w = (posibleGain-sumasigned)/posibleGain*pd->auxInfluences[fatherAuxId].weightValue*pd->domain;
-		
-		int inflId = findWeight(pd->influences,pd->ownerLabel);
-		if(inflId < 0)
-			pd->influences.push_back(weight(pd->ownerLabel,w));
-		else
-			pd->influences[inflId] = weight(pd->ownerLabel,w);
-
-		pd->auxInfluences.clear();
-
-		continue;
-		*/
-		
+        PointData* pd = &(bd->pointData[bd->surfaces[surfIdx].nodes[i]->id]);		
 
 		float childGain = 0;
         for(int infl = 0; infl< pd->auxInfluences.size(); infl++)

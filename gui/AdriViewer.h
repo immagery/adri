@@ -91,6 +91,8 @@ public:
     void toogleModelToLines();
     void toogleVisibility(bool toogle);
 
+	shaderIdx m_currentype;
+
 	virtual void setShaderConfiguration( shaderIdx type){}
 	virtual void setSmoothPasses(int , int ) {}
 	virtual void setTwistParams(double , double , bool, bool ){}

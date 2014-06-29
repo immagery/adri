@@ -151,8 +151,6 @@ public:
 
     ~cell3d();
 
-    void clear();
-
     // With these two functions the type is codified as a couple of booleans
     T_cell getType()
     {
@@ -207,6 +205,7 @@ public:
 
 class Modelo;
 
+
 // Uniform grid
 class grid3d
 {
@@ -215,19 +214,21 @@ public:
     // constructor
     grid3d();
 
-    grid3d(MyBox3 bounding, Eigen::Vector3i divisions, int weightsSize);
+    grid3d(MyBox3 bounding, Vector3i divisions, int weightsSize);
 
-    void initwithNoData(MyBox3 bounding_, Eigen::Vector3i divisions);
-    void init(MyBox3 bounding, Eigen::Vector3i divisions, int weightsSize);
+    void initwithNoData(MyBox3 bounding_, Vector3i divisions);
+    void init(MyBox3 bounding, Vector3i divisions, int weightsSize);
 
-	void getCoordsFromPoint(Eigen::Vector3d& pt, vector<weight>& weights);
-	void getCoordsFromPointSimple(Eigen::Vector3d& pt, vector<weight>& weights);
+	void clearData();
 
-	bool hasData(Eigen::Vector3i& pt);
-	bool isOut(Eigen::Vector3i& pt);
+	void getCoordsFromPoint(Vector3d& pt, vector<weight>& weights);
+	void getCoordsFromPointSimple(Vector3d& pt, vector<weight>& weights);
+
+	bool hasData(Vector3i& pt);
+	bool isOut(Vector3i& pt);
 	void copyValues(vector<weight>& weights, vector<weight>& weights_out);
 
-	Eigen::Vector3d getCenterOfCell(int i, int j, int k);
+	Vector3d getCenterOfCell(int i, int j, int k);
 
 	void initBasicData();
 
@@ -236,7 +237,7 @@ public:
     void updateStatistics();
 
     // Dimensiones del grid en los tres ejes (vcg)
-    Eigen::Vector3i dimensions;
+    Vector3i dimensions;
 
     // Resolution
     int res;
@@ -248,7 +249,7 @@ public:
     // Numero de vertices representados en el grid
     int weightSize;
 
-    // tama√±o del lado de la celda
+    // tamano del lado de la celda
     float cellSize;
 
     // Valores que pueden tomar los pesos del grid.
@@ -295,10 +296,12 @@ public:
     // Extiende por interior los pesos asignados en las celdas de los v√©rtices.
     void expandWeights();
 
-	// Extiende por interior los pesos asignados en las celdas de los vertices, optimizado para no morir en peso de memoria.
+	// Extiende por interior los pesos asignados en las celdas de los vertices, 
+	// optimizado para no morir en peso de memoria.
 	void expandWeightsOptimized(Modelo* m);
 
-    // Normaliza los valores para que estén entre 0 y 1, como todas las funciones son continuas, esta también debería serlo.
+    // Normaliza los valores para que estén entre 0 y 1, 
+	// como todas las funciones son continuas, esta también debería serlo.
     void normalizeWeights();
 
 	void normalizeWeightsOptimized();
@@ -314,10 +317,10 @@ public:
     //int typeCells(MyFace& face);
 
     // Devuelve la direccion de la celda a la que pertenece el punto.
-    Eigen::Vector3i cellId(Eigen::Vector3d pt);
+    Vector3i cellId(Eigen::Vector3d pt);
 
 	// Devuelve el centro de la celda en coordenadas de mundo.
-    Eigen::Vector3d cellCenter(int i,int j,int k);
+    Vector3d cellCenter(int i,int j,int k);
 
     // Rellena las celdas que quedan dentro de los contornos.
     // Se llama cuando el contorno ya est√° inicializado.
@@ -351,7 +354,11 @@ public:
 
 };
 
-void interpolateLinear(vector<weight>& result, vector<weight>& ptminWeights, vector<weight>& ptmaxWeights, float interpolationValue);
+void interpolateLinear( vector<weight>& result, 
+						vector<weight>& ptminWeights, 
+						vector<weight>& ptmaxWeights, 
+						float interpolationValue);
+
 void interpolateBiLinear(vector<weight>& result, 
 						 vector<weight>& pt01, 
 						 vector<weight>& pt02,

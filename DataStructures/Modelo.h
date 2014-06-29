@@ -7,6 +7,8 @@
 #include "grid3D.h"
 #include "SurfaceData.h"
 
+#include <DataStructures\AirVoxelization.h>
+
 class Modelo : public Geometry
 {
 public:
@@ -27,6 +29,9 @@ public:
 	binding* bind;
 	bool computedBindings;
 	bool rigBinded;
+
+	// Grid for analize volume
+	voxGrid3d* grid;
 
     string sModelPath; // Ruta donde est‡ el modelo
     string sModelPrefix; // Prefijo de los ficheros del modelo
