@@ -83,9 +83,12 @@ void voxGrid3d::mergeResults(voxGrid3d* grid, int idx)
 		{
 			for(int k = 0; k< grid->dimensions.z(); k++)
 			{
-				// Copiamos los contenidos del grid donde toca
-				T_cell type = grid->cells[i][j][k]->getType();
-				cells[i][j][k].push_back(new vox3D(idx, (T_vox)type ));
+				if(grid->cells[i][j][k].size() > 0)
+				{
+					// Copiamos los contenidos del grid donde toca
+					T_vox type = grid->cells[i][j][k][0]->getType();
+					cells[i][j][k].push_back(new vox3D(idx, (T_vox)type ));
+				}
 			}
 		}
 	}
