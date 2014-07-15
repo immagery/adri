@@ -16,7 +16,7 @@ public:
     /// max coordinate point
     Eigen::Vector3d max;
         /// The bounding box constructor
-    inline  MyBox3() { min.x()= 1;max.x()= -1;min.y()= 1;max.y()= -1;min.z()= 1;max.z()= -1;}
+	inline  MyBox3() { min.x() = 99999; max.x() = -99999; min.y() = 99999; max.y() = -99999; min.z() = 99999; max.z() = -99999; }
         /// Copy constructor
     inline  MyBox3( const MyBox3 & b ) { min=b.min; max=b.max; }
         /// Min Max constructor

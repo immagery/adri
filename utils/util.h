@@ -35,7 +35,7 @@ double timelapse(clock_t clock1,clock_t clock2);
 
 int indexOf(vector<int>& labels, int label);
 
-double round(double x);
+double roundUtil(double x);
 
 float sign(float v);
 
@@ -75,5 +75,11 @@ float kernelFunction(float partDistance,
                      bool invert,
                      double K = 100,
                      double alpha = 10);
+
+// Returns the min of each the component in a vector3d way
+Vector3d minPt(Vector3d pt1, Vector3d pt2);
+
+// Returns the max of each the component in a vector3d way
+Vector3d maxPt(Vector3d pt1, Vector3d pt2);
 
 #endif // UTIL_H
