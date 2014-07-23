@@ -6,7 +6,6 @@
 #include "GeometryRender.h"
 using namespace std;
 
-class GeometryRender;
 class object;
 class ModeloRender : public GeometryRender
 {    
@@ -20,6 +19,7 @@ class ModeloRender : public GeometryRender
         }
 
         virtual void drawFunc(object* obj);
+		virtual void drawAnalitics(object* obj);
 };
 
 #endif //MODELO_RENDER_H

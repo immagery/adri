@@ -58,6 +58,7 @@ void AdriMainWindow::connectSignals() {
     connect(ui->actionMove, SIGNAL(triggered()), this, SLOT(toogleMoveTool()));
     connect(ui->actionRotate, SIGNAL(triggered()), this, SLOT(toogleRotateTool()));
 
+	// Air create skeletons tools
 	connect(ui->actionCreateSkeletonTool, SIGNAL(triggered()), this, SLOT(toogleCreateSkeletonTool()));
 
 	connect(ui->CreateToolBtn, SIGNAL(released()), this, SLOT(setCreateTool()));
@@ -73,6 +74,8 @@ void AdriMainWindow::connectSignals() {
     connect(ui->visibility_btn, SIGNAL(stateChanged(int)), this, SLOT(toogleVisibility(int)));
 	connect(ui->drawSupportInfo, SIGNAL(stateChanged(int)), this, SLOT(toogleVisibility(int)));
 	connect(ui->defNodesSize, SIGNAL(valueChanged(int)), this, SLOT(toogleVisibility(int)));
+
+	connect(ui->Analisis_check_box, SIGNAL(clicked()), this, SLOT(analisisDataShow()));
 
 	connect(ui->vertex_colors_btn, SIGNAL(stateChanged(int)), this, SLOT(toogleVisibility(int)));
 
@@ -145,6 +148,14 @@ void AdriMainWindow::connectSignals() {
 
 	// Simulation
 	connect(ui->toggleSim, SIGNAL(clicked()), this, SLOT(toggleSimulation()));
+}
+
+void AdriMainWindow::analisisDataShow()
+{
+	bool enableAnalisisShow = ui->Analisis_check_box->isChecked();
+
+	ui->glCustomWidget->m_bShowAnalisis = enableAnalisisShow;
+
 }
 
 void AdriMainWindow::changeTwistParameters()

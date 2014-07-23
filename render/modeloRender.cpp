@@ -4,12 +4,8 @@
 
 #include <DataStructures/Modelo.h> 
 
-void ModeloRender::drawFunc(object* obj)
+void ModeloRender::drawAnalitics(object* obj)
 {
-	GeometryRender::drawFunc( obj);
-
-	if(shMode == SH_MODE_SELECTION) return;
-
 	// transformaciones
 	beforeDraw(obj);
 
@@ -17,18 +13,6 @@ void ModeloRender::drawFunc(object* obj)
 	Modelo* m = (Modelo*)obj;
 
 	glDisable(GL_LIGHTING);
-
-	/*
-	if(m->bind)
-	{
-		for(unsigned int trs = 0; trs < m->bind->virtualTriangles.size(); trs++ )
-		{
-			glVertex( m->bind->virtualTriangles[trs].pts[0]->node->position);
-			glVertex( m->bind->virtualTriangles[trs].pts[1]->node->position);
-			glVertex( m->bind->virtualTriangles[trs].pts[2]->node->position);
-		}
-	}
-	*/
 
 	if (m->grid)
 	{
@@ -56,13 +40,13 @@ void ModeloRender::drawFunc(object* obj)
 						v = (float)m->grid->cells[gridIdxX][gridIdxY][gridIdxZ][0]->pieceId / numPieces;
 						GetColour(v, 0, 1, r, g, b);
 
-						if (m->grid->cells[gridIdxX][gridIdxY][gridIdxZ][0]->getType() == VT_BOUNDARY)
-							glColor3d(r, g,b);
-						//else if (m->grid->cells[gridIdxX][gridIdxY][gridIdxZ][0]->getType() == VT_INTERIOR)
-						//	glColor3d(r, g, b);
+						if (m->grid->cells[gridIdxX][gridIdxY][gridIdxZ].size() > 0 && m->grid->cells[gridIdxX][gridIdxY][gridIdxZ][0]->pieceId == auxValue)
+						{
+								glColor3d(r, g, b);
+						}
 						else
 							continue;//glColor3d(1.0, 1.0, 1.0);
-					
+
 						glVertex3d(pt.x(), pt.y(), pt.z());
 					}
 				}
@@ -115,13 +99,20 @@ void ModeloRender::drawFunc(object* obj)
 		glVertex3d(boxMin.x(), boxMax.y(), boxMax.z());
 		glVertex3d(boxMax.x(), boxMax.y(), boxMax.z());
 
-		
+
 		glEnd();
 	}
 
+	glEnable(GL_LIGHTING);
+
+	afterDraw(obj);
+}
 
 
-    glEnable(GL_LIGHTING);
+void ModeloRender::drawFunc(object* obj)
+{
+	GeometryRender::drawFunc( obj);
 
-    afterDraw(obj);
+	if(shMode == SH_MODE_SELECTION) return;
+
 }

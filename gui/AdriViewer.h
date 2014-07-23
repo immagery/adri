@@ -154,10 +154,11 @@ public:
 	vector<joint*> CurrentProcessJoints;
 
     QString sPathGlobal;
+	bool m_bShowAnalisis;
+	AdriMainWindow *parent;
 
-    bool updateInfo();
+	bool updateInfo();
 
-    AdriMainWindow *parent;
 protected:
     virtual void drawWithNames();
     virtual void draw();
@@ -170,6 +171,7 @@ protected:
     virtual void mouseMoveEvent(QMouseEvent *e);
     virtual void mouseReleaseEvent(QMouseEvent *e);
 
+	virtual void setAuxValue(int value){ valueAux = value; }
 
 public slots:
 
@@ -238,7 +240,6 @@ private :
 
   QList<DrawObject*> objects_;
   QList<int> selection_;
-
 };
 
 #endif

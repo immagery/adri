@@ -121,6 +121,8 @@ public:
 
 		dirtyFlag = true;
 		segmentationDirtyFlag = true;
+		expansionDirtyFlag = true;
+		smoothDirtyFlag = true;
 
 		addedToComputations = false;
 
@@ -222,6 +224,9 @@ public:
 	bool addedToComputations;
 
 	bool creationDirtyFlag;
+
+	bool expansionDirtyFlag;
+	bool smoothDirtyFlag;
 
 	bool freeNode;
 

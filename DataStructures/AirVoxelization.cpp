@@ -100,7 +100,7 @@ void voxGrid3d::mergeResults(voxGrid3d* grid, int idx)
 
 	//printf("Dimensiones de copia: (%d %d %d)\n", grid->dimensions.x(), grid->dimensions.y(), grid->dimensions.z());
 
-	#pragma omp parallel for
+	//#pragma omp parallel for
 	for(int i = 0; i< grid->dimensions.x(); i++)
 	{
 		for(int j = 0; j< grid->dimensions.y(); j++)
@@ -321,7 +321,7 @@ int voxGrid3d::typeCells(SurfaceGraph* mesh)
 
 	// The max and min cell to explore.
 	Vector3i cellMin = cellId(SubSurfaceBounding.min);
-		Vector3i cellMax = cellId(SubSurfaceBounding.max);
+	Vector3i cellMax = cellId(SubSurfaceBounding.max);
 
 	// Expand the box
 	for (int comp = 0; comp < 3; comp++) if(cellMin[comp] > 0) cellMin[comp] -= 1;
@@ -523,13 +523,17 @@ bool voxGrid3d::isContained(Vector3i pos, int surfaceId, bool alsoBoundary)
 {
 	for (int i = 0; i < cells[pos.x()][pos.y()][pos.z()].size(); i++)
 	{
+		int piece = cells[pos.x()][pos.y()][pos.z()][i]->pieceId;
 		// If it is interior or boundary
-		if ( cells[pos.x()][pos.y()][pos.z()][i]->pieceId == surfaceId &&
-			(cells[pos.x()][pos.y()][pos.z()][i]->getType() == VT_INTERIOR || 
-			 cells[pos.x()][pos.y()][pos.z()][i]->getType() == VT_BOUNDARY ))
+		if (piece == surfaceId)
 		{
-			if (alsoBoundary && cells[pos.x()][pos.y()][pos.z()][i]->getType() == VT_BOUNDARY || !alsoBoundary)
-				return true;
+			T_vox type = cells[pos.x()][pos.y()][pos.z()][i]->getType();
+
+			if (type == VT_INTERIOR || type == VT_BOUNDARY)
+			{
+				if (!alsoBoundary && type == VT_BOUNDARY || alsoBoundary)
+					return true;
+			}
 		}
 	}
 
@@ -676,12 +680,12 @@ void VoxelizeModel(Modelo* m, bool onlyBorders)
 	MyBox3 bounding_;
 	m->getBoundingBox(bounding_.min, bounding_.max);
 
-	float dimValue = pow(2.0, 8);
+	float dimValue = pow(2.0, 7);
 	Vector3i divisions(dimValue, dimValue, dimValue);
 
-	Vector3d diagonal(bounding_.max.x() - bounding_.min.x(),
-		bounding_.max.y() - bounding_.min.y(),
-		bounding_.max.z() - bounding_.min.z());
+	Vector3d diagonal(	bounding_.max.x() - bounding_.min.x(),
+						bounding_.max.y() - bounding_.min.y(),
+						bounding_.max.z() - bounding_.min.z()  );
 
 	bounding_.min -= diagonal * 0.01;
 	bounding_.max += diagonal * 0.01;
@@ -701,13 +705,12 @@ void VoxelizeModel(Modelo* m, bool onlyBorders)
 	voxGrid3d* processGrid = new voxGrid3d();
 	processGrid->init(bounding_, divisions, cellSize);
 
-	if (!m->grid) 
-		m->grid = new voxGrid3d();
+	if (!m->grid)  m->grid = new voxGrid3d();
 
 	m->grid->init(bounding_, divisions, cellSize);
 
 	// process each grid
-	for (int surfIdx = 0; surfIdx< m->bind->surfaces.size(); surfIdx++)
+	for (int surfIdx = 0; surfIdx < m->bind->surfaces.size(); surfIdx++)
 	{
 		if (VERBOSE) printf("Procesing surface %d de %d\n", surfIdx, m->bind->surfaces.size());
 

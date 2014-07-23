@@ -121,9 +121,15 @@ public slots:
 	// Simulation
 	void toggleSimulation();
 
+	// Twist control
 	void changeTwistParameters();
 	void changeTwistParameters(int value);
+	
+	// Bulge control
 	void changeBulgeParameters();
+
+	// Computations visual analisis
+	void analisisDataShow();
 
 protected:
     virtual void keyPressEvent(QKeyEvent* event);

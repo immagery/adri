@@ -3265,6 +3265,19 @@
                 <string>Smooth Twist</string>
                </property>
               </widget>
+              <widget class="QCheckBox" name="Analisis_check_box">
+               <property name="geometry">
+                <rect>
+                 <x>280</x>
+                 <y>160</y>
+                 <width>91</width>
+                 <height>17</height>
+                </rect>
+               </property>
+               <property name="text">
+                <string>Analisis</string>
+               </property>
+              </widget>
              </widget>
              <widget class="QGroupBox" name="groupBox_12">
               <property name="geometry">

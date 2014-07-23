@@ -198,6 +198,13 @@ void Modelo::drawFunc()
     shading->afterDraw(this);
 }
 
+void Modelo::drawAnalitics()
+{
+	// Pintamos este modelo
+	((ModeloRender*)shading)->drawAnalitics(this);
+
+}
+
 bool Modelo::select(bool bToogle, unsigned int id)
 {
     //bool lo_tengo = false;
@@ -322,13 +329,6 @@ void BuildSurfaceGraphs(Modelo* m)
 				printf("Aqui hay un problema con las conexiones, nodo %d\n", n);
 			}		
 		}
-
-		printf("Posibles ids:\n");
-		for(int r = 0; r < harvestIds.size(); r++)
-		{
-			printf("%d ", harvestIds[r]);
-		}
-		printf("\n");
 	}
 
 	map<int, int> idsDispatched;

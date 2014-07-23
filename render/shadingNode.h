@@ -32,6 +32,8 @@ public:
 
 		highlight = false;
 
+		auxValue = 0;
+
 
     }
 
@@ -53,6 +55,8 @@ public:
 
 		shMode = SH_MODE_SMOOTH;
 		highlight = false;
+
+		auxValue = 0;
 	}
 
     bool visible;
@@ -80,6 +84,9 @@ public:
 	void afterDraw(object* obj);
 
 	//void drawFunc(object* obj);
+
+	void setAuxValue(int value) { auxValue = value; }
+	int auxValue;
 
 };
 

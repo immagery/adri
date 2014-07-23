@@ -173,23 +173,20 @@ class PointData
 	void saveToFile(FILE* fout);
 	void loadFromFile(ifstream& myfile);
 
-    // The cell contains a vertex or not
-    bool vertexContainer;
-
     // Color para representar varias cosas.
     Eigen::Vector3f color;
 
 	GraphNode* node;
 
-    // Segmentation labels
-    vector<double> embedding;
-
-    // Global owner node of the cell.
-    int segmentId;
+	// Global owner node of the cell.
+	int segmentId;
 
 	// Distance to the owner cell
 	float segmentDistance;
 
+    // Segmentation labels
+    vector<double> embedding;
+    
     // Intermediate owner of the cell, and its weight
     int ownerLabel;
     float ownerWeight;
@@ -201,7 +198,8 @@ class PointData
 
     // Domain of influcence
     float domain;
-    int domainId;
+
+	int domainId;
 
     // Iteration pass
     int itPass;
@@ -215,9 +213,6 @@ class PointData
 
     // Influences assigned to this cell
     vector<weight> influences;
-
-	// Influences assigned to this cell
-    //vector< vector<float> > secondInfluences;
 
 	// Influences temporary assigned to childs.
     vector< vector<secWeight> >secondInfluences;
