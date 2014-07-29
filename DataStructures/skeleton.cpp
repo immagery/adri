@@ -343,6 +343,34 @@ void joint::getRelatives(vector<joint*>& joints)
 }
 
 //JOINT
+void joint::copyBasicData(joint* inJoint, bool onlyRotation)
+{
+	if (!onlyRotation)
+		pos = inJoint->pos;
+
+	qrot = inJoint->qrot;
+	qOrient = inJoint->qOrient;
+
+	if (!onlyRotation)
+		translation = inJoint->translation;
+
+	rotation = inJoint->rotation;
+	twist = inJoint->twist;
+
+	// For precomputation
+	//worldPosition = inJoint->worldPosition;
+
+	/* Creo que no es necesario */
+	
+	//restOrient = inJoint->restOrient;
+
+	// Rest modelling
+	//restPos = inJoint->restPos;
+	//restRot = inJoint->restRot;
+
+
+}
+
 void joint::drawFunc()
 {    
 	

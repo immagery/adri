@@ -775,7 +775,7 @@ void normalizeWeightsByDomain(binding *bd, int surfIdx)
 				continue;
 			}
 
-			if (pd->domain > childGain)
+			if ((pd->domain - childGain) > FLT_EPSILON*2)
 			{
 				//printf("\n\nEn principio aqui no entra, porque el padre tambien juega.\n\n"); fflush(0);
 				if (pd->domainId >= 0)

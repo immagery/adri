@@ -52,7 +52,7 @@ public:
 	}
 
 	// adds a new joint to the skeleton
-	void addNewNode(Vector3d point);
+	DefGroup* addNewNode(Vector3d point);
 
 	// Deletes the last joint created (undo)
 	void removeLastNode();

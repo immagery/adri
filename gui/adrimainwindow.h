@@ -124,6 +124,9 @@ public slots:
 	// Twist control
 	void changeTwistParameters();
 	void changeTwistParameters(int value);
+
+	// General computation control
+	void changeGeneralParameters();
 	
 	// Bulge control
 	void changeBulgeParameters();

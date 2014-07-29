@@ -131,6 +131,9 @@ void AdriMainWindow::connectSignals() {
 	// Bulge control
 	connect(ui->bulgeEffectActivation, SIGNAL(clicked()), this, SLOT(changeBulgeParameters()));
 
+	// General Parameters
+	connect(ui->RT_interaction_check, SIGNAL(clicked()), this, SLOT(changeGeneralParameters()));
+
 	// Transform 
 	connect(ui->translationAmountX, SIGNAL(valueChanged(int)), this, SLOT(changeTransformTranslateAmountX(int)));
     connect(ui->translationAmountY, SIGNAL(valueChanged(int)), this, SLOT(changeTransformTranslateAmountY(int)));
@@ -179,6 +182,11 @@ void AdriMainWindow::changeBulgeParameters()
 	ui->glCustomWidget->setBulgeParams(ui->bulgeEffectActivation->isChecked());
 }
 
+void AdriMainWindow::changeGeneralParameters()
+{
+	ui->glCustomWidget->enableRTInteraction(ui->RT_interaction_check->isChecked());
+}
+ 
 AdriMainWindow::AdriMainWindow(QWidget *parent) :
     QMainWindow(parent), ui(new Ui::MainWindow)
 {

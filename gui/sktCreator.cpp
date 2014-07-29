@@ -40,82 +40,70 @@ void ComputeWithBoneOrientedRotations(joint* jt)
 	}
 }
 
-void sktCreator::addNewNode(Vector3d point)
+DefGroup* sktCreator::addNewNode(Vector3d point)
 {
-	if(last != NULL)
+	int actualRoot = -1;
+
+	// creation
+	DefGroup* df = new DefGroup(scene::getNewId(T_DEFNODE));
+	df->references = &(dynRig->defRig.defGroupsRef);
+	df->transformation = new joint(scene::getNewId(T_BONE));
+	joint* newJoint = df->transformation;
+
+	if (last != NULL)
 	{
-		// creation
-		DefGroup* df = new DefGroup(scene::getNewId(T_DEFNODE));
-		df->references = &(dynRig->defRig.defGroupsRef);
-		df->transformation = new joint(scene::getNewId(T_BONE));
-		joint* newJoint = df->transformation;
-
-		// position
-		newJoint->worldPosition = point;
-
-		// setting rotation and orientation?
-		newJoint->setRotation(0, 0, 0, false);
-		newJoint->setJointOrientation(0,0,0);
-
 		// child/father relation
+		// From DefGroup point of view
 		last->relatedGroups.push_back(df);
 		df->dependentGroups.push_back(last);
-		newJoint->father = last->transformation;
 
-		last->transformation->childs.push_back(newJoint);
-
-		//references
-		dynRig->defRig.defGroups.push_back(df);
-		dynRig->defRig.defGroupsRef[df->nodeId] = df;		
-		
-		// si solo hemos añadido uno
-		if(dynRig->defRig.defGroups.size() == 1 && dynRig->defRig.roots.size() == 0)
-			dynRig->defRig.roots.push_back(df);
-
-		newJoint->dirtyFlag = true;
-		df->dirtyFlag = true;
-
-		last = df;
+		// I'm not sure
+		// From joint point of view
+		//newJoint->father = last->transformation;
+		//last->transformation->childs.push_back(newJoint);
 	}
 	else
 	{
-		// creation
-		DefGroup* df = new DefGroup(scene::getNewId(T_DEFNODE));
-		df->references = &(dynRig->defRig.defGroupsRef);
-		df->transformation = new joint(scene::getNewId(T_BONE));
-		joint* newJoint = df->transformation;
-
-		// position
-		newJoint->worldPosition = point;
-
 		// setting rotation and orientation?
-		newJoint->setRotation(0, 0, 0, false);
-		newJoint->setJointOrientation(0,0,0);
+		//newJoint->setRotation(0, 0, 0, false);
+		//newJoint->setJointOrientation(0,0,0);
 
 		// child/father relation -> no parent relation
-		newJoint->father = NULL;
-
-		//references
-		dynRig->defRig.defGroups.push_back(df);
-		dynRig->defRig.defGroupsRef[df->nodeId] = df;		
-		
-		// si solo hemos añadido uno
-		if(dynRig->defRig.defGroups.size() == 1 && dynRig->defRig.roots.size() == 0)
-			dynRig->defRig.roots.push_back(df);
-
-		newJoint->dirtyFlag = true;
-		df->dirtyFlag = true;
-
-		last = df;
+		//newJoint->father = NULL;
+		dynRig->defRig.roots.push_back(df);
 	}
 
-	if(dynRig->defRig.roots.size() > 0)
-		ComputeWithWorldOrientedRotations(dynRig->defRig.roots[0]->transformation);
+	df->setTranslation(point.x(), point.y(), point.z(), false);
 
+
+	//references
+	dynRig->defRig.defGroups.push_back(df);
+	//dynRig->defRig.defGroupsRef[df->nodeId] = df;		
+	last = df;
+
+	// si solo hemos añadido uno
+	//if(dynRig->defRig.defGroups.size() == 1 && dynRig->defRig.roots.size() == 0)
+	//	dynRig->defRig.roots.push_back(df);
+
+	// dirty bits
 	dynRig->dirtyFlag = true;
+	newJoint->dirtyFlag = true;
+	df->dirtyFlag = true;
+
+	// Recompute worldPos
+	//for (int rootIdx = 0; rootIdx < dynRig->defRig.roots.size(); rootIdx++)
+	//{
+	//	dynRig->defRig.roots[rootIdx]->computeWorldPos(dynRig->defRig.roots[rootIdx]);
+	//}
+
+	df->computeWorldPos(df);
+
+	df->update();
 	dynRig->update();
 
 	//ComputeWithBoneOrientedRotations(dynSkt->root);
+
+	return df;
 }
 
 void sktCreator::removeLastNode()
@@ -158,21 +146,32 @@ void resetRestPose(DefGroup* groupDest)
 
 void copyDefGroup(DefGroup* groupDest, DefGroup* groupOrig)
 {
+	groupDest->deformers.resize(groupOrig->deformers.size());
 	for(int defIdx = 0; defIdx< groupOrig->deformers.size(); defIdx++)
 	{
-		groupOrig->deformers[defIdx] = groupDest->deformers[defIdx];
+		// TO_DEBUG
+		groupDest->deformers[defIdx] = groupOrig->deformers[defIdx];
 	}
 
-	if(groupOrig->transformation)
-		groupDest->transformation = new joint(*groupOrig->transformation);
+	if (groupOrig->transformation)
+	{
+		groupDest->transformation = new joint();
+		groupDest->transformation->copyFrom(groupOrig->transformation);
+	}
 	else
-		groupDest->transformation = NULL;
+		groupDest->transformation = new joint();
 
-	if(groupOrig->rigTransform)
-		groupDest->rigTransform = new joint(*groupOrig->rigTransform);
+	// I dont know what is it... 
+	if (groupOrig->rigTransform)
+	{
+		groupDest->rigTransform = new joint();
+		groupDest->rigTransform->copyFrom(groupOrig->rigTransform);
+	}
 	else
-		groupDest->rigTransform = NULL;
+		groupDest->rigTransform = new joint();
+	//
 
+	// Properties... generic
 	groupDest->subdivisionRatio = groupDest->subdivisionRatio;
 	groupDest->expansion = groupDest->expansion;
 	groupDest->smoothingPasses = groupDest->smoothingPasses;
@@ -210,6 +209,7 @@ void copyDefGroupsHierarchy(AirRig* strain, DefGroup* link, DefGroup* graft)
 	resetRestPose(sprout);
 
 	// Setting dirty flags triggers computation
+	sprout->dirtyFlag = true;
 	sprout->dirtyCreation = true;
 	sprout->dirtyTransformation = true;
 	sprout->dirtySegmentation = true;
@@ -220,6 +220,8 @@ void copyDefGroupsHierarchy(AirRig* strain, DefGroup* link, DefGroup* graft)
 
 	if(link != NULL)
 		sprout->dependentGroups.push_back(link);
+	else
+		link = sprout;
 
 	strain->defRig.defGroups.push_back(sprout);
 	strain->defRig.defGroupsRef[sprout->nodeId] = sprout;
@@ -239,27 +241,42 @@ void sktCreator::finishRig()
 
 	int firstIndexToCopy = 0;
 
-	if(parentNode != NULL)
+	if (parentNode != NULL)
 	{
-		// tengo que cargarme el primer nodo porque lo había copiado.
-		if(dynRig->defRig.defGroups.size() > 1)
+		// Solo copiamos si hay mas de uno, porque sino solo tenemos la base... estariamos duplicando.
+		if (dynRig->defRig.defGroups.size() > 1)
 		{
-			// Solo copiamos si hay mas de uno, porque sino solo tenemos la base... estariamos duplicando.
+			// Copia de la jerarquia
 			copyDefGroupsHierarchy(parentRig, parentNode, dynRig->defRig.roots[0]->relatedGroups[0]);
-			ComputeWithWorldOrientedRotations(parentNode->transformation);
+
+			// Correction for place the new branch in the correct place
+			Quaterniond qrotExtra = dynRig->defRig.roots[0]->relatedGroups[0]->transformation->rotation * parentNode->transformation->rotation.inverse();
+			parentNode->relatedGroups.back()->transformation->qrot = qrotExtra;
+			Vector3d worldPositionRel = dynRig->defRig.roots[0]->relatedGroups[0]->transformation->translation - parentNode->transformation->translation;
+			parentNode->relatedGroups.back()->transformation->pos = parentNode->transformation->rotation.inverse()._transformVector(worldPositionRel);
+
+			// Seleccionar el nodo de nuevo
 			parentNode->select(true, parentNode->nodeId);
+			parentNode->computeWorldPos(parentNode);
 		}
 	}
 	else
 	{
 		copyDefGroupsHierarchy(parentRig, parentNode, dynRig->defRig.roots[0]);
-		//parentRig->defRig.roots[0]->select(true, parentRig->defRig.roots[0]->nodeId);
-		dynRig->defRig.roots[0]->select(true, dynRig->defRig.roots[0]->nodeId);
+
+		parentNode = parentRig->defRig.roots.back();
+
+		parentNode->select(true, parentNode->nodeId);
+		parentNode->computeWorldPos(parentNode);
 	}
+
+	parentRig->dirtyFlag = true;
 
 	// 2. Clear the dyn rig
 	dynRig->defRig.roots.clear();
 	dynRig->defRig.defGroupsRef.clear();
+	for (int i = 0; i < dynRig->defRig.defGroups.size(); i++)
+		delete dynRig->defRig.defGroups[i];
 	dynRig->defRig.defGroups.clear();
 
 	// 3. Setup the states for further creation

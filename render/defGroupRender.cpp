@@ -186,7 +186,7 @@ void DefGroupRender::drawFunc()
 
 	drawAxisHandle(maxRelation*scene::drawingNodeStdSize);
 
-	if(scene::drawDefNodes)
+	if (scene::drawDefNodes && AirRig::mode != MODE_ANIM)
 	{
 		for(int defIdx = 0; defIdx < group->deformers.size(); defIdx++)
 		{

@@ -186,10 +186,12 @@ void Modelo::Clear()
 
 void Modelo::drawFunc()
 {
-    // Pintamos este modelo
-	((ModeloRender*)shading)->drawFunc(this);
+	ModeloRender* renderer = (ModeloRender*)shading;
 
-    shading->beforeDraw(this); // Las cajas y demás se moverán solidarias.
+    // Pintamos este modelo
+	renderer->drawFunc(this);
+
+	shading->beforeDraw(this); // Las cajas y demás se moverán solidarias.
 
 	// Objects associated
     //if(currentCage)
@@ -200,8 +202,16 @@ void Modelo::drawFunc()
 
 void Modelo::drawAnalitics()
 {
+	ModeloRender* renderer = (ModeloRender*)shading;
+
 	// Pintamos este modelo
-	((ModeloRender*)shading)->drawAnalitics(this);
+	//renderer->drawAnalitics(this);
+
+	// Draw original model
+	shadingMode oldMode = renderer->shtype;
+	renderer->shtype = shadingMode::T_LINES;
+	renderer->drawFunc(originalModel);
+	renderer->shtype = oldMode;
 
 }
 

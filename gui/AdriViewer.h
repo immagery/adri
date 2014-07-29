@@ -98,6 +98,8 @@ public:
 	virtual void setTwistParams(double , double , bool, bool ){}
 	virtual void setBulgeParams( bool ){}
 
+	virtual void enableRTInteraction(bool){}
+
     // State flags
     bool loadedModel;
     bool loadedCages;
@@ -209,6 +211,8 @@ public slots:
 	void showBarProgress(int value);
 
 	virtual void setSceneScale(float scale){}
+
+	virtual void resetAnimation(){}
 
 signals:
     void updateSceneView();
