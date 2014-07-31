@@ -134,6 +134,8 @@ public slots:
 	// Computations visual analisis
 	void analisisDataShow();
 
+	virtual void moveThroughHierarchy(int keyCode){ ui->glCustomWidget->moveThroughHierarchy(keyCode); }
+
 protected:
     virtual void keyPressEvent(QKeyEvent* event);
 

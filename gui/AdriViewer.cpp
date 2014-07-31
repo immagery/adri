@@ -1113,7 +1113,7 @@ void AdriViewer::drawSelectionRectangle() const
   glVertex2i(rectangle_.left(),  rectangle_.bottom());
   glEnd();
 
-  glLineWidth(2.0);
+  glLineWidth(2);
   glColor4f(0.4f, 0.4f, 0.5f, 0.5f);
   glBegin(GL_LINE_LOOP);
   glVertex2i(rectangle_.left(),  rectangle_.top());
@@ -1121,6 +1121,7 @@ void AdriViewer::drawSelectionRectangle() const
   glVertex2i(rectangle_.right(), rectangle_.bottom());
   glVertex2i(rectangle_.left(),  rectangle_.bottom());
   glEnd();
+  glLineWidth(1);
 
   glDisable(GL_BLEND);
   glEnable(GL_LIGHTING);

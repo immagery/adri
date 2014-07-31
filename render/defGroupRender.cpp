@@ -135,7 +135,7 @@ void DefGroupRender::drawWithNames()
 	
 	if(g->relatedGroups.size() == 0)
 	{
-		drawSphere(10, 1.0);
+		drawOpaqueSphere(10, scene::drawingNodeStdSize*0.2);
 		maxRelation = 1.0;
 	}
 
@@ -149,42 +149,42 @@ void DefGroupRender::drawFunc()
 
 	double maxRelation = 0;
 
-	glLineWidth(1);
-
 	// Render the bone shape
-	if(selected)
-		glColor3f(0.5,0.25,0.5);
-	else if(highlight)
-	{
-		//printf("highlight bone: %d - %s\n", g->nodeId, g->sName.c_str());
-		glColor3f(0.0,1.0,1.0);
-	}
-	else
-		glColor3f(1.0,1.0,1.0);
+	if(selected) glColor3f(0.5,0.25,0.5);
+	else if(highlight) glColor3f(0.0,1.0,1.0);
+	else glColor3f(1.0,1.0,1.0);
+	
+	glMatrixMode(GL_MODELVIEW);
 
+	float lineNorm = 0;
 	for(int groupIdx = 0; groupIdx < g->relatedGroups.size(); groupIdx++)
 	{
 		DefGroup* child = g->relatedGroups[groupIdx];
-		glPushMatrix();
-		useModelMatrix(child->transformation->parentRot, g->transformation->translation);
-		Vector3d line = child->transformation->translation - g->transformation->translation;
-		drawStickDefGroup(line.norm());
 
-		maxRelation = max(line.norm()*0.2, maxRelation);
+		glPushMatrix();
+
+		useModelMatrix(child->transformation->parentRot, g->transformation->translation);
+		
+		Vector3d line = child->transformation->translation - g->transformation->translation;
+		lineNorm = line.norm();
+
+		drawStickDefGroup(lineNorm);
+		
+		maxRelation = max(lineNorm*0.2, maxRelation);
+
 		glPopMatrix();
 	}
 
-	glMatrixMode(GL_MODELVIEW);
 	glPushMatrix();
 	useModelMatrix(g->transformation->rotation, g->transformation->translation);
 	
-	if(g->relatedGroups.size() == 0)
+	if (g->relatedGroups.size() == 0 || (g->relatedGroups.size() == 1 && lineNorm == 0))
 	{
-		drawTriCircle(20, scene::drawingNodeStdSize*0.5);
+		drawTriCircle(20, scene::drawingNodeStdSize*0.2);
 		maxRelation = 1.0;
 	}
 
-	drawAxisHandle(maxRelation*scene::drawingNodeStdSize);
+	drawAxisHandle(scene::drawingNodeStdSize*0.5);
 
 	if (scene::drawDefNodes && AirRig::mode != MODE_ANIM)
 	{

@@ -206,6 +206,8 @@ public slots:
 	virtual void setToolCrtMode(int ctx){}
 	virtual void setTool(ToolType ctx){}
 
+	virtual void moveThroughHierarchy(int keyCode){}
+
 	// UI INFO INTERFACE
 	void showInfo(string str);
 	void showBarProgress(int value);

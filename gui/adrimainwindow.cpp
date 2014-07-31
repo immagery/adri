@@ -328,16 +328,8 @@ void AdriMainWindow::updateSmoothSlidervalue(int)
 void AdriMainWindow::updateExpansionSlidervalue(int)
 {
     float valueAux = ui->expansionSlider->value();
-    float value = 0;
-    
-	/*if(valueAux <= 100)
-        value = ((float)ui->expansionSlider->value())/100.0;
-    else
-    {
-        value = (((valueAux-100)/100)*9)+1.0;
-    }*/
+	float value = (valueAux - 2500) / 5000.0 + 1.0;
 
-	value = valueAux / 1000.0;
 
     ui->expansionValueEdit->setText(QString("%1").arg(value));
 }
@@ -408,8 +400,11 @@ void AdriMainWindow::defGroupValueUpdate(float expansion, bool twistEnabled, boo
 {
 	ui->twistEnableCheck->setChecked(twistEnabled);
 
+
+	float value = ((expansion - 1.0) * 5000.0) + 2500;
+
 	ui->expansionValueEdit->setText(QString("%1").arg(expansion));
-	ui->expansionSlider->setValue(expansion*1000);
+	ui->expansionSlider->setValue(value);
 
 	ui->bulgeEffectActivation->setChecked(bulgeEnabled);
 
@@ -434,24 +429,11 @@ void AdriMainWindow::NodeDataUpdate(float iniTw, float finTw, bool enableTw, boo
 
 void AdriMainWindow::jointDataUpdate(float fvalue, int id)
 {
-	/*
-    if(fvalue <=1)
-    {
-		ui->expansionSlider->setValue((int)round(fvalue*100));
-    }
-    else
-    {
-        int value = ((int)round((fvalue-1)/9*100)+100);
-        ui->expansionSlider->setValue(value);
-    }*/
 
-	int value = (int)round(fvalue*1000.0);
-	if(value > 3000) value = 3000;
-	if(value < 1) value = 1;
+	float value = ((fvalue - 1.0) * 5000.0) + 2500;
 
 	ui->expansionSlider->setValue(value);
-
-    ui->expansionValueEdit->setText(QString("%1").arg((float)value/1000.0));
+	ui->expansionValueEdit->setText(QString("%1").arg((float)fvalue));
 	
     ui->DistancesVertSource->setValue(id);
     distancesSourceValueChange(id);
@@ -849,6 +831,8 @@ AdriMainWindow::~AdriMainWindow()
     delete ui;
 }
 
+
+
 void AdriMainWindow::keyPressEvent(QKeyEvent* event)
 {
     int current = 0;
@@ -915,6 +899,7 @@ void AdriMainWindow::keyPressEvent(QKeyEvent* event)
         ui->shadingModeSelection->setCurrentIndex(3);
         ui->infoData->setText("Lines shading mode");
         break;
+
     default:
         break;
     }

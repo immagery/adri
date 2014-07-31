@@ -42,6 +42,8 @@ void ComputeWithBoneOrientedRotations(joint* jt)
 
 DefGroup* sktCreator::addNewNode(Vector3d point)
 {
+	printf("Add new node...\n");
+
 	int actualRoot = -1;
 
 	// creation
@@ -206,6 +208,7 @@ void copyDefGroupsHierarchy(AirRig* strain, DefGroup* link, DefGroup* graft)
 
 	copyDefGroup(sprout, graft);
 
+
 	resetRestPose(sprout);
 
 	// Setting dirty flags triggers computation
@@ -218,8 +221,11 @@ void copyDefGroupsHierarchy(AirRig* strain, DefGroup* link, DefGroup* graft)
 	sprintf(name, "DefGroup%d", sprout->nodeId);
 	sprout->sName = name;
 
-	if(link != NULL)
+	if (link != NULL)
+	{
+		link->dirtyFlag = true;
 		sprout->dependentGroups.push_back(link);
+	}
 	else
 		link = sprout;
 

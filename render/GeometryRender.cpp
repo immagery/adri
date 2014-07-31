@@ -185,7 +185,7 @@ void GeometryRender::drawFunc(object* obj)
 
         glDisable(GL_LIGHTING);
         glColor3f(color[0], color[1], color[2]);
-		glLineWidth(1.0);
+
         for(int tr = 0; tr< geom->triangles.size(); tr++ )
 		{
              glBegin(GL_LINE_LOOP);
@@ -225,12 +225,9 @@ void GeometryRender::drawFunc(object* obj)
         else
             glColor3f(0.2, 1.0, 0.2);
 
-        //MyMesh::FaceIterator fi;
-        //for(fi = geom->face.begin(); fi!=geom->face.end(); ++fi )
         for(int tr = 0; tr< geom->triangles.size(); tr++ )
 		{
              glBegin(GL_LINE_LOOP);
-             glLineWidth(10.0);
              for(int i = 0; i<=3; i++) 
 			 {
 				glVertex(geom->triangles[tr]->verts[i%3]->position);
@@ -247,8 +244,6 @@ void GeometryRender::drawFunc(object* obj)
 
             glBegin(GL_POINTS);
             // vertices normales
-            //MyMesh::VertexIterator vi;
-            //for(vi = geom->vert.begin(); vi!=geom->vert.end(); ++vi )
             for(int vi = 0; vi < geom->nodes.size(); vi++ )
 			{
                 glVertex(geom->nodes[vi]->position);
