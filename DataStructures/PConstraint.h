@@ -1,6 +1,6 @@
 #ifndef PCONSTRAINT_H 
 #define PCONSTRAINT_H
-
+ 
 #include <DataStructures/Particle.h>
 
 enum contraint_type{EQUALITY = 0, INEQUALITY};

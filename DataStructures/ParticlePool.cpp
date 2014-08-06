@@ -3,7 +3,7 @@
 #define VELOCITY_CUT 0.001
 
 void ParticlePool::InitDefaultValues()
-{
+{ 
     poolSize = 0;
     pool.size();    
     gravity = -9.8;
@@ -59,13 +59,14 @@ void ParticlePool::simulate(float timeStep)
     // 1. Compute new velocity
     for(int partIdx = 0; partIdx < poolSize; partIdx++)
     {
-        pool[partIdx].v += timeStep*pool[partIdx].weight*computeExtforces(partIdx)*pool[partIdx].onlyRestrictionForces;
+        pool[partIdx].v += timeStep * pool[partIdx].weight *
+						   computeExtforces(partIdx) * pool[partIdx].onlyRestrictionForces;
     }
 
     // 2. DampVelocities
     dampVelocities();
 
-    //3. Compute estimations and assign as a init solution
+    //3. Compute estimations and assign as an init solution
      vector< Vector3d > dP(poolSize);
     for(int partIdx = 0; partIdx < poolSize; partIdx++)
     {
@@ -101,12 +102,6 @@ void ParticlePool::simulate(float timeStep)
         for(int constrIdx = 0; constrIdx < modelConstraints.size(); constrIdx++)
         {	
             modelConstraints[constrIdx]->solve(dP, numIterations);
-
-			/*for(int partIdx = 0; partIdx < poolSize; partIdx++)
-			{
-				if(dP[partIdx].x() != dP[partIdx].x())
-					int stop = 0;
-			}*/
         }
 
     }
@@ -125,7 +120,7 @@ void ParticlePool::simulate(float timeStep)
 
 Vector3d ParticlePool::computeExtforces(int partIdx)
 {
-    //TODEBUG
+    //TO_DEBUG
     // Now just gravity
     return Vector3d(0,gravity,0);
 }
@@ -144,10 +139,8 @@ void ParticlePool::dampVelocities()
 	}
 
 	return;
-	
 
-
-	// PROPOSED FOR PBD
+	// PROPOSED BY PBD
 	// 1-2. center of masses and its velocity
 	Vector3d cm(0,0,0);
 	Vector3d vm(0,0,0);

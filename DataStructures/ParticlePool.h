@@ -1,10 +1,10 @@
 #ifndef PARTICLE_POOL_H
 #define PARTICLE_POOL_H
 
-#include "DataStructures/node.h"
-#include "DataStructures/Particle.h"
-#include "DataStructures/PConstraint.h"
-#include "DataStructures/PPreConstraint.h"
+#include <DataStructures/node.h>
+#include <DataStructures/Particle.h>
+#include <DataStructures/PConstraint.h>
+#include <DataStructures/PPreConstraint.h>
 
 class ParticlePool : public node 
 {
