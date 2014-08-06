@@ -125,7 +125,7 @@ float det(Eigen::Vector3f u1, Eigen::Vector3f u2, Eigen::Vector3f u3)
             - u1[2]*u2[1]*u3[0] - u2[0]*u1[1]*u3[2] - u3[1]*u1[0]*u2[2] ;
 }
 
-double round(double x)
+double roundUtil(double x)
 {
 	return floor(x + 0.5);
 }
@@ -468,4 +468,24 @@ float kernelFunction(float partDistance,
 	weight = (weight-minV)/(maxV-minV);
 
     return weight;
+}
+
+Vector3d minPt(Vector3d pt1, Vector3d pt2)
+{
+	Vector3d minValue;
+	minValue.x() = min(pt1.x(), pt2.x());
+	minValue.y() = min(pt1.y(), pt2.y());
+	minValue.z() = min(pt1.z(), pt2.z());
+
+	return minValue;
+}
+
+Vector3d maxPt(Vector3d pt1, Vector3d pt2)
+{
+	Vector3d maxValue;
+	maxValue.x() = max(pt1.x(), pt2.x());
+	maxValue.y() = max(pt1.y(), pt2.y());
+	maxValue.z() = max(pt1.z(), pt2.z());
+
+	return maxValue;
 }

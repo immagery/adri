@@ -1,5 +1,5 @@
 #include <DataStructures\AirVoxelization.h>
-#include <DataStructures\grid3D.h>
+#include <DataStructures\Modelo.h>
 #include <utils\util.h>
 
 #include <iostream>
@@ -32,19 +32,39 @@ voxGrid3d::voxGrid3d()
 
 }
 
-void voxGrid3d::init(MyBox3 in_bounding, Vector3i divisions)
+voxGrid3d::~voxGrid3d()
+{
+	for (int i = 0; i< cells.size(); i++)
+	{
+		for (int j = 0; j< cells[i].size(); j++)
+		{
+			for (int k = 0; k< cells[i][j].size(); k++)
+			{
+				cells[i][j][k].clear();
+			}
+			cells[i][j].clear();
+		}
+		cells[i].clear();
+	}
+	cells.clear();
+}
+
+void voxGrid3d::init(MyBox3 in_bounding, Vector3i divisions, float _cellSize)
 {
 	bounding = in_bounding;
 	dimensions = divisions;
+	cellSize = _cellSize;
 	
-	cells.resize(divisions.x());
-	for(int i = 0; i< divisions.x(); i++)
+	cells.resize(dimensions.x());
+
+	#pragma omp parallel for
+	for (int i = 0; i< dimensions.x(); i++)
 	{
-		cells[i].resize(divisions.y());
-		for(int j = 0; j< divisions.y(); j++)
+		cells[i].resize(dimensions.y());
+		for (int j = 0; j< dimensions.y(); j++)
 		{
-			cells[i][j].resize(divisions.z());
-			for(int k = 0; k< divisions.z(); k++)
+			cells[i][j].resize(dimensions.z());
+			for (int k = 0; k< dimensions.z(); k++)
 			{
 				cells[i][j][k].clear();
 			}
@@ -54,6 +74,7 @@ void voxGrid3d::init(MyBox3 in_bounding, Vector3i divisions)
 
 void voxGrid3d::clearData()
 {
+	#pragma omp parallel for
 	for(int i = 0; i< cells.size(); i++)
 	{
 		for(int j = 0; j< cells[i].size(); j++)
@@ -77,18 +98,24 @@ void voxGrid3d::mergeResults(voxGrid3d* grid, int idx)
 			return;
 	   }
 
+	//printf("Dimensiones de copia: (%d %d %d)\n", grid->dimensions.x(), grid->dimensions.y(), grid->dimensions.z());
+
+	//#pragma omp parallel for
 	for(int i = 0; i< grid->dimensions.x(); i++)
 	{
 		for(int j = 0; j< grid->dimensions.y(); j++)
 		{
 			for(int k = 0; k< grid->dimensions.z(); k++)
 			{
-				if(grid->cells[i][j][k].size() > 0)
+				for (int typeIdx = 0; typeIdx < grid->cells[i][j][k].size(); typeIdx++)
 				{
-					// Copiamos los contenidos del grid donde toca
-					T_vox type = grid->cells[i][j][k][0]->getType();
-					cells[i][j][k].push_back(new vox3D(idx, (T_vox)type ));
-				}
+					T_vox type = grid->cells[i][j][k][typeIdx]->getType();
+					if (type == VT_INTERIOR || type == VT_BOUNDARY)
+					{
+						// Podemos hacer una comparacion para quedarnos con lo que es interior sobre lo que es borde.
+						cells[i][j][k].push_back(new vox3D(idx, (T_vox)type));
+					}
+				}				
 			}
 		}
 	}
@@ -112,6 +139,91 @@ bool voxGrid3d::hasData(Eigen::Vector3i& pt)
 	return false;
 }
 
+int voxGrid3d::fillFromCorners( Vector3i minCell, Vector3i maxCell)
+{
+	vector<Vector3i> listForProcess;
+	int cellsCount = 0;
+
+	// Encolamos los 8 extremos.
+	listForProcess.push_back( Vector3i( minCell.x(), minCell.y() , minCell.z() ));
+	listForProcess.push_back( Vector3i( minCell.x(), maxCell.y() , minCell.z() ));
+	listForProcess.push_back( Vector3i( minCell.x(), minCell.y() , maxCell.z() ));
+	listForProcess.push_back( Vector3i( minCell.x(), maxCell.y() , maxCell.z() ));
+
+	listForProcess.push_back( Vector3i(maxCell.x() , minCell.y() , minCell.z() ));
+	listForProcess.push_back( Vector3i(maxCell.x() , maxCell.y() , minCell.z() ));
+	listForProcess.push_back( Vector3i(maxCell.x() , minCell.y() , maxCell.z() ));
+	listForProcess.push_back( Vector3i(maxCell.x() , maxCell.y() , maxCell.z() ));
+
+	//Reset the visits
+	Vector3i newDimensions; 
+	newDimensions = maxCell - minCell + Vector3i(1,1,1);
+
+	// Mark the out boundingBox
+	#pragma omp parallel for
+	for (int dimX = 0; dimX < dimensions.x(); dimX++)
+	{
+		for (int dimY = 0; dimY < dimensions.y(); dimY++)
+		{
+			for (int dimZ = 0; dimZ < dimensions.z(); dimZ++)
+			{
+				if (dimX < minCell.x() || dimY < minCell.y() || dimZ < minCell.z() ||
+					dimX > maxCell.x() || dimY > maxCell.y() || dimZ > maxCell.z())
+				{
+					if (cells[dimX][dimY][dimZ].size() == 0)
+					{
+						cells[dimX][dimY][dimZ].push_back(new vox3D(VT_EXTERIOR));
+					}
+				}
+			}
+		}
+	}
+
+	// Expanding neighbours
+	vector<Vector3i> neighbours;
+	neighbours.push_back(Vector3i(0, 0, -1)); 
+	neighbours.push_back(Vector3i(0, 0, 1));
+	neighbours.push_back(Vector3i(0, -1, 0));
+	neighbours.push_back(Vector3i(0, 1, 0));
+	neighbours.push_back(Vector3i(-1, 0, 0));
+	neighbours.push_back(Vector3i(1, 0, 0));
+
+	// We try to empty the queue.
+	while (!listForProcess.empty())
+	{
+		Vector3i pos = listForProcess.back(); listForProcess.pop_back();
+
+		if (cells[pos.x()][pos.y()][pos.z()].size() == 0)
+		{
+			cells[pos.x()][pos.y()][pos.z()].push_back(new vox3D(VT_EXTERIOR));
+			cellsCount++;
+		}
+		else continue;
+
+		for (unsigned int l = 0; l< neighbours.size(); l++)
+		{
+			int i = neighbours[l].x();
+			int j = neighbours[l].y();
+			int k = neighbours[l].z();
+
+			Vector3i neighbourPos(pos.x() + i, pos.y() + j, pos.z() + k);
+
+			// We add cells if are inside the grid and are free
+			if (neighbourPos.x() >= minCell.x() && neighbourPos.y() >= minCell.y() && neighbourPos.z() >= minCell.z() &&
+				neighbourPos.x() <= maxCell.x() && neighbourPos.y() <= maxCell.y() && neighbourPos.z() <= maxCell.z())
+			{
+				Vector3i neighbourPosRelated = neighbourPos - minCell;
+				if (cells[neighbourPos.x()][neighbourPos.y()][neighbourPos.z()].size() == 0)
+				{
+					listForProcess.push_back(neighbourPos);
+				}
+			}
+		}
+	}
+
+	return cellsCount;
+}
+
 int voxGrid3d::fillFromCorners()
 {
     vector<Vector3i> listForProcess;
@@ -122,6 +234,7 @@ int voxGrid3d::fillFromCorners()
     listForProcess.push_back(Vector3i(0,dimensions.y()-1,0));
     listForProcess.push_back(Vector3i(0,0,dimensions.z()-1));
     listForProcess.push_back(Vector3i(0,dimensions.y()-1,dimensions.z()-1));
+
     listForProcess.push_back(Vector3i(dimensions.x()-1,0,0));
     listForProcess.push_back(Vector3i(dimensions.x()-1,dimensions.y()-1,0));
     listForProcess.push_back(Vector3i(dimensions.x()-1,0,dimensions.z()-1));
@@ -189,15 +302,35 @@ int voxGrid3d::typeCells(SurfaceGraph* mesh)
 {
     int TypedCells = 0;
 
+	int partValue = mesh->triangles.size() / 10;
+
 	for(int i = 0; i< mesh->triangles.size(); i++ )
 	{
         TypedCells += typeCells(mesh, i);
 	}
 
-    // Marcamos lo que es externo.
-    fillFromCorners();
+	// Get BoundingBox
+	MyBox3 SubSurfaceBounding;
+	for (unsigned int i = 1; i< mesh->nodes.size(); i++)
+	{
+		if (i == 0) SubSurfaceBounding.min = SubSurfaceBounding.max = mesh->nodes[0]->position;
 
-    // Marcamos lo que es interno.
+		SubSurfaceBounding.min = minPt(SubSurfaceBounding.min, mesh->nodes[i]->position);
+		SubSurfaceBounding.max = maxPt(SubSurfaceBounding.max, mesh->nodes[i]->position);
+	}
+
+	// The max and min cell to explore.
+	Vector3i cellMin = cellId(SubSurfaceBounding.min);
+	Vector3i cellMax = cellId(SubSurfaceBounding.max);
+
+	// Expand the box
+	for (int comp = 0; comp < 3; comp++) if(cellMin[comp] > 0) cellMin[comp] -= 1;
+	for (int comp = 0; comp < 3; comp++) if (cellMax[comp] < dimensions[comp]-1) cellMax[comp] += 1;
+
+	// Marcamos lo que es externo.
+	fillFromCorners(cellMin, cellMax);
+
+	// Marcamos lo que es interno.
     fillInside();
 
     return TypedCells;
@@ -373,46 +506,6 @@ int voxGrid3d::typeCells(SurfaceGraph* mesh, int triIdx)
         }
     }
 
-    
-    // Podemos ampliar el contorno para estabilizar m‡s el c‡lculo.
-    /*
-	for(int i = 0; i< cells.size(); i++)
-    {
-        for(int j = 0; j< cells[i].size(); j++)
-        {
-            for(int k = 0; k< cells[i][j].size(); k++)
-            {
-                if(cells[i][j][k]->tipo == BOUNDARY && !cells[i][j][k]->changed)
-                {
-
-                    for(int l = -1; l< 2; l++)
-                    {
-                        for(int m = -1; m< 2; m++)
-                        {
-                            for(int n = -1; n< 2; n++)
-                            {
-                                if(l == 0 && m == 0 && n == 0) continue;
-
-
-                                if(l+i < 0 || m+j < 0 || n+k < 0 || dimensions.x() <= l+i || dimensions.y() <= m+j || dimensions.z() <= n+k )  continue;
-
-                                if(cells[i][j][k]->tipo == BOUNDARY) continue;
-
-                                if(cells[i+l][j+m][k+n])
-                                {
-                                    cells[i+l][j+m][k+n]->tipo = BOUNDARY;
-                                    cells[i][j][k]->changed = true;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    */
-
      return boundaryCells;
 }
 
@@ -424,6 +517,29 @@ Vector3i voxGrid3d::cellId(Eigen::Vector3d pt)
     int z = (int)floor(aux.z()/cellSize);
     return Vector3i(x,y,z);
 }
+
+
+bool voxGrid3d::isContained(Vector3i pos, int surfaceId, bool alsoBoundary)
+{
+	for (int i = 0; i < cells[pos.x()][pos.y()][pos.z()].size(); i++)
+	{
+		int piece = cells[pos.x()][pos.y()][pos.z()][i]->pieceId;
+		// If it is interior or boundary
+		if (piece == surfaceId)
+		{
+			T_vox type = cells[pos.x()][pos.y()][pos.z()][i]->getType();
+
+			if (type == VT_INTERIOR || type == VT_BOUNDARY)
+			{
+				if (!alsoBoundary && type == VT_BOUNDARY || alsoBoundary)
+					return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 
 Vector3d voxGrid3d::cellCenter(int i,int j,int k)
 {
@@ -553,4 +669,67 @@ void voxGrid3d::LoadFromFile(ifstream& myfile)
 		data->LoadFromFile(myfile);
 	}
 	*/
+}
+
+
+///FUNCTIONS THAT DOES THE PROCESS
+void VoxelizeModel(Modelo* m, bool onlyBorders)
+{
+	clock_t begin = clock();
+
+	MyBox3 bounding_;
+	m->getBoundingBox(bounding_.min, bounding_.max);
+
+	float dimValue = pow(2.0, 7);
+	Vector3i divisions(dimValue, dimValue, dimValue);
+
+	Vector3d diagonal(	bounding_.max.x() - bounding_.min.x(),
+						bounding_.max.y() - bounding_.min.y(),
+						bounding_.max.z() - bounding_.min.z()  );
+
+	bounding_.min -= diagonal * 0.01;
+	bounding_.max += diagonal * 0.01;
+
+	double cellSize = diagonal.norm() / dimValue;
+
+	divisions.x() = ceil((bounding_.max.x() - bounding_.min.x()) / cellSize);
+	bounding_.max.x() = divisions.x()*cellSize + bounding_.min.x();
+
+	divisions.y() = ceil((bounding_.max.y() - bounding_.min.y()) / cellSize);
+	bounding_.max.y() = divisions.y()*cellSize + bounding_.min.y();
+
+	divisions.z() = ceil((bounding_.max.z() - bounding_.min.z()) / cellSize);
+	bounding_.max.z() = divisions.z()*cellSize + bounding_.min.z();
+
+	// Processing grid
+	voxGrid3d* processGrid = new voxGrid3d();
+	processGrid->init(bounding_, divisions, cellSize);
+
+	if (!m->grid)  m->grid = new voxGrid3d();
+
+	m->grid->init(bounding_, divisions, cellSize);
+
+	// process each grid
+	for (int surfIdx = 0; surfIdx < m->bind->surfaces.size(); surfIdx++)
+	{
+		if (VERBOSE) printf("Procesing surface %d de %d\n", surfIdx, m->bind->surfaces.size());
+
+		// 1. clear grid
+		processGrid->clearData();
+
+		// 2. process surface
+		processGrid->typeCells(&m->bind->surfaces[surfIdx]);
+
+		// 3. copy result
+		m->grid->mergeResults(processGrid, surfIdx);
+	}
+
+	delete processGrid;
+	processGrid = NULL;
+
+	if (VERBOSE)
+	{
+		clock_t end = clock();
+		cout << ">> TOTAL (construccion del grid desde cero): " << double(timelapse(begin, end)) << " s" << endl;
+	}
 }

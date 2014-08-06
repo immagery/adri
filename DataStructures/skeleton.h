@@ -69,6 +69,7 @@ class joint : public object
         joint(unsigned int nodeId);
         joint(joint* _father);
         joint(joint* _father, unsigned int nodeId);
+		void copyBasicData(joint* inJoint, bool onlyRotation = true);
         ~joint();
 
 		void initDefaults();

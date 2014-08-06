@@ -245,7 +245,6 @@ PointData::PointData()
     auxInfluences.clear();
 
     embedding.clear();
-    vertexContainer = false;
     itPass =-1;
 
 	secondInfluences.clear();
@@ -294,7 +293,6 @@ PointData::PointData(const PointData& pd)
 	for(int i = 0; i< pd.embedding.size(); i++)
 		embedding[i] = pd.embedding[i]; 
 
-	vertexContainer = pd.vertexContainer;
     itPass =-1;
 
     confidenceLevel = pd.confidenceLevel;
@@ -327,8 +325,6 @@ PointData::PointData(int weightsSize)
         influences.resize(weightsSize);
     else
         influences.clear();
-
-    vertexContainer = false;
 
     auxInfluences.clear();
     itPass =-1;
@@ -490,15 +486,20 @@ void cleanZeroInfluences(binding* bd)
     {
         PointData* pd = &(bd->pointData[i]);
 
+		vector<weight> tempInfluences(pd->influences.size());
+		int elements = 0;
+
         // Eliminamos los pesos igual a 0 o negativos
         pd->auxInfluences.clear();
+		
 		double weightsSum = 0;
 		int count = 0; 
         for(int infl = 0; infl < pd->influences.size(); infl++)
         {
             if(pd->influences[infl].weightValue > err)
 			{
-                pd->auxInfluences.push_back(pd->influences[infl]);
+				tempInfluences[elements] = pd->influences[infl];
+				elements++;
 				weightsSum += pd->influences[infl].weightValue;
 				count++;
 			}
@@ -513,20 +514,17 @@ void cleanZeroInfluences(binding* bd)
 
 		if(count > 0)
 			weightsSum /=count;
-		else
-		{
-			//printf("No tiene pesos\n"); 
-			//fflush(0);
-		}
+
+		// Si todos los elementos estan bien, pasamos
+		if (elements == pd->influences.size()) return;
 
         pd->influences.clear();
-		pd->influences.resize(pd->auxInfluences.size());
+		pd->influences.resize(elements);
         
-		for(int infl = 0; infl < pd->auxInfluences.size(); infl++)
-        {
-			pd->influences[infl] = weight(pd->auxInfluences[infl].label, pd->auxInfluences[infl].weightValue/weightsSum);
-        }
-		pd->auxInfluences.clear();
+		for (int infl = 0; infl < elements; infl++)
+			pd->influences[infl] = weight(tempInfluences[infl].label, tempInfluences[infl].weightValue / weightsSum);
+
+		tempInfluences.clear();
     }
 }
 
@@ -741,95 +739,106 @@ void binding::saveCompactBinding(string fileName, map<int, string>& deformersRel
 
 void normalizeWeightsByDomain(binding *bd, int surfIdx)
 {
+
 	int length = bd->surfaces[surfIdx].nodes.size();
+	int numBlocks = 8;
+	int valuesPerBlock = (int)ceil((float)length / (float)numBlocks);
+	
+	#pragma omp parallel for
+	for (int idxBlock = 0; idxBlock < numBlocks; idxBlock++)
+	{
+		int iniBlock = idxBlock*valuesPerBlock;
+		int finBlock = iniBlock + valuesPerBlock;
 
-    for(int i = 0; i< length; i++)
-    {
-        PointData* pd = &(bd->pointData[bd->surfaces[surfIdx].nodes[i]->id]);		
+		for (int i = iniBlock; i < finBlock && i < length; i++)
+		///for (int i = 0; i < length; i++)
+		{
+			PointData* pd = &(bd->pointData[bd->surfaces[surfIdx].nodes[i]->id]);
 
-		float childGain = 0;
-        for(int infl = 0; infl< pd->auxInfluences.size(); infl++)
-        {
-			// DEBUG info -> to comment
-			float err = (1/pow(10.0,5.0));
-            if(pd->auxInfluences[infl].weightValue < 0 || (pd->auxInfluences[infl].weightValue - 1.0)>err)
+			float childGain = 0;
+			for (int infl = 0; infl < pd->auxInfluences.size(); infl++)
 			{
-				// Algo está pasando...
-                printf("hay algun problema en la asignacion de pesos.\n");
+				// DEBUG info -> to comment
+				float err = (1 / pow(10.0, 5.0));
+				if (pd->auxInfluences[infl].weightValue < 0 || (pd->auxInfluences[infl].weightValue - 1.0)>err)
+				{
+					// Algo está pasando...
+					printf("hay algun problema en la asignacion de pesos.\n");
+				}
+
+				childGain += pd->auxInfluences[infl].weightValue;
 			}
 
-            childGain += pd->auxInfluences[infl].weightValue;
-        }
+			if (childGain == 0)
+			{
+				pd->auxInfluences.clear();
+				continue;
+			}
 
-		if(childGain == 0)
-        {
-            pd->auxInfluences.clear();
-            continue;
-        }
-
-        if(pd->domain > childGain)
-        {
-            //printf("\n\nEn principio aqui no entra, porque el padre tambien juega.\n\n"); fflush(0);
-            if(pd->domainId >= 0)
-            {
-                // Obtener la influencia del padre y quitar lo que tocaria.
-                int fatherId = findWeight(pd->influences, pd->domainId);
-                if(fatherId >= 0)
-                {
-					//float rest = pd->auxInfluences.size()-childGain+;
-                    pd->influences[fatherId].weightValue = pd->domain - childGain;
-                
-				    for(int infl = 0; infl< pd->auxInfluences.size(); infl++)
+			if ((pd->domain - childGain) > FLT_EPSILON*2)
+			{
+				//printf("\n\nEn principio aqui no entra, porque el padre tambien juega.\n\n"); fflush(0);
+				if (pd->domainId >= 0)
+				{
+					// Obtener la influencia del padre y quitar lo que tocaria.
+					int fatherId = findWeight(pd->influences, pd->domainId);
+					if (fatherId >= 0)
 					{
-						int l = pd->auxInfluences[infl].label;
-						float w = pd->auxInfluences[infl].weightValue;
-						pd->influences.push_back(weight(l,w));
+						//float rest = pd->auxInfluences.size()-childGain+;
+						pd->influences[fatherId].weightValue = pd->domain - childGain;
+
+						for (int infl = 0; infl < pd->auxInfluences.size(); infl++)
+						{
+							int l = pd->auxInfluences[infl].label;
+							float w = pd->auxInfluences[infl].weightValue;
+							pd->influences.push_back(weight(l, w));
+						}
+					}
+					else
+					{
+						printf("No hay padre. Si no padre, no hijo...jeje\n"); fflush(0);
+						assert(false);
 					}
 				}
 				else
 				{
-					printf("No hay padre. Si no padre, no hijo...jeje\n"); fflush(0);
+					// Si es caso base tendría que cubrir todo el domain
 					assert(false);
 				}
-            }
+			}
 			else
 			{
-				// Si es caso base tendría que cubrir todo el domain
-				assert(false);
-			}
-        }
-        else
-        {
-            // Eliminamos el peso del padre, porque lo repartiremos.
-            if(pd->domainId >= 0)
-            {
-                int fatherId = findWeight(pd->influences, pd->domainId);
-                if(fatherId >= 0)
-                {
-                    if(pd->influences[fatherId].weightValue != pd->domain)
-                    {
-						assert(false);
-                        printf("Hay un problema de inicializacion del dominio...\n");
-                        fflush(0);
-                    }
+				// Eliminamos el peso del padre, porque lo repartiremos.
+				if (pd->domainId >= 0)
+				{
+					int fatherId = findWeight(pd->influences, pd->domainId);
+					if (fatherId >= 0)
+					{
+						if (pd->influences[fatherId].weightValue != pd->domain)
+						{
+							assert(false);
+							printf("Hay un problema de inicializacion del dominio...\n");
+							fflush(0);
+						}
 
-                    pd->influences[fatherId].weightValue = 0;
+						pd->influences[fatherId].weightValue = 0;
+					}
 				}
-            }
 
-			for(int infl = 0; infl< pd->auxInfluences.size(); infl++)
-			{
-				int l = pd->auxInfluences[infl].label;
-				float w = (pd->auxInfluences[infl].weightValue/childGain)*pd->domain;
-				pd->influences.push_back(weight(l,w));
+				for (int infl = 0; infl < pd->auxInfluences.size(); infl++)
+				{
+					int l = pd->auxInfluences[infl].label;
+					float w = (pd->auxInfluences[infl].weightValue / childGain)*pd->domain;
+					pd->influences.push_back(weight(l, w));
+				}
+
 			}
 
-        }
-		
-		// For test memory issues
-		for(int ai = 0; ai < pd->auxInfluences.size(); ai++)
-			pd->auxInfluences[ai] = weight(-1,0);
+			pd->auxInfluences.clear();
+		}
 
-		pd->auxInfluences.clear();
-    }
+	}
+
+	//clock_t fin = clock();
+	//printf("Fin Normalizacion:%fms\n", ((double)(fin-ini)) / CLOCKS_PER_SEC * 1000);
 }

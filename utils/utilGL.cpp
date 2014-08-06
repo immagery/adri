@@ -19,16 +19,19 @@ void drawOpaqueCircle(int res, double r)
 
     double passAngle = (2*M_PI )/ res;
 
-    glBegin(GL_TRIANGLES);
+	glDisable(GL_CULL_FACE);
+    glBegin(GL_QUADS);
 
+	float red = 0.9;
     for(int i = 0; i< res; i++)
 	{
         glVertex3d(0,cos(passAngle*i)*r,sin(passAngle*i)*r);
 		glVertex3d(0,cos(passAngle*(1+i))*r,sin(passAngle*(1+i))*r);
-		glVertex3d(0,0,0);
+		glVertex3d(0, cos(passAngle*(1 + i))*r*red, sin(passAngle*(1 + i))*r*red);
+		glVertex3d(0, cos(passAngle*i)*r*0.9, sin(passAngle*i)*r*red);
 	}
-
     glEnd();
+	glEnable(GL_CULL_FACE);
 
 }
 

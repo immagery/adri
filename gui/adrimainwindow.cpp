@@ -34,22 +34,12 @@ void AdriMainWindow::connectSignals() {
     connect(ui->import_distances, SIGNAL(triggered()), this, SLOT(ImportDistances()) );
 
     connect(ui->shadingModeSelection, SIGNAL(currentIndexChanged(int)), this, SLOT(ShadingModeChange(int)) );
-
     connect(ui->colorLayersCheck, SIGNAL(toggled(bool)), this, SLOT(EnableColorLayer(bool)) );
     connect(ui->ColorLayerSeletion, SIGNAL(valueChanged(int)), this, SLOT(ChangeColorLayerValue(int)) );
-
     connect(ui->actionImportSegementation, SIGNAL(triggered()), this, SLOT(DoAction()) );
-
-    //connect(ui->prop_function_updt, SIGNAL(released()), this, SLOT(ChangeSourceVertex()));
-
     connect(ui->DistancesVertSource, SIGNAL(valueChanged(int)), this, SLOT(distancesSourceValueChange(int)));
-
     connect(ui->actionExit, SIGNAL(triggered()), this, SLOT(CloseApplication()) );
-    //connect(ui->processGC,  SIGNAL(triggered()), ui->glCustomWidget, SLOT(processGreenCoordinates()) );
-    //connect(ui->processHC,  SIGNAL(triggered()), ui->glCustomWidget, SLOT(processHarmonicCoordinates()));
-    //connect(ui->processMVC, SIGNAL(triggered()), ui->glCustomWidget, SLOT(processMeanValueCoordinates()));
-   // connect(ui->processAll, SIGNAL(triggered()), ui->glCustomWidget, SLOT(processAllCoords()));
-    //connect(ui->deformedMeshCheck, SIGNAL(released()), ui->glCustomWidget, SLOT(showDeformedModelSlot()));
+
 
 	connect(ui->GridDraw_interior, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
     connect(ui->GridDraw_exterior, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
@@ -60,39 +50,15 @@ void AdriMainWindow::connectSignals() {
 
     connect(ui->cagesComboBox, SIGNAL(currentIndexChanged(int)), ui->glCustomWidget, SLOT(ChangeStillCage(int)));
     connect(ui->enableStillCage, SIGNAL(toggled(bool)), this, SLOT(enableStillCage(bool)));
-
-    connect(ui->HCGridDraw, SIGNAL(released()), ui->glCustomWidget, SLOT(showHCoordinatesSlot()));
     connect(ui->GridDraw_boundary, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
-
-    // Actualizaciones del grid.
-    //connect(ui->GridDraw_interior, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
-    //connect(ui->GridDraw_exterior, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
-    //connect(ui->allGrid_button, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
-    //connect(ui->gridSlices_button, SIGNAL(released()), ui->glCustomWidget, SLOT(updateGridRender()));
-    //connect(ui->SliceSelectorXY, SIGNAL(valueChanged(int)), ui->glCustomWidget, SLOT(ChangeSliceXY(int)));
-    //connect(ui->SliceSelectorXZ, SIGNAL(valueChanged(int)), ui->glCustomWidget, SLOT(ChangeSliceXZ(int)));
-
-	//connect(ui->nextStep_button, SIGNAL(released()), ui->glCustomWidget, SLOT(nextProcessStep()));
-	//connect(ui->allNextStep_button, SIGNAL(released()), ui->glCustomWidget, SLOT(allNextProcessSteps()));
-
-	connect(ui->prop_function_updt, SIGNAL(released()), ui->glCustomWidget, SLOT(PropFunctionConf()));
-
-    connect(ui->prop_function_updt, SIGNAL(released()), ui->glCustomWidget, SLOT(PropFunctionConf()));
-
     connect(ui->paintModel_btn, SIGNAL(released()), ui->glCustomWidget, SLOT(paintModelWithGrid()));
-    connect(ui->metricUsedCheck, SIGNAL(released()), ui->glCustomWidget, SLOT(PropFunctionConf()));
-
-    connect(ui->drawInfluences_check, SIGNAL(released()), ui->glCustomWidget, SLOT(showHCoordinatesSlot()));
-
-    connect(ui->coordTab, SIGNAL(currentChanged(int)), ui->glCustomWidget, SLOT(active_GC_vs_HC(int)));
-
     connect(ui->glCustomWidget, SIGNAL(updateSceneView()), this, SLOT(updateSceneView()));
     connect(ui->outlinerView, SIGNAL(clicked(QModelIndex)), this, SLOT(selectObject(QModelIndex)));
-
 	connect(ui->actionSelection, SIGNAL(triggered()), this, SLOT(toogleSelectionTool()));
     connect(ui->actionMove, SIGNAL(triggered()), this, SLOT(toogleMoveTool()));
     connect(ui->actionRotate, SIGNAL(triggered()), this, SLOT(toogleRotateTool()));
 
+	// Air create skeletons tools
 	connect(ui->actionCreateSkeletonTool, SIGNAL(triggered()), this, SLOT(toogleCreateSkeletonTool()));
 
 	connect(ui->CreateToolBtn, SIGNAL(released()), this, SLOT(setCreateTool()));
@@ -109,6 +75,8 @@ void AdriMainWindow::connectSignals() {
 	connect(ui->drawSupportInfo, SIGNAL(stateChanged(int)), this, SLOT(toogleVisibility(int)));
 	connect(ui->defNodesSize, SIGNAL(valueChanged(int)), this, SLOT(toogleVisibility(int)));
 
+	connect(ui->Analisis_check_box, SIGNAL(clicked()), this, SLOT(analisisDataShow()));
+
 	connect(ui->vertex_colors_btn, SIGNAL(stateChanged(int)), this, SLOT(toogleVisibility(int)));
 
 	connect(ui->actionDoTests, SIGNAL(triggered()), this, SLOT(LaunchTests()));
@@ -119,18 +87,8 @@ void AdriMainWindow::connectSignals() {
     connect(ui->exportWeights_btn, SIGNAL(released()), ui->glCustomWidget, SLOT(exportWeightsToMaya()));
 
     connect(ui->expansionSlider, SIGNAL(valueChanged(int)), this, SLOT(updateExpansionSlidervalue(int)));
-	//connect(ui->expansionSlider, SIGNAL(valueChanged(int)), this, SLOT(updateExpansionSlidervalue(int)));
-
 	connect(ui->thresholdSlider, SIGNAL(valueChanged(int)), this, SLOT(updateThresholdSlidervalue(int)));
 	connect(ui->threshold_enable, SIGNAL(toggled(bool)), this, SLOT(enableThreshold(bool)));
-	
-    //connect(ui->smoothPropagationSlider, SIGNAL(sliderReleased()), this, SLOT(changeSmoothSlider()));
-    //connect(ui->smoothPropagationSlider, SIGNAL(valueChanged(int)), this, SLOT(updateSmoothSlidervalue(int)));
-
-	//connect(ui->smoothingPasses, SIGNAL(valueChanged(int)), this, SLOT(changeSmoothingPasses(int)));
-
-	//connect(ui->auxValueInt, SIGNAL(valueChanged(int)), this, SLOT(changeAuxValueInt(int)));
-
 	connect(ui->glCustomWidget, SIGNAL(defGroupData(float, float, bool, bool, int)), this,
 							    SLOT(NodeDataUpdate(float, float, bool, bool, int)));
 
@@ -140,7 +98,6 @@ void AdriMainWindow::connectSignals() {
 	connect(ui->glCustomWidget, SIGNAL(labelsFromSelectedUpdate(int ,string )), this,
 								  SLOT(labelsFromSelectedUpdate(int ,string )));
 
-    //connect(ui->glCustomWidget, SIGNAL(jointDataShow(float, int)), this , SLOT(jointDataUpdate(float,int)));
 	connect(ui->glCustomWidget, SIGNAL(jointTransformationValues(float,float,float,float,float,float)), this , 
 								SLOT(jointTransformUpdate(float,float,float,float,float,float)));
 
@@ -174,6 +131,9 @@ void AdriMainWindow::connectSignals() {
 	// Bulge control
 	connect(ui->bulgeEffectActivation, SIGNAL(clicked()), this, SLOT(changeBulgeParameters()));
 
+	// General Parameters
+	connect(ui->RT_interaction_check, SIGNAL(clicked()), this, SLOT(changeGeneralParameters()));
+
 	// Transform 
 	connect(ui->translationAmountX, SIGNAL(valueChanged(int)), this, SLOT(changeTransformTranslateAmountX(int)));
     connect(ui->translationAmountY, SIGNAL(valueChanged(int)), this, SLOT(changeTransformTranslateAmountY(int)));
@@ -191,6 +151,14 @@ void AdriMainWindow::connectSignals() {
 
 	// Simulation
 	connect(ui->toggleSim, SIGNAL(clicked()), this, SLOT(toggleSimulation()));
+}
+
+void AdriMainWindow::analisisDataShow()
+{
+	bool enableAnalisisShow = ui->Analisis_check_box->isChecked();
+
+	ui->glCustomWidget->m_bShowAnalisis = enableAnalisisShow;
+
 }
 
 void AdriMainWindow::changeTwistParameters()
@@ -214,6 +182,11 @@ void AdriMainWindow::changeBulgeParameters()
 	ui->glCustomWidget->setBulgeParams(ui->bulgeEffectActivation->isChecked());
 }
 
+void AdriMainWindow::changeGeneralParameters()
+{
+	ui->glCustomWidget->enableRTInteraction(ui->RT_interaction_check->isChecked());
+}
+ 
 AdriMainWindow::AdriMainWindow(QWidget *parent) :
     QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -300,7 +273,8 @@ void AdriMainWindow::ClearScene()
 
 void AdriMainWindow::OpenNewScene()
 {
-    QFileDialog inFileDialog(0, "Selecciona un fichero", ui->glCustomWidget->sPathGlobal, "*.txt, *.snk");
+    //QFileDialog inFileDialog(0, "Selecciona un fichero", ui->glCustomWidget->sPathGlobal, "*.txt, *.snk");
+	QFileDialog inFileDialog(0, "Selecciona un fichero", ui->glCustomWidget->sPathGlobal, "");
     inFileDialog.setFileMode(QFileDialog::ExistingFile);
     QStringList fileNames;
      if (inFileDialog.exec())
@@ -354,16 +328,8 @@ void AdriMainWindow::updateSmoothSlidervalue(int)
 void AdriMainWindow::updateExpansionSlidervalue(int)
 {
     float valueAux = ui->expansionSlider->value();
-    float value = 0;
-    
-	/*if(valueAux <= 100)
-        value = ((float)ui->expansionSlider->value())/100.0;
-    else
-    {
-        value = (((valueAux-100)/100)*9)+1.0;
-    }*/
+	float value = (valueAux - 2500) / 5000.0 + 1.0;
 
-	value = valueAux / 1000.0;
 
     ui->expansionValueEdit->setText(QString("%1").arg(value));
 }
@@ -434,8 +400,11 @@ void AdriMainWindow::defGroupValueUpdate(float expansion, bool twistEnabled, boo
 {
 	ui->twistEnableCheck->setChecked(twistEnabled);
 
+
+	float value = ((expansion - 1.0) * 5000.0) + 2500;
+
 	ui->expansionValueEdit->setText(QString("%1").arg(expansion));
-	ui->expansionSlider->setValue(expansion*1000);
+	ui->expansionSlider->setValue(value);
 
 	ui->bulgeEffectActivation->setChecked(bulgeEnabled);
 
@@ -460,24 +429,11 @@ void AdriMainWindow::NodeDataUpdate(float iniTw, float finTw, bool enableTw, boo
 
 void AdriMainWindow::jointDataUpdate(float fvalue, int id)
 {
-	/*
-    if(fvalue <=1)
-    {
-		ui->expansionSlider->setValue((int)round(fvalue*100));
-    }
-    else
-    {
-        int value = ((int)round((fvalue-1)/9*100)+100);
-        ui->expansionSlider->setValue(value);
-    }*/
 
-	int value = (int)round(fvalue*1000.0);
-	if(value > 3000) value = 3000;
-	if(value < 1) value = 1;
+	float value = ((fvalue - 1.0) * 5000.0) + 2500;
 
 	ui->expansionSlider->setValue(value);
-
-    ui->expansionValueEdit->setText(QString("%1").arg((float)value/1000.0));
+	ui->expansionValueEdit->setText(QString("%1").arg((float)fvalue));
 	
     ui->DistancesVertSource->setValue(id);
     distancesSourceValueChange(id);
@@ -875,6 +831,8 @@ AdriMainWindow::~AdriMainWindow()
     delete ui;
 }
 
+
+
 void AdriMainWindow::keyPressEvent(QKeyEvent* event)
 {
     int current = 0;
@@ -941,6 +899,7 @@ void AdriMainWindow::keyPressEvent(QKeyEvent* event)
         ui->shadingModeSelection->setCurrentIndex(3);
         ui->infoData->setText("Lines shading mode");
         break;
+
     default:
         break;
     }

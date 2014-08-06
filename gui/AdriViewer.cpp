@@ -118,6 +118,8 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
 
 	setSceneCenter(Vec(0,0,0));
     setSceneRadius(400);
+
+	m_bShowAnalisis = false;
 }
 
  AdriViewer::~AdriViewer()
@@ -158,7 +160,7 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
 	// Define 'Control+Q' as the new exit shortcut (default was 'Escape')
 	setShortcut(EXIT_VIEWER, Qt::CTRL+Qt::Key_Q);
 
-	setBackgroundColor(QColor(Qt::black));
+	setBackgroundColor(QColor(Qt::gray));
 	setFPSIsDisplayed(true);
 
     //testScene();
@@ -167,7 +169,8 @@ AdriViewer::AdriViewer(QWidget * parent , const QGLWidget * shareWidget, Qt::Win
 void AdriViewer::showInfo(string str)
 {
 	QString texto(str.c_str());
-	parent->ui->infoBar->setText(QString(INFO_STRING).arg(texto));
+	if (parent && parent->ui && parent->ui->infoBar)
+		parent->ui->infoBar->setText(QString(INFO_STRING).arg(texto));
 }
 void AdriViewer::showBarProgress(int value)
 {
@@ -859,6 +862,8 @@ void AdriViewer::ReBuildScene(){
 
 	 shaderIdx curr = m_currentype;
 	 setShaderConfiguration(SHD_NO_SHADE);
+
+
      for(unsigned int i = 0; i< escena->skeletons.size(); i++)
      {
          if(!escena->skeletons[i] || !escena->skeletons[i]->shading->visible)
@@ -1108,7 +1113,7 @@ void AdriViewer::drawSelectionRectangle() const
   glVertex2i(rectangle_.left(),  rectangle_.bottom());
   glEnd();
 
-  glLineWidth(2.0);
+  glLineWidth(2);
   glColor4f(0.4f, 0.4f, 0.5f, 0.5f);
   glBegin(GL_LINE_LOOP);
   glVertex2i(rectangle_.left(),  rectangle_.top());
@@ -1116,6 +1121,7 @@ void AdriViewer::drawSelectionRectangle() const
   glVertex2i(rectangle_.right(), rectangle_.bottom());
   glVertex2i(rectangle_.left(),  rectangle_.bottom());
   glEnd();
+  glLineWidth(1);
 
   glDisable(GL_BLEND);
   glEnable(GL_LIGHTING);

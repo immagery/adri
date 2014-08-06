@@ -121,9 +121,20 @@ public slots:
 	// Simulation
 	void toggleSimulation();
 
+	// Twist control
 	void changeTwistParameters();
 	void changeTwistParameters(int value);
+
+	// General computation control
+	void changeGeneralParameters();
+	
+	// Bulge control
 	void changeBulgeParameters();
+
+	// Computations visual analisis
+	void analisisDataShow();
+
+	virtual void moveThroughHierarchy(int keyCode){ ui->glCustomWidget->moveThroughHierarchy(keyCode); }
 
 protected:
     virtual void keyPressEvent(QKeyEvent* event);

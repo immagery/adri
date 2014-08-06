@@ -37,6 +37,7 @@ public:
     string sModelPrefix; // Prefijo de los ficheros del modelo
 
     virtual void drawFunc();
+	virtual void drawAnalitics();
 
 	// vertex and triangle counters
 	int vn() {return (int)nodes.size();}

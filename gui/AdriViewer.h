@@ -98,6 +98,8 @@ public:
 	virtual void setTwistParams(double , double , bool, bool ){}
 	virtual void setBulgeParams( bool ){}
 
+	virtual void enableRTInteraction(bool){}
+
     // State flags
     bool loadedModel;
     bool loadedCages;
@@ -154,10 +156,11 @@ public:
 	vector<joint*> CurrentProcessJoints;
 
     QString sPathGlobal;
+	bool m_bShowAnalisis;
+	AdriMainWindow *parent;
 
-    bool updateInfo();
+	bool updateInfo();
 
-    AdriMainWindow *parent;
 protected:
     virtual void drawWithNames();
     virtual void draw();
@@ -170,6 +173,7 @@ protected:
     virtual void mouseMoveEvent(QMouseEvent *e);
     virtual void mouseReleaseEvent(QMouseEvent *e);
 
+	virtual void setAuxValue(int value){ valueAux = value; }
 
 public slots:
 
@@ -202,11 +206,15 @@ public slots:
 	virtual void setToolCrtMode(int ctx){}
 	virtual void setTool(ToolType ctx){}
 
+	virtual void moveThroughHierarchy(int keyCode){}
+
 	// UI INFO INTERFACE
 	void showInfo(string str);
 	void showBarProgress(int value);
 
 	virtual void setSceneScale(float scale){}
+
+	virtual void resetAnimation(){}
 
 signals:
     void updateSceneView();
@@ -238,7 +246,6 @@ private :
 
   QList<DrawObject*> objects_;
   QList<int> selection_;
-
 };
 
 #endif

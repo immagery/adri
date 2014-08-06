@@ -116,6 +116,8 @@ Modelo::Modelo(unsigned int nodeId) : Geometry(nodeId)
 	computedBindings = false;
 	rigBinded = false;
 
+	grid = NULL;
+
 	delete shading;
 	shading = new ModeloRender(this);
 }
@@ -184,16 +186,33 @@ void Modelo::Clear()
 
 void Modelo::drawFunc()
 {
-    // Pintamos este modelo
-	((ModeloRender*)shading)->drawFunc(this);
+	ModeloRender* renderer = (ModeloRender*)shading;
 
-    shading->beforeDraw(this); // Las cajas y demás se moverán solidarias.
+    // Pintamos este modelo
+	renderer->drawFunc(this);
+
+	shading->beforeDraw(this); // Las cajas y demás se moverán solidarias.
 
 	// Objects associated
     //if(currentCage)
     //    currentCage->drawFunc();
 
     shading->afterDraw(this);
+}
+
+void Modelo::drawAnalitics()
+{
+	ModeloRender* renderer = (ModeloRender*)shading;
+
+	// Pintamos este modelo
+	//renderer->drawAnalitics(this);
+
+	// Draw original model
+	shadingMode oldMode = renderer->shtype;
+	renderer->shtype = shadingMode::T_LINES;
+	renderer->drawFunc(originalModel);
+	renderer->shtype = oldMode;
+
 }
 
 bool Modelo::select(bool bToogle, unsigned int id)
@@ -320,13 +339,6 @@ void BuildSurfaceGraphs(Modelo* m)
 				printf("Aqui hay un problema con las conexiones, nodo %d\n", n);
 			}		
 		}
-
-		printf("Posibles ids:\n");
-		for(int r = 0; r < harvestIds.size(); r++)
-		{
-			printf("%d ", harvestIds[r]);
-		}
-		printf("\n");
 	}
 
 	map<int, int> idsDispatched;

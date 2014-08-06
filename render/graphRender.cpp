@@ -14,7 +14,7 @@ void GraphRender::drawFunc(object* obj)
     glDisable(GL_LIGHTING);
     glColor3f(color[0], color[1], color[2]);
     
-	glLineWidth(3.0);	
+	glLineWidth(3);
 	glBegin(GL_LINES);
 	for(int node = 0; node < geom->nodes.size(); node++)
 	{
@@ -28,9 +28,11 @@ void GraphRender::drawFunc(object* obj)
 	}
 	glEnd();
 
+	glLineWidth(1);
+
 	float pointSize = 5;
 	glColor3f(0.5, 0, 0.5);
-	glPointSize(pointSize*0.9);
+	glPointSize(pointSize);
 
 	glBegin(GL_POINTS);
 	// vertices normales

@@ -171,26 +171,21 @@ bool Geometry::getBoundingBox(Eigen::Vector3d& minAuxPt,Eigen::Vector3d& maxAuxP
 {
 	if(nodes.size() < 0)
 	{
-		minBBox = maxBBox = minAuxPt = maxAuxPt = Eigen::Vector3d(0,0,0);
+		minBBox = maxBBox = minAuxPt = maxAuxPt = Vector3d(0,0,0);
 		return false;
 	}
 
-	double minValue[3], maxValue[3];	
-
-	for(int i = 0; i< 3; i++)
-		minValue[i] = maxValue[i] = nodes[0]->position[i];
+	Vector3d minValue, maxValue;	
+	minValue = maxValue = nodes[0]->position;
 
 	for(unsigned int i = 1; i< nodes.size(); i++)
 	{
-		for(int j = 0; j< 3; j++)
-		{
-			minValue[j] = min(minValue[j], nodes[i]->position[j]);
-			maxValue[j] = max(maxValue[j], nodes[i]->position[j]);
-		}
+		minValue = minPt(minValue, nodes[i]->position);
+		maxValue = maxPt(maxValue, nodes[i]->position);
 	}
 
-    minBBox = minAuxPt = Eigen::Vector3d(minValue[0], minValue[1], minValue[2]);
-    maxBBox = maxAuxPt = Eigen::Vector3d(maxValue[0], maxValue[1], maxValue[2]);
+    minBBox = minAuxPt = minValue;
+    maxBBox = maxAuxPt = maxValue;
     return true;
 }
 
